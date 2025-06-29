@@ -83,3 +83,8 @@
     padding-left: 0;
   }
 }
+.logo-link {
+  text-decoration: none;
+  color: inherit;
+  font-weight: bold;
+}

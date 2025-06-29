@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Navbar from '../components/Navbar'; // ✅ Adjust if your navbar path differs
+import Navbar from '../components/Navbar';
 import './RegisterSociety.css';
 import societyIllustration from '../assets/society-illustration.png'; // ✅ Use your illustration here
 
