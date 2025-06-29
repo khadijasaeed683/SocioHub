@@ -16,7 +16,7 @@ const LandingPage = () => {
       <section className="hero">
         <h1>Manage Your Campus Events Professionally</h1>
         <p>Your all-in-one hub for university societies and events.</p>
-        <Link to="/register-society" className="cta-btn">Get Started</Link>
+        <Link to="/register" className="cta-btn">Get Started</Link>
       </section>
 
       {/* Feature Sections */}
@@ -32,7 +32,7 @@ const LandingPage = () => {
       <section className="feature-section">
         <img src={joinImg} alt="Join Society" className="feature-img" />
         <div className="feature-text">
-          <h2>🙋 Join a Society</h2>
+          <h2>Join a Society</h2>
           <p>Find your favorite university society, send join requests, or join instantly with your edu email.</p>
           <Link to="/signup" className="feature-btn">Join Now</Link>
         </div>
@@ -40,7 +40,7 @@ const LandingPage = () => {
 
       <section className="feature-section">
         <div className="feature-text">
-          <h2>👀 Browse Public Events</h2>
+          <h2>Browse Public Events</h2>
           <p>Explore campus-wide public events and RSVP without logging in. Stay involved, effortlessly.</p>
           <Link to="/events" className="feature-btn">Explore Events</Link>
         </div>

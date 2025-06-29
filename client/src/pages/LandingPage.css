@@ -37,7 +37,7 @@
 
 .feature-section {
   display: flex;
-  align-items: center;
+  align-items: left;
   justify-content: space-between;
   padding: 60px 10%;
   gap: 40px;
