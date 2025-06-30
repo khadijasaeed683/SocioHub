@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import './ExploreEvents.css';
+import './RSVPForm.css'; // Assuming RSVPForm styles are here
 
 const dummyEvents = [
   {
@@ -31,11 +32,28 @@ const dummyEvents = [
 
 const ExploreEvents = () => {
   const [rsvpedEvents, setRsvpedEvents] = useState([]);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [formData, setFormData] = useState({ name: '', email: '', reason: '' });
 
-  const handleRSVP = (eventId) => {
-    if (!rsvpedEvents.includes(eventId)) {
-      setRsvpedEvents([...rsvpedEvents, eventId]);
-    }
+  const handleRSVPClick = (event) => {
+    setSelectedEvent(event);
+  };
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+
+    setRsvpedEvents((prev) => [...prev, selectedEvent._id]);
+    alert('RSVP submitted and is pending society approval.');
+
+    setSelectedEvent(null);
+    setFormData({ name: '', email: '', reason: '' });
+  };
+
+  const handleInputChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   return (
@@ -54,13 +72,55 @@ const ExploreEvents = () => {
 
               <button
                 disabled={rsvpedEvents.includes(event._id)}
-                onClick={() => handleRSVP(event._id)}
+                onClick={() => handleRSVPClick(event)}
               >
-                {rsvpedEvents.includes(event._id) ? 'RSVPed' : 'RSVP'}
+                {rsvpedEvents.includes(event._id) ? 'RSVP Pending' : 'RSVP'}
               </button>
             </div>
           ))}
         </div>
+
+        {/* RSVP Form Modal */}
+        {selectedEvent && (
+          <div className="rsvp-form-modal">
+            <div className="rsvp-form-container">
+              <h3>RSVP for {selectedEvent.title}</h3>
+              <form onSubmit={handleFormSubmit}>
+                <label>Your Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  required
+                />
+
+                <label>Your Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                />
+
+                <label>Reason for Attending (optional)</label>
+                <textarea
+                  name="reason"
+                  value={formData.reason}
+                  onChange={handleInputChange}
+                ></textarea>
+
+                <div className="form-actions">
+                  <button type="submit">Submit RSVP</button>
+                  <button type="button" onClick={() => setSelectedEvent(null)} className="cancel-btn">
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
