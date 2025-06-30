@@ -7,6 +7,7 @@ import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import UserDashboard from './pages/UserDashboard';
 import ExploreEvents from './pages/ExploreEvents';
+import JoinSociety from './pages/JoinSociety';
 
 const AppWrapper = () => {
   const [loggedInUser, setLoggedInUser] = useState(null);
@@ -32,6 +33,8 @@ const AppWrapper = () => {
       <Route path="/register" element={<SignupPage onSignup={handleSignup} />} />
       <Route path="/register-society" element={<RegisterSociety />} />
       <Route path="/events" element={<ExploreEvents />} />
+      <Route path="/JoinSociety" element={<JoinSociety />} />
+
 
 
       {/* 👤 Protected Route (sample only — no guard yet) */}

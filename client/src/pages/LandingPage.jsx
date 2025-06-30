@@ -34,7 +34,7 @@ const LandingPage = () => {
         <div className="feature-text">
           <h2>Join a Society</h2>
           <p>Find your favorite university society, send join requests, or join instantly with your edu email.</p>
-          <Link to="/signup" className="feature-btn">Join Now</Link>
+          <Link to="/JoinSociety" className="feature-btn">Join Now</Link>
         </div>
       </section>
 
