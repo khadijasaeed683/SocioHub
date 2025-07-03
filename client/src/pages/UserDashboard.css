@@ -90,3 +90,19 @@ h2 {
     width: 90%;
   }
 }
+
+
+.dashboard-layout {
+  display: flex;
+}
+
+.dashboard-page {
+  padding: 30px;
+  margin-left: 220px;
+  transition: margin-left 0.3s ease;
+  width: 100%;
+}
+
+.sidebar.collapsed ~ .dashboard-page {
+  margin-left: 60px;
+}

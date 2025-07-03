@@ -1,0 +1,127 @@
+.sidebar {
+  width: 250px;
+  background-color: #222831;
+  color: #fff;
+  min-height: 100vh;
+  transition: width 0.3s ease;
+  position: fixed;
+  left: 0;
+  top: 0;
+  overflow-x: hidden;
+  z-index: 100;
+  padding-top: 60px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar.collapsed {
+  width: 70px;
+}
+
+.sidebar-toggle {
+  position: absolute;
+  top: 10px;
+  right: -18px;
+  background: #393E46;
+  color: #fff;
+  padding: 5px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 101;
+  font-size: 1rem;
+}
+
+.sidebar-links {
+  display: flex;
+  flex-direction: column;
+  padding: 0 15px;
+  flex-grow: 1;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 8px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.2s;
+  position: relative;
+}
+
+.sidebar-item:hover {
+  background-color: #393E46;
+}
+
+.sidebar-item.active {
+  background-color: #00ADB5;
+}
+
+.sidebar-courses {
+  padding: 15px;
+  border-top: 1px solid #393E46;
+  margin-top: auto;
+}
+
+.course-section {
+  font-weight: bold;
+  padding: 8px 0;
+  margin-top: 10px;
+  color: #00ADB5;
+}
+
+.course-item {
+  padding: 8px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.course-item:hover {
+  background-color: #393E46;
+}
+
+.tooltip {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #393E46;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+  margin-left: 15px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s;
+  z-index: 1000;
+  font-size: 0.8rem;
+}
+
+.sidebar-item:hover .tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Collapsed state styles */
+.sidebar.collapsed .sidebar-courses {
+  display: none;
+}
+
+.sidebar.collapsed .sidebar-item {
+  justify-content: center;
+  padding: 15px 0;
+}
+
+.sidebar.collapsed .sidebar-item span:not(.tooltip) {
+  display: none;
+}
+
+.sidebar.collapsed .course-item {
+  display: none;
+}
+
+.sidebar.collapsed .course-section {
+  display: none;
+}
