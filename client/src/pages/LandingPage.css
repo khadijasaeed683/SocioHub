@@ -87,3 +87,61 @@
   border-radius: 10px;
   object-fit: contain;    /* ✅ avoid stretching */
 }
+.society-gallery {
+  display: flex;
+  overflow-x: auto; /* horizontal scroll if needed */
+  gap: 20px;
+  padding: 20px 0;
+  scroll-snap-type: x mandatory; /* optional smooth snap */
+}
+
+.society-gallery::-webkit-scrollbar {
+  height: 8px;
+}
+
+.society-gallery::-webkit-scrollbar-thumb {
+  background: #948979;
+  border-radius: 4px;
+}
+
+.society-card {
+  flex: 0 0 auto; /* prevent shrinking */
+  min-width: 200px;
+  background-color: #948979;
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+  scroll-snap-align: start; /* optional smooth snap */
+  transition: transform 0.3s ease;
+}
+
+.society-card:hover {
+  transform: translateY(-5px);
+}
+
+.society-card img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.society-card h3 {
+  margin-top: 10px;
+  color: #222831;
+  font-size: 1rem;
+}
+
+.details-btn {
+  background-color: #222831;
+  color:rgb(212, 198, 178);
+  padding: 12px 24px;
+  text-decoration: none;
+  font-weight: 550;
+  border-radius: 6px;
+  transition: background 0.3s ease;
+}
+
+.details-btn:hover {
+  background-color:rgb(90, 100, 114);
+}

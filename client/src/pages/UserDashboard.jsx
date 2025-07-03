@@ -7,7 +7,7 @@ const UserDashboard = ({ user, societies, events }) => {
     <>
       <Navbar />
       <div className="dashboard-page">
-        <h1>Welcome, {user.name}</h1>
+        <h1>Welcome, {user.username}</h1>
 
         <section className="joined-societies">
           <h2>Your Societies</h2>

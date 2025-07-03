@@ -1,32 +1,47 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import './SignupPage.css';
 import Navbar from '../components/Navbar';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const SignupPage = ({ onSignup }) => {
-  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSignup = (e) => {
-    e.preventDefault();
+  const handleSignup = async (e) => {
+  e.preventDefault();
 
-    if (name && email && password) {
-      const newUser = {
-        name,
-        email,
-        _id: 'user_' + Date.now(),
-        password // normally not sent to frontend
-      };
-      onSignup(newUser);
-      toast.success('Signup successful! Redirecting to dashboard...');
+  try {
+    const response = await fetch('http://localhost:5000/api/auth/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username, email, password }), // updated here
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      setError(data.error || data.message || 'Signup failed');
+      toast.error(data.error || data.message || 'Signup failed');
+      setUsername('');
+      setEmail('');
+      setPassword('');
     } else {
-      setError('All fields are required');
-      toast.error('Please fill in all fields');
+      onSignup(data.user);
+      toast.success('Signup successful! Redirecting to dashboard...');
     }
-  };
+  } catch (err) {
+    console.error(err);
+    setError('Server error. Try again later.');
+    toast.error('Server error. Try again later.');
+  }
+};
+
 
   return (
     <>
@@ -39,8 +54,8 @@ const SignupPage = ({ onSignup }) => {
             <label>Name</label>
             <input
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               placeholder="Enter your full name"
               required
             />
@@ -64,6 +79,10 @@ const SignupPage = ({ onSignup }) => {
             />
 
             <button type="submit">Create Account</button>
+
+            <p className="register-link" align="center">
+              Already have an account? <Link to="/login">Login</Link>
+            </p>
           </form>
         </div>
       </div>
