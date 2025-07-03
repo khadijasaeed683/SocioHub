@@ -1,27 +1,15 @@
-import React, { useState } from 'react';
 import './RSVPForm.css';
 
-const RSVPForm = ({ event, onSubmit, onCancel }) => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    reason: '',
-  });
-
+const RSVPForm = ({ event, formData, setFormData, onSubmit, onCancel }) => {
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit(formData); // pass form data up to parent
   };
 
   return (
     <div className="rsvp-form-modal">
       <div className="rsvp-form-container">
         <h3>RSVP for {event.title}</h3>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={onSubmit}>
           <label>Your Name</label>
           <input
             type="text"
@@ -40,6 +28,16 @@ const RSVPForm = ({ event, onSubmit, onCancel }) => {
             onChange={handleChange}
             required
             placeholder="Enter your email"
+          />
+
+          <label>Your Phone</label>
+          <input
+            type="phone"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            required
+            placeholder="Enter your phone"
           />
 
           <label>Why do you want to attend? (optional)</label>

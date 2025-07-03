@@ -10,7 +10,6 @@ const UserDashboard = ({ user, societies, events }) => {
   const adminSocieties = societies.filter((society) =>
     society.admins.includes(user._id)
   );
-  
 
   return (
     <>

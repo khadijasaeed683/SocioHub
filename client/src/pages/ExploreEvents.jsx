@@ -1,53 +1,78 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
+import EventCard from '../components/EventCard'; // Assuming EventCard is a separate component
+import RSVPForm from './RSVPForm'; // Assuming RSVPForm is a separate component
 import './ExploreEvents.css';
 import './RSVPForm.css'; // Assuming RSVPForm styles are here
 
-const dummyEvents = [
-  {
-    _id: '1',
-    title: 'TechFest 2025',
-    description: 'A 3-day tech exhibition with competitions and talks.',
-    date: '2025-07-15',
-    societyName: 'UET Tech Society',
-    openToAll: true,
-  },
-  {
-    _id: '2',
-    title: 'Art Gala',
-    description: 'A display of student artwork with live performances.',
-    date: '2025-07-20',
-    societyName: 'UET Art Society',
-    openToAll: false,
-  },
-  {
-    _id: '3',
-    title: 'Literary Slam',
-    description: 'Poetry and storytelling night.',
-    date: '2025-07-25',
-    societyName: 'Literary Society',
-    openToAll: true,
-  },
-];
 
 const ExploreEvents = () => {
   const [rsvpedEvents, setRsvpedEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [formData, setFormData] = useState({ name: '', email: '', reason: '' });
 
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/explore-events');
+        const data = await res.json();
+
+        if (!res.ok) {
+          setError(data.message || 'Failed to fetch events');
+        } else {
+          setEvents(data);
+        }
+      } catch (err) {
+        setError('Server error. Try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+  
   const handleRSVPClick = (event) => {
     setSelectedEvent(event);
   };
 
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
+  const handleFormSubmit = async (e) => {
+  e.preventDefault();
 
-    setRsvpedEvents((prev) => [...prev, selectedEvent._id]);
-    alert('RSVP submitted and is pending society approval.');
+  try {
+    const res = await fetch(`http://localhost:5000/api/explore-events/${selectedEvent._id}/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+      }),
+    });
+    console.log('Submitting RSVP with data:', formData);
 
-    setSelectedEvent(null);
-    setFormData({ name: '', email: '', reason: '' });
-  };
+    const data = await res.json();
+
+    if (!res.ok) {
+      setError(data.message || 'Registration failed');
+    } else {
+      alert('✅ ' + data.message);
+      // Optionally close form or refresh events
+      setSelectedEvent(null);
+      setFormData({ name: '', email: '', phone: '' }); // Reset form data
+    }
+  } catch (error) {
+    console.error(error);
+    setError('Server error. Please try again later.');
+  }
+};
+
 
   const handleInputChange = (e) => {
     setFormData((prev) => ({
@@ -62,64 +87,26 @@ const ExploreEvents = () => {
       <div className="explore-events-page">
         <h2>Upcoming Events</h2>
         <div className="events-list">
-          {dummyEvents.map((event) => (
-            <div key={event._id} className="event-card">
-              <h3>{event.title}</h3>
-              <p className="event-date">📅 {event.date}</p>
-              <p className="event-desc">{event.description}</p>
-              <p className="event-society">🎓 Hosted by: {event.societyName}</p>
-              {event.openToAll && <span className="open-tag">Open to All</span>}
-
-              <button
-                disabled={rsvpedEvents.includes(event._id)}
-                onClick={() => handleRSVPClick(event)}
-              >
-                {rsvpedEvents.includes(event._id) ? 'RSVP Pending' : 'RSVP'}
-              </button>
-            </div>
+          {events.map((event) => (
+            <EventCard
+              key={event._id}
+              event={event}
+              isRsvped={false} // Replace with your RSVP state logic
+              onRSVPClick={handleRSVPClick}
+            />
           ))}
         </div>
 
         {/* RSVP Form Modal */}
         {selectedEvent && (
-          <div className="rsvp-form-modal">
-            <div className="rsvp-form-container">
-              <h3>RSVP for {selectedEvent.title}</h3>
-              <form onSubmit={handleFormSubmit}>
-                <label>Your Name</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  required
-                />
+          <RSVPForm
+            event={selectedEvent}
+            formData={formData}
+            setFormData={setFormData}
+            onSubmit={handleFormSubmit}
+            onCancel={() => setSelectedEvent(null)}
+          />
 
-                <label>Your Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  required
-                />
-
-                <label>Reason for Attending (optional)</label>
-                <textarea
-                  name="reason"
-                  value={formData.reason}
-                  onChange={handleInputChange}
-                ></textarea>
-
-                <div className="form-actions">
-                  <button type="submit">Submit RSVP</button>
-                  <button type="button" onClick={() => setSelectedEvent(null)} className="cancel-btn">
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
         )}
       </div>
     </>

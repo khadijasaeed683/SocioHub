@@ -75,7 +75,11 @@
 .society-form input[type="text"],
 .society-form input[type="email"],
 .society-form input[type="password"],
-.society-form input[type="file"] {
+.society-form input[type="file"],
+.society-form input[type="url"],
+.society-form input[type="tel"],
+.society-form select,
+.society-form textarea {
   padding: 10px;
   margin-bottom: 20px;
   border-radius: 6px;
@@ -83,6 +87,11 @@
   background-color: #222831;
   color: #DFD0B8;
   font-size: 0.95rem;
+}
+
+.society-form textarea {
+  resize: vertical;
+  min-height: 80px;
 }
 
 /* Submit button */
@@ -94,11 +103,12 @@
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color color 0.3s ease;
 }
 
 .society-form button:hover {
   background-color: #b3a78c;
+  color: #222831;
 }
 
 /* Responsive adjustments */

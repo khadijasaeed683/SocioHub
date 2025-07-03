@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+
 import './LoginPage.css';
 import Navbar from '../components/Navbar';
 
@@ -7,22 +9,40 @@ const LoginPage = ({ onLogin }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const dummyUser = {
-    email: 'user@sociohub.com',
-    password: '123456',
-    name: 'Khadija Saeed',
-    _id: 'user123'
-  };
+  
+  const handleLogin = async (e) => {
+  e.preventDefault();
+  setError('');
 
-  const handleLogin = (e) => {
-    e.preventDefault();
+  try {
+    const response = await fetch('http://localhost:5000/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
 
-    if (email === dummyUser.email && password === dummyUser.password) {
-      onLogin(dummyUser);
+    const data = await response.json();
+    console.log('Login response:', data);
+    if (!response.ok) {
+      setError(data.message || 'Login failed');
+      setEmail('');
+      setPassword('');
+      
     } else {
-      setError('Invalid credentials');
+      // Call onLogin prop to set user in parent App
+      onLogin(data.user);
+
+      // Optionally save token in localStorage for future requests
+      localStorage.setItem('token', data.token);
     }
-  };
+  } catch (err) {
+    console.error(err);
+    setError('Server error. Try again later.');
+  }
+};
+
 
   return (
     <>
@@ -51,6 +71,9 @@ const LoginPage = ({ onLogin }) => {
             />
 
             <button type="submit">Login</button>
+            <p className="register-link" align="center">
+              Don't have an account? <Link to="/register">Sign up</Link>
+            </p>
           </form>
 
           <p className="dummy-tip">
