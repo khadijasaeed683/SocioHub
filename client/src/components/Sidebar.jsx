@@ -7,10 +7,10 @@ import {
   FaSignOutAlt
 } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { SidebarContext } from '../context/SidebarContext'; // ✅ import context
+import { SidebarContext } from '../context/SidebarContext';
 
 const Sidebar = ({ user, societies }) => {
-  const { isOpen } = useContext(SidebarContext); // ✅ global control
+  const { isOpen } = useContext(SidebarContext);
   const [adminDropdownOpen, setAdminDropdownOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -29,7 +29,7 @@ const Sidebar = ({ user, societies }) => {
         {/* Societies Administration Dropdown */}
         <div className="sidebar-item" onClick={toggleAdminDropdown}>
           <FaUsersCog />
-          {isOpen ? <span>Societies Administration</span> : <span className="tooltip">Societies</span>}
+          {isOpen ? <span>Society Admin Portal</span> : <span className="tooltip">Societies</span>}
         </div>
 
         {isOpen && adminDropdownOpen && (
@@ -39,7 +39,7 @@ const Sidebar = ({ user, societies }) => {
                 <div
                   key={society._id}
                   className="dropdown-item"
-                  onClick={() => navigate(`/society/${society._id}`)}
+                  onClick={() => navigate(`/manage-society/${society._id}/overview`)}
                 >
                   {society.name}
                 </div>
