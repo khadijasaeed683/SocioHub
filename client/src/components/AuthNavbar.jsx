@@ -1,20 +1,29 @@
-import React, { useState } from 'react';
-import { FaBars } from 'react-icons/fa';
+import React, { useContext, useState } from 'react';
 import './AuthNavbar.css';
+import { SidebarContext } from '../context/SidebarContext';
 
-const AuthNavbar = ({ user, onSignOut, onSidebarToggle }) => {
+const AuthNavbar = ({ user, onSignOut }) => {
+  const { toggleSidebar } = useContext(SidebarContext);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
+  const toggleDropdown = () => setDropdownOpen((prev) => !prev);
+
+  const getInitials = (name) => {
+    if (!name) return '';
+    return name
+      .split(' ')
+      .map((word) => word[0].toUpperCase())
+      .slice(0, 2)
+      .join('');
+  };
 
   return (
-    <nav className="auth-navbar">
+    <div className="auth-navbar">
       <div className="navbar-left">
-        <div className="navbar-left-content">
-          <FaBars className="sidebar-toggle" onClick={onSidebarToggle} />
-          
-        </div>
-        <h2>SociHub</h2>
+        <button className="hamburger" onClick={toggleSidebar}>
+          ☰
+        </button>
+        <span className="app-name">SocioHub</span>
       </div>
 
       <div className="navbar-right">
@@ -23,10 +32,10 @@ const AuthNavbar = ({ user, onSignOut, onSidebarToggle }) => {
             {user?.avatar ? (
               <img src={user.avatar} alt="DP" />
             ) : (
-              <span>{user?.name?.charAt(0)}</span>
+              <span>{getInitials(user?.name)}</span>
             )}
           </div>
-          <span className="username">{user.name}</span>
+          <span className="username">{user?.name}</span>
         </div>
 
         {dropdownOpen && (
@@ -37,7 +46,7 @@ const AuthNavbar = ({ user, onSignOut, onSidebarToggle }) => {
           </div>
         )}
       </div>
-    </nav>
+    </div>
   );
 };
 

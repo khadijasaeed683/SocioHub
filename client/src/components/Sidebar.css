@@ -8,11 +8,12 @@
   left: 0;
   top: 0;
   overflow-x: hidden;
-  z-index: 100;
-  padding-top: 60px;
+  z-index: 999; /* ⬅️ Lower than navbar's 1000 */
+  padding-top: 90px; /* ⬅️ Already good */
   display: flex;
   flex-direction: column;
 }
+
 
 .sidebar.collapsed {
   width: 70px;
@@ -124,4 +125,30 @@
 
 .sidebar.collapsed .course-section {
   display: none;
+}
+.admin-dropdown {
+  margin-left: 30px;
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown-item {
+  padding: 6px 10px;
+  font-size: 0.95rem;
+  background-color: #333943;
+  margin-bottom: 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: #444c56;
+}
+
+.dropdown-item.disabled {
+  opacity: 0.5;
+  cursor: default;
+  background-color: transparent;
 }

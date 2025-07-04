@@ -1,79 +1,71 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import './Sidebar.css';
-import { 
-  FaChevronLeft, 
-  FaChevronRight, 
-  FaHome, 
-  FaCalendarAlt, 
-  FaChalkboardTeacher, 
-  FaUserFriends,
-  FaTasks 
+import {
+  FaUsersCog,
+  FaPlusCircle,
+  FaCog,
+  FaSignOutAlt
 } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { SidebarContext } from '../context/SidebarContext'; // ✅ import context
 
 const Sidebar = ({ user, societies }) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const { isOpen } = useContext(SidebarContext); // ✅ global control
+  const [adminDropdownOpen, setAdminDropdownOpen] = useState(false);
   const navigate = useNavigate();
 
-  const handleToggle = () => {
-    setIsCollapsed(!isCollapsed);
-  };
+  const toggleAdminDropdown = () => setAdminDropdownOpen(!adminDropdownOpen);
 
   const adminSocieties = societies?.filter(s => s.admins.includes(user._id)) || [];
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/login');
+  };
+
   return (
-    <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
-      <div className="sidebar-toggle" onClick={handleToggle}>
-        {isCollapsed ? <FaChevronRight /> : <FaChevronLeft />}
-      </div>
-
+    <div className={`sidebar ${!isOpen ? 'collapsed' : ''}`}>
       <div className="sidebar-links">
-        <div className="sidebar-item" onClick={() => navigate('/dashboard')}>
-          <FaHome />
-          {!isCollapsed && <span>Home</span>}
-          {isCollapsed && <span className="tooltip">Home</span>}
+        {/* Societies Administration Dropdown */}
+        <div className="sidebar-item" onClick={toggleAdminDropdown}>
+          <FaUsersCog />
+          {isOpen ? <span>Societies Administration</span> : <span className="tooltip">Societies</span>}
         </div>
 
-        <div className="sidebar-item" onClick={() => navigate('/calendar')}>
-          <FaCalendarAlt />
-          {!isCollapsed && <span>Calendar</span>}
-          {isCollapsed && <span className="tooltip">Calendar</span>}
+        {isOpen && adminDropdownOpen && (
+          <div className="admin-dropdown">
+            {adminSocieties.length > 0 ? (
+              adminSocieties.map(society => (
+                <div
+                  key={society._id}
+                  className="dropdown-item"
+                  onClick={() => navigate(`/society/${society._id}`)}
+                >
+                  {society.name}
+                </div>
+              ))
+            ) : (
+              <div className="dropdown-item disabled">Nothing to show</div>
+            )}
+          </div>
+        )}
+
+        {/* Create Society */}
+        <div className="sidebar-item" onClick={() => navigate('/register-society')}>
+          <FaPlusCircle />
+          {isOpen ? <span>Create Society</span> : <span className="tooltip">Create</span>}
         </div>
 
-        <div className="sidebar-item active" onClick={() => navigate('/teaching')}>
-          <FaChalkboardTeacher />
-          {!isCollapsed && <span>Teaching</span>}
-          {isCollapsed && <span className="tooltip">Teaching</span>}
+        {/* Settings */}
+        <div className="sidebar-item" onClick={() => navigate('/settings')}>
+          <FaCog />
+          {isOpen ? <span>Settings</span> : <span className="tooltip">Settings</span>}
         </div>
 
-        <div className="sidebar-item" onClick={() => navigate('/enrolled')}>
-          <FaUserFriends />
-          {!isCollapsed && <span>Enrolled</span>}
-          {isCollapsed && <span className="tooltip">Enrolled</span>}
-        </div>
-
-        <div className="sidebar-item" onClick={() => navigate('/todo')}>
-          <FaTasks />
-          {!isCollapsed && <span>To do</span>}
-          {isCollapsed && <span className="tooltip">To do</span>}
-        </div>
-      </div>
-
-      <div className="sidebar-courses">
-        <div className="course-section">A</div>
-        <div className="course-item" onClick={() => navigate('/course/ai-lab')}>
-          {!isCollapsed ? 'AI lab Section-C 2023' : 'AI'}
-        </div>
-        <div className="course-item" onClick={() => navigate('/course/adbms')}>
-          {!isCollapsed ? 'ADBMS Theory 23-(B) B' : 'ADB'}
-        </div>
-
-        <div className="course-section">C</div>
-        <div className="course-item" onClick={() => navigate('/course/coal')}>
-          {!isCollapsed ? 'COAL Theory B' : 'COA'}
-        </div>
-        <div className="course-item" onClick={() => navigate('/course/section-b')}>
-          {!isCollapsed ? 'Section B' : 'SB'}
+        {/* Logout */}
+        <div className="sidebar-item" onClick={handleLogout}>
+          <FaSignOutAlt />
+          {isOpen ? <span>Logout</span> : <span className="tooltip">Logout</span>}
         </div>
       </div>
     </div>
