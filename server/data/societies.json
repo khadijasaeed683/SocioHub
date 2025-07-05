@@ -1,0 +1,143 @@
+  [
+  {
+    "name": "Innovators Hub",
+    "description": "Innovators Hub is a community of passionate tech enthusiasts, software developers, and startup-minded students who collaborate to build innovative projects, participate in hackathons, and learn emerging technologies together. The society regularly organizes coding bootcamps, guest lectures from industry leaders, and startup incubation sessions to nurture the entrepreneurial mindset within campus.",
+    "logo": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&ixid=M3w5MXwwfDF8MHx8dGVjaHxlbnwwfHx8fHwxNzE0ODI4NTQwfA&auto=format&fit=crop&w=80&h=80&q=80",
+    "coverImage": "https://images.unsplash.com/photo-1518779578993-ec3579fee39f?ixlib=rb-4.0.3&ixid=M3w5MXwwfDF8MHx8aGFja2F0aG9ufGVufDB8fHx8fDE3MTQ4Mjg2NDQ&auto=format&fit=crop&w=1200&q=80",
+    "website": "https://innovatorshub.com",
+    "contactEmail": "contact@innovatorshub.com",
+    "phone": "+923001234567",
+    "type": "academic",
+    "socialLinks": {
+      "instagram": "https://instagram.com/innovatorshub",
+      "linkedin": "https://linkedin.com/company/innovatorshub"
+    }
+  },
+  {
+    "name": "Artistic Minds",
+    "description": "Artistic Minds is a platform for students to express their creativity and imagination through fine arts, digital illustration, crafts, and design. The society conducts art exhibitions, live painting sessions, creative workshops, and charity art auctions to showcase talent and support social causes through art.",
+    "logo": "https://images.unsplash.com/photo-1582726239753-2d3b2e39b4e2?ixlib=rb-4.0.3&ixid=M3w5MXwwfDF8MHx8YXJ0fGVufDB8fHx8fDE3MTQ4Mjg3MTg&auto=format&fit=crop&w=80&h=80&q=80",
+    "coverImage": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&ixid=M3w5MXwwfDF8MHx8YXJ0fGVufDB8fHx8fDE3MTQ4Mjg3MzU&auto=format&fit=crop&w=1200&q=80",
+    "website": "https://artisticminds.org",
+    "contactEmail": "hello@artisticminds.org",
+    "phone": "+923004567890",
+    "type": "art",
+    "socialLinks": {
+      "instagram": "https://instagram.com/artisticminds",
+      "linkedin": "https://linkedin.com/company/artisticminds"
+    }
+  },
+  {
+    "name": "Literary League",
+    "description": "Literary League connects students who have a love for literature, poetry, and creative writing. Members engage in weekly poetry slams, book discussions, short story competitions, and author meetups, fostering a rich literary culture within campus.",
+    "logo": "https://images.unsplash.com/photo-1509021436665-8f07dbf5bf1d?ixlib=rb-4.0.3&ixid=M3w5MXwwfDF8MHx8bGl0ZXJhdHVyZXxlbnwwfHx8fHwxNzE0ODI4NzQ1&auto=format&fit=crop&w=80&h=80&q=80",
+    "coverImage": "https://images.unsplash.com/photo-1522098543979-ffc7f79d4088?ixlib=rb-4.0.3&ixid=M3w5MXwwfDF8MHx8bGl0ZXJhdHVyZXxlbnwwfHx8fHwxNzE0ODI4NzUy&auto=format&fit=crop&w=1200&q=80",
+    "website": "https://literaryleague.com",
+    "contactEmail": "info@literaryleague.com",
+    "phone": "+923008765432",
+    "type": "literary",
+    "socialLinks": {
+      "instagram": "https://instagram.com/literaryleague",
+      "linkedin": "https://linkedin.com/company/literaryleague"
+    }
+  },
+  {
+    "name": "Fitness Freaks",
+    "description": "Fitness Freaks motivates students to adopt a healthy lifestyle by organizing regular yoga sessions, sports tournaments, fitness challenges, and seminars on nutrition and mental health to ensure overall well-being.",
+    "logo": "https://images.unsplash.com/photo-1583454110550-066f58c2b3ac?ixlib=rb-4.0.3&ixid=M3w5MXwwfDF8MHx8Zml0bmVzc3xlbnwwfHx8fHwxNzE0ODI4NzY1&auto=format&fit=crop&w=80&h=80&q=80",
+    "coverImage": "https://images.unsplash.com/photo-1546484959-f1455c0e7605?ixlib=rb-4.0.3&ixid=M3w5MXwwfDF8MHx8c3BvcnR8ZW58MHx8fHx8MTcxNDgyODc3Mg&auto=format&fit=crop&w=1200&q=80",
+    "website": "https://fitnessfreaks.club",
+    "contactEmail": "join@fitnessfreaks.club",
+    "phone": "+923006543210",
+    "type": "sports",
+    "socialLinks": {
+      "instagram": "https://instagram.com/fitnessfreaks",
+      "linkedin": "https://linkedin.com/company/fitnessfreaks"
+    }
+  },
+  {
+    "name": "Change Makers",
+    "description": "Change Makers is dedicated to social activism and community development. The society organizes charity drives, awareness campaigns, and volunteering programs to empower underprivileged communities and advocate for social justice.",
+    "logo": "https://images.unsplash.com/photo-1532635245-6e3c1d3e669c?ixlib=rb-4.0.3&ixid=M3w5MXwwfDF8MHx8c29jaWFsfGVufDB8fHx8fDE3MTQ4Mjg3ODU&auto=format&fit=crop&w=80&h=80&q=80",
+    "coverImage": "https://images.unsplash.com/photo-1494883759339-0b042055a4ee?ixlib=rb-4.0.3&ixid=M3w5MXwwfDF8MHx8Y2hhcml0eXxlbnwwfHx8fHwxNzE0ODI4Nzg4&auto=format&fit=crop&w=1200&q=80",
+    "website": "https://changemakers.org",
+    "contactEmail": "contact@changemakers.org",
+    "phone": "+923002345678",
+    "type": "social",
+    "socialLinks": {
+      "instagram": "https://instagram.com/changemakers",
+      "linkedin": "https://linkedin.com/company/changemakers"
+    }
+  }
+,
+  {
+    "name": "Code Warriors",
+    "description": "Competitive programming and software development society.",
+    "logo": "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?crop=entropy&cs=tinysrgb&fit=crop&h=80&w=80",
+    "coverImage": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?crop=entropy&cs=tinysrgb&fit=crop&h=300&w=600",
+    "website": "https://codewarriors.dev",
+    "contactEmail": "admin@codewarriors.dev",
+    "phone": "+923007890123",
+    "type": "academic",
+    "socialLinks": {
+      "instagram": "https://instagram.com/codewarriors",
+      "linkedin": "https://linkedin.com/company/codewarriors"
+    }
+  },
+  {
+    "name": "Drama Society",
+    "description": "Performing arts, theatre, and stage performances.",
+    "logo": "https://images.unsplash.com/photo-1525026198548-4baa812f1183?crop=entropy&cs=tinysrgb&fit=crop&h=80&w=80",
+    "coverImage": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?crop=entropy&cs=tinysrgb&fit=crop&h=300&w=600",
+    "website": "https://dramasociety.org",
+    "contactEmail": "drama@dramasociety.org",
+    "phone": "+923009876543",
+    "type": "art",
+    "socialLinks": {
+      "instagram": "https://instagram.com/dramasociety",
+      "linkedin": "https://linkedin.com/company/dramasociety"
+    }
+  },
+  {
+    "name": "Business Leaders Club",
+    "description": "Empowering future entrepreneurs and business leaders.",
+    "logo": "https://images.unsplash.com/photo-1497366216548-37526070297c?crop=entropy&cs=tinysrgb&fit=crop&h=80&w=80",
+    "coverImage": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?crop=entropy&cs=tinysrgb&fit=crop&h=300&w=600",
+    "website": "https://businessleaders.club",
+    "contactEmail": "info@businessleaders.club",
+    "phone": "+923001112233",
+    "type": "academic",
+    "socialLinks": {
+      "instagram": "https://instagram.com/businessleaders",
+      "linkedin": "https://linkedin.com/company/businessleaders"
+    }
+  },
+  {
+    "name": "Robotics Club",
+    "description": "For students passionate about robotics and automation.",
+    "logo": "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?crop=entropy&cs=tinysrgb&fit=crop&h=80&w=80",
+    "coverImage": "https://images.unsplash.com/photo-1591696205602-2db58a6b77d4?crop=entropy&cs=tinysrgb&fit=crop&h=300&w=600",
+    "website": "https://roboticsclub.tech",
+    "contactEmail": "contact@roboticsclub.tech",
+    "phone": "+923005556677",
+    "type": "academic",
+    "socialLinks": {
+      "instagram": "https://instagram.com/roboticsclub",
+      "linkedin": "https://linkedin.com/company/roboticsclub"
+    }
+  },
+  {
+    "name": "Environmental Society",
+    "description": "Promoting sustainability and environmental awareness.",
+    "logo": "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?crop=entropy&cs=tinysrgb&fit=crop&h=80&w=80",
+    "coverImage": "https://images.unsplash.com/photo-1465146633011-14f18c72b735?crop=entropy&cs=tinysrgb&fit=crop&h=300&w=600",
+    "website": "https://environsociety.org",
+    "contactEmail": "green@environsociety.org",
+    "phone": "+923004443322",
+    "type": "social",
+    "socialLinks": {
+      "instagram": "https://instagram.com/environsociety",
+      "linkedin": "https://linkedin.com/company/environsociety"
+    }
+  }
+]

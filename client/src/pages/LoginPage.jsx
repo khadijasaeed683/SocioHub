@@ -36,6 +36,7 @@ const LoginPage = ({ onLogin }) => {
 
       // Optionally save token in localStorage for future requests
       localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
     }
   } catch (err) {
     console.error(err);

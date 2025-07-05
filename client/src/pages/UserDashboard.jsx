@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthNavbar from '../components/AuthNavbar';
 import Sidebar from '../components/Sidebar';
@@ -36,14 +36,13 @@ const dummyEvents = {
 
 const UserDashboard = () => {
   const navigate = useNavigate();
-  const user = dummyUser;
-  const societies = dummySocieties;
+  const user = JSON.parse(localStorage.getItem('user'));
   const events = dummyEvents;
 
-  const adminSocieties = societies.filter((society) =>
-    society.admins.includes(user._id)
-  );
-
+  const [societies, setSocieties] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [adminSocieties, setAdminSocieties] = useState(null)
   const [showUnregisterForm, setShowUnregisterForm] = useState(null);
   const [unregisterReason, setUnregisterReason] = useState('');
   const [password, setPassword] = useState('');
@@ -54,6 +53,33 @@ const UserDashboard = () => {
     setUnregisterReason('');
     setPassword('');
   };
+  useEffect(() => {
+        const fetchSocieties = async () => {
+          try {
+            const res = await fetch('http://localhost:5000/api/society/user-societies', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      }
+    });
+            const data = await res.json();
+    
+            if (!res.ok) {
+              setError(data.message || 'Failed to fetch societies');
+            } else {
+              setSocieties([...data.registeredSocieties, ...data.joinedSocieties]);
+
+            }
+          } catch (err) {
+            setError('Server error. Try again later.');
+          } finally {
+            setLoading(false);
+          }
+        };
+    
+        fetchSocieties();
+      }, []);
 
   return (
     <>
@@ -62,17 +88,17 @@ const UserDashboard = () => {
         <Sidebar user={user} adminSocieties={adminSocieties} />
 
         <div className="dashboard-page">
-          <h1>Welcome, {user.name}</h1>
+          <h1>Welcome, {user.username}</h1>
 
           <section className="joined-societies">
-            <h2>Your Societies</h2>
+            <h2>Your Joined Societies</h2>
             <div className="society-list">
               {societies.map((society) => (
                 <div key={society._id} className="society-card">
                   <h3>{society.name}</h3>
                   <p className="role-tag">
                     Role:{' '}
-                    {society.admins.includes(user._id) ? 'Admin' : 'Member'}
+                    {society.createdBy === user._id ? 'Admin' : 'Member'}
                   </p>
                 </div>
               ))}

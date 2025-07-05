@@ -2,71 +2,72 @@ import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import './RegisterSociety.css';
 import societyIllustration from '../assets/society-illustration.png';
+import { toast } from 'react-toastify';
 
 const RegisterSociety = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    logo: null,
-    coverImage: null,
-    website: '',
-    contactEmail: '',
-    phone: '',
-    instagram: '',
-    linkedin: '',
-    type: '',
-  });
-
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: files ? files[0] : value,
-    }));
-  };
+  // Separate individual states for each field
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [logo, setLogo] = useState(null);
+  const [coverImage, setCoverImage] = useState(null);
+  const [website, setWebsite] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [instagram, setInstagram] = useState('');
+  const [linkedin, setLinkedin] = useState('');
+  const [type, setType] = useState('');
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  // ✅ Create FormData to send files and text fields
-  const data = new FormData();
-  data.append('name', formData.societyName);
-  data.append('description', formData.description || ''); // add description input if not present
-  data.append('logo', formData.file); // assuming 'file' is your logo
-  data.append('coverImage', formData.coverImage || ''); // if coverImage input is added
-  data.append('website', formData.website || '');
-  data.append('contactEmail', formData.officialEmail);
-  data.append('phone', formData.phone || '');
-  data.append('type', formData.type || '');
-  data.append('socialLinks.instagram', formData.instagram || '');
-  data.append('socialLinks.linkedin', formData.linkedin || '');
+    const data = new FormData();
+    data.append('name', name);
+    data.append('description', description);
+    data.append('logo', logo);
+    data.append('coverImage', coverImage || '');
+    data.append('website', website);
+    data.append('contactEmail', contactEmail);
+    data.append('phone', phone);
+    data.append('type', type);
+    data.append('socialLinks.instagram', instagram);
+    data.append('socialLinks.linkedin', linkedin);
 
-  try {
-    const res = await fetch(`http://localhost:5000/api/society/register`, {
-      method: 'POST',
-      headers: {
-        // 'Content-Type': 'multipart/form-data' ❌ DO NOT SET when using FormData in fetch
-        Authorization: `Bearer ${localStorage.getItem('token')}`, // if using JWT auth
-      },
-      body: data,
-    });
+    console.log('Submitting society registration:', Object.fromEntries(data.entries()));
 
-    const result = await res.json();
+    try {
+      const res = await fetch(`http://localhost:5000/api/society/`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: data,
+      });
 
-    if (res.ok) {
-      alert('Society registration submitted successfully!');
-      console.log(result);
-      // Optional: Redirect or reset form
-    } else {
-      alert(result.message || 'Registration failed.');
+      const result = await res.json();
+
+      if (res.ok) {
+        toast.success('Society registration submitted successfully!');
+        console.log(result);
+        // Optional: Reset form fields
+        setName('');
+        setDescription('');
+        setLogo(null);
+        setCoverImage(null);
+        setWebsite('');
+        setContactEmail('');
+        setPhone('');
+        setInstagram('');
+        setLinkedin('');
+        setType('');
+      } else {
+        toast.error(result.message || 'Registration failed.');
+      }
+
+    } catch (err) {
+      console.error(err);
+      toast.error('Registration failed. Please try again.');
     }
-
-  } catch (err) {
-    console.error('Register society error:', err);
-    alert('Server error during registration.');
-  }
-};
-
+  };
 
   return (
     <>
@@ -85,34 +86,34 @@ const RegisterSociety = () => {
 
             <form className="society-form" onSubmit={handleSubmit}>
               <label>Society Name</label>
-              <input type="text" name="name" required onChange={handleChange} />
+              <input type="text" name="name" required value={name} onChange={(e) => setName(e.target.value)} />
 
               <label>Description</label>
-              <textarea name="description" required onChange={handleChange} />
+              <textarea name="description" required value={description} onChange={(e) => setDescription(e.target.value)} />
 
               <label>Logo</label>
-              <input type="file" name="logo" accept="image/*" required onChange={handleChange} />
+              <input type="file" name="logo" accept="image/*" required onChange={(e) => setLogo(e.target.files[0])} />
 
               <label>Cover Image</label>
-              <input type="file" name="coverImage" accept="image/*" onChange={handleChange} />
+              <input type="file" name="coverImage" accept="image/*" onChange={(e) => setCoverImage(e.target.files[0])} />
 
               <label>Website</label>
-              <input type="url" name="website" onChange={handleChange} />
+              <input type="url" name="website" value={website} onChange={(e) => setWebsite(e.target.value)} />
 
               <label>Contact Email</label>
-              <input type="email" name="contactEmail" required onChange={handleChange} />
+              <input type="email" name="contactEmail" required value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} />
 
               <label>Phone</label>
-              <input type="tel" name="phone" required onChange={handleChange} />
+              <input type="tel" name="phone" required value={phone} onChange={(e) => setPhone(e.target.value)} />
 
               <label>Instagram</label>
-              <input type="url" name="instagram" placeholder="https://instagram.com/yourpage" onChange={handleChange} />
+              <input type="url" name="instagram" placeholder="https://instagram.com/yourpage" value={instagram} onChange={(e) => setInstagram(e.target.value)} />
 
               <label>LinkedIn</label>
-              <input type="url" name="linkedin" placeholder="https://linkedin.com/in/yourpage" onChange={handleChange} />
+              <input type="url" name="linkedin" placeholder="https://linkedin.com/in/yourpage" value={linkedin} onChange={(e) => setLinkedin(e.target.value)} />
 
               <label>Type</label>
-              <select name="type" onChange={handleChange}>
+              <select name="type" value={type} onChange={(e) => setType(e.target.value)}>
                 <option value="">Select Type</option>
                 <option value="academic">Academic</option>
                 <option value="sports">Sports</option>
@@ -122,7 +123,7 @@ const RegisterSociety = () => {
                 <option value="other">Other</option>
               </select>
 
-              <button type="submit" >Submit Registration</button>
+              <button type="submit">Submit Registration</button>
             </form>
           </div>
         </div>

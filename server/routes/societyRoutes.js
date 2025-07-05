@@ -20,6 +20,11 @@ router.get(
   getAllSocieties
 );
 router.get(
+  '/user-societies',
+  protect,
+  getUserSocieties
+);
+router.get(
   '/:id',
   getSocietyById
 );
@@ -34,11 +39,7 @@ router.post(
   registerSociety
 );
 
-router.get(
-  '/user-societies',
-  protect,
-  getUserSocieties
-);
+
 
 router.post(
   '/:id/join',

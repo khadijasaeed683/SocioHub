@@ -73,6 +73,7 @@
 
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
 
 import LandingPage from './pages/LandingPage';
 import RegisterSociety from './pages/RegisterSociety';
@@ -81,6 +82,8 @@ import SignupPage from './pages/SignupPage';
 import UserDashboard from './pages/UserDashboard';
 import ExploreEvents from './pages/ExploreEvents';
 import JoinSociety from './pages/JoinSociety';
+import SocietyDetails from './pages/SocietyDetails';
+
 
 import ManageSociety from './pages/ManageSociety/ManageSociety';
 import Overview from './pages/ManageSociety/Overview';
@@ -105,6 +108,9 @@ const AppWrapper = () => {
   };
 
   return (
+    <>
+    <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} />
+
     <Routes>
       {/* 🌐 Public Routes */}
       <Route path="/" element={<LandingPage />} />
@@ -113,6 +119,7 @@ const AppWrapper = () => {
       <Route path="/register-society" element={<RegisterSociety />} />
       <Route path="/events" element={<ExploreEvents />} />
       <Route path="/JoinSociety" element={<JoinSociety />} />
+      <Route path="/society/:id" element={<SocietyDetails />} />
 
       {/* 👤 Dashboard Route */}
       <Route
@@ -146,6 +153,7 @@ const AppWrapper = () => {
         <Route path="settings" element={<Settings />} />
       </Route>
     </Routes>
+    </>
   );
 };
 

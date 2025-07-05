@@ -33,7 +33,7 @@ const SignupPage = ({ onSignup }) => {
       setPassword('');
     } else {
       onSignup(data.user);
-      toast.success('Signup successful! Redirecting to dashboard...');
+      toast.success('Signup successful!');
     }
   } catch (err) {
     console.error(err);

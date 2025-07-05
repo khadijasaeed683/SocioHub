@@ -61,7 +61,7 @@ const createEvent = async (req, res) => {
         message: `Location is already booked for another event (${conflictingEvent.title}) at this date and time.`
       });
     }
-
+    // posterUrl = await generateEventPoster({ title, description, startTime, endTime, location, date: eventDate, societyId });
     //  Create new event
     const newEvent = await Event.create({
       title,

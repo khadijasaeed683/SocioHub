@@ -1,11 +1,12 @@
 import React, { useContext, useState } from 'react';
 import './AuthNavbar.css';
 import { SidebarContext } from '../context/SidebarContext';
+import { Link, useNavigate } from 'react-router-dom';
 
 const AuthNavbar = ({ user, onSignOut }) => {
   const { toggleSidebar } = useContext(SidebarContext);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-
+  const navigate = useNavigate();
   const toggleDropdown = () => setDropdownOpen((prev) => !prev);
 
   const getInitials = (name) => {
@@ -23,7 +24,7 @@ const AuthNavbar = ({ user, onSignOut }) => {
         <button className="hamburger" onClick={toggleSidebar}>
           ☰
         </button>
-        <span className="app-name">SocioHub</span>
+        <Link to="/" className="logo-link">SocioHub</Link>
       </div>
 
       <div className="navbar-right">
@@ -32,10 +33,10 @@ const AuthNavbar = ({ user, onSignOut }) => {
             {user?.avatar ? (
               <img src={user.avatar} alt="DP" />
             ) : (
-              <span>{getInitials(user?.name)}</span>
+              <span>{getInitials(user?.username)}</span>
             )}
           </div>
-          <span className="username">{user?.name}</span>
+          <span className="username">{user?.username}</span>
         </div>
 
         {dropdownOpen && (

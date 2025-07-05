@@ -16,6 +16,7 @@ const protect = async (req, res, next) => {
     console.log("Decoded token:", decoded);
     req.user = await User.findById(decoded.id).select('-password');
     next();
+    console.log("User authenticated:", req.user.username);
   } catch (err) {
     res.status(401).json({ message: "Invalid token" });
   }

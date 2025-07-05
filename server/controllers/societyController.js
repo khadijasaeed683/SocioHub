@@ -52,7 +52,6 @@ const registerSociety = async (req, res) => {
       type,
       createdBy: user._id
     });
-
     res.status(201).json({ message: 'Society registration requested', request: newRequest });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -73,9 +72,9 @@ const getAllSocieties = async (req, res) => {
 };
 
 const getUserSocieties = async (req, res) => {
-    
+  console.log("User trying to get societies:");
   const user = req.user;
-
+  console.log("User trying to get societies:", user.username, user._id);
   try {
     const registeredSocieties = await Society.find({ createdBy: user._id });
     const joinedSocieties = await Society.find({ members: user._id });
@@ -83,9 +82,9 @@ const getUserSocieties = async (req, res) => {
     if (!registeredSocieties.length && !joinedSocieties.length) {
       return res.status(404).json({ error: 'You have not registered/joined any society' });
     }
-    res.status(200).json({ registeredSocieties, joinedSocieties });
+    return res.status(200).json({ registeredSocieties, joinedSocieties });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
