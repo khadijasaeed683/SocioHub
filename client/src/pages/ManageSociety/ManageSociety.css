@@ -1,0 +1,47 @@
+.manage-society-layout {
+  display: flex;
+  height: 100vh;
+  background-color: #f5f4f2;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.manage-society-sidebar {
+  width: 220px;
+  background-color: #222831;
+  color: #fff;
+  padding: 30px 20px;
+}
+
+.sidebar-heading {
+  font-size: 1.3rem;
+  margin-bottom: 30px;
+  color: #DFD0B8;
+}
+
+.sidebar-links {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.sidebar-links a {
+  color: #ccc;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: color 0.2s ease;
+}
+
+.sidebar-links a:hover {
+  color: #DFD0B8;
+}
+
+.sidebar-links .active-link {
+  color: #DFD0B8;
+  font-weight: bold;
+}
+
+.manage-society-main {
+  flex: 1;
+  padding: 40px;
+  overflow-y: auto;
+}
