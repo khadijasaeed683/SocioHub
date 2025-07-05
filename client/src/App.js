@@ -74,6 +74,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
+import { Navigate } from 'react-router-dom';
 
 import LandingPage from './pages/LandingPage';
 import RegisterSociety from './pages/RegisterSociety';
@@ -83,6 +84,8 @@ import UserDashboard from './pages/UserDashboard';
 import ExploreEvents from './pages/ExploreEvents';
 import JoinSociety from './pages/JoinSociety';
 import SocietyDetails from './pages/SocietyDetails';
+import ProfileSettings from './pages/ProfileSettings';
+
 
 
 import ManageSociety from './pages/ManageSociety/ManageSociety';
@@ -106,6 +109,10 @@ const AppWrapper = () => {
     setLoggedInUser(userData);
     navigate('/dashboard');
   };
+  const handleSignOut = () => {
+    setLoggedInUser(null);
+    navigate('/login');
+  };
 
   return (
     <>
@@ -120,6 +127,19 @@ const AppWrapper = () => {
       <Route path="/events" element={<ExploreEvents />} />
       <Route path="/JoinSociety" element={<JoinSociety />} />
       <Route path="/society/:id" element={<SocietyDetails />} />
+      <Route
+        path="/profile-settings"
+        element={
+          loggedInUser ? (
+            <ProfileSettings user={loggedInUser} onSignOut={handleSignOut} />
+          ) : (
+            <Navigate to="/login" />
+          )
+        }
+      />
+
+
+
 
       {/* 👤 Dashboard Route */}
       <Route
@@ -152,6 +172,8 @@ const AppWrapper = () => {
         <Route path="events" element={<Events />} />
         <Route path="settings" element={<Settings />} />
       </Route>
+
+
     </Routes>
     </>
   );

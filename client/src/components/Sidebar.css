@@ -50,6 +50,7 @@
   position: relative;
 }
 
+
 .sidebar-item:hover {
   background-color: #393E46;
 }
@@ -152,3 +153,28 @@
   cursor: default;
   background-color: transparent;
 }
+
+.dropdown-icon {
+  transition: transform 0.3s ease;
+}
+
+.dropdown-icon.open {
+  transform: rotate(90deg);
+}
+
+.sidebar-item.with-dropdown {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sidebar-item-content {
+  gap: 10px;
+  flex-grow: 1;
+}
+
+.sidebar-icon {
+  font-size: 1rem;
+}
+
+

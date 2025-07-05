@@ -1,0 +1,148 @@
+.profile-settings-page {
+  padding: 40px;
+  background-color: #f9f6f0;
+  min-height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.profile-settings-page h2 {
+  margin-bottom: 25px;
+  color: #222831;
+}
+
+.profile-section {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 40px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.avatar-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.avatar-preview img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.avatar-placeholder {
+  width: 120px;
+  height: 120px;
+  background: #ccc;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.info-fields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.info-fields label {
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.info-fields input,
+.info-fields textarea {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-top: 5px;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.save-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #393e46;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Certificates Section */
+.certificates-section {
+  margin-bottom: 40px;
+  padding: 25px;
+  border: 1px solid #dcdcdc;
+  background: #fff;
+  border-radius: 10px;
+}
+
+.certificates-section h3 {
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+  color: #222831;
+}
+
+.badges-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.badge-card {
+  background-color: #dfd0b8;
+  padding: 10px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  color: #393e46;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.upload-label {
+  display: inline-block;
+  padding: 8px 14px;
+  background-color: #393e46;
+  color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+/* Danger Zone */
+.danger-zone {
+  padding: 25px;
+  background-color: #fff;
+  border: 1px solid #f44336;
+  border-radius: 10px;
+}
+
+.danger-zone h3 {
+  color: #c62828;
+  margin-bottom: 10px;
+}
+
+.danger-zone input {
+  padding: 10px;
+  width: 100%;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.delete-btn {
+  padding: 10px 20px;
+  background-color: #c62828;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
