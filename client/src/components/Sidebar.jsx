@@ -1,6 +1,11 @@
 import React, { useContext, useState } from 'react';
 import './Sidebar.css';
-import { FaUsersCog, FaPlusCircle, FaCog, FaSignOutAlt, FaAngleRight } from 'react-icons/fa';
+import {
+  FaUsersCog,
+  FaPlusCircle,
+  FaCog,
+  FaSignOutAlt
+} from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { SidebarContext } from '../context/SidebarContext';
 
@@ -11,32 +16,24 @@ const Sidebar = ({ user, societies }) => {
 
   const toggleAdminDropdown = () => setAdminDropdownOpen(!adminDropdownOpen);
 
-  const adminSocieties = societies?.filter(s => s.admins.includes(user._id)) || [];
+  const adminSocieties = societies?.filter(s => Array.isArray(s.admins) && s.admins.includes(user._id)) || [];
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/login');
   };
+  console.log("Sidebar user._id:", user?._id);
+  console.log("Received societies:", societies);
+  console.log("Filtered adminSocieties:", adminSocieties);
 
   return (
     <div className={`sidebar ${!isOpen ? 'collapsed' : ''}`}>
       <div className="sidebar-links">
         {/* Societies Administration Dropdown */}
-        <div className="sidebar-item with-dropdown" onClick={toggleAdminDropdown}>
-          <div className="sidebar-item-content">
-            <FaUsersCog className="sidebar-icon" />
-            {isOpen && (
-              <>
-                <span>Society Admin Portal</span>
-                <FaAngleRight className={`dropdown-icon ${adminDropdownOpen ? 'open' : ''}`} />
-              </>
-            )}
-          </div>
-          {!isOpen && <span className="tooltip">Societies</span>}
+        <div className="sidebar-item" onClick={toggleAdminDropdown}>
+          <FaUsersCog />
+          {isOpen ? <span>Society Admin Portal</span> : <span className="tooltip">Societies</span>}
         </div>
-
-
-
 
         {isOpen && adminDropdownOpen && (
           <div className="admin-dropdown">

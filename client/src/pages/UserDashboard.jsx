@@ -4,48 +4,34 @@ import AuthNavbar from '../components/AuthNavbar';
 import Sidebar from '../components/Sidebar';
 import './UserDashboard.css';
 
-const dummyUser = {
-  _id: 'u123',
-  name: 'John Doe',
-  email: 'john@example.com',
-};
-
-const dummySocieties = [
-  {
-    _id: 's1',
-    name: 'Tech Society',
-    admins: ['u123'],
-  },
-  {
-    _id: 's2',
-    name: 'Art Society',
-    admins: [],
-  },
-];
-
-const dummyEvents = {
-  registered: [
-    { _id: 'e1', title: 'TechFest 2025', societyName: 'Tech Society' },
-    { _id: 'e2', title: 'Art Gala', societyName: 'Art Society' },
-  ],
-  upcoming: [
-    { _id: 'e3', title: 'Hackathon', date: '2025-08-01' },
-    { _id: 'e4', title: 'Painting Workshop', date: '2025-08-10' },
-  ],
-};
-
 const UserDashboard = () => {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem('user'));
-  const events = dummyEvents;
+  const user = JSON.parse(localStorage.getItem('user')) || { _id: 'u123', username: 'John Doe' };
+  
+  // Dummy societies for testing Admin Portal
+  const dummySocieties = [
+    { _id: 's1', name: 'Tech Society', admins: ['6868299578d684c8ef58ee45'], createdBy: '6868299578d684c8ef58ee45' },
+    { _id: 's2', name: 'Art Society', admins: ['6868299578d684c8ef58ee45'], createdBy: 'j' },
+    { _id: 's3', name: 'Science Club', admins: ['j'], createdBy: '6868299578d684c8ef58ee45' }
+  ];
 
   const [societies, setSocieties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [adminSocieties, setAdminSocieties] = useState(null)
   const [showUnregisterForm, setShowUnregisterForm] = useState(null);
   const [unregisterReason, setUnregisterReason] = useState('');
   const [password, setPassword] = useState('');
+
+  const dummyEvents = {
+    registered: [
+      { _id: 'e1', title: 'TechFest 2025', societyName: 'Tech Society' },
+      { _id: 'e2', title: 'Art Gala', societyName: 'Art Society' },
+    ],
+    upcoming: [
+      { _id: 'e3', title: 'Hackathon', date: '2025-08-01' },
+      { _id: 'e4', title: 'Painting Workshop', date: '2025-08-10' },
+    ],
+  };
 
   const handleUnregister = (eventId) => {
     alert(`Unregistered from event ${eventId}. Reason: ${unregisterReason}`);
@@ -53,39 +39,46 @@ const UserDashboard = () => {
     setUnregisterReason('');
     setPassword('');
   };
-  useEffect(() => {
-        const fetchSocieties = async () => {
-          try {
-            const res = await fetch('http://localhost:5000/api/society/user-societies', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-      }
-    });
-            const data = await res.json();
-    
-            if (!res.ok) {
-              setError(data.message || 'Failed to fetch societies');
-            } else {
-              setSocieties([...data.registeredSocieties, ...data.joinedSocieties]);
 
-            }
-          } catch (err) {
-            setError('Server error. Try again later.');
-          } finally {
-            setLoading(false);
-          }
-        };
-    
-        fetchSocieties();
-      }, []);
+  useEffect(() => {
+    const fetchSocieties = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/society/user-societies', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          setError(data.message || 'Failed to fetch societies');
+        } else {
+          setSocieties([...data.registeredSocieties, ...data.joinedSocieties]);
+        }
+      } catch (err) {
+        setError('Server error. Try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSocieties();
+  }, []);
+
+  // Use dummySocieties for Sidebar testing instead of fetched societies
+  const adminSocieties = dummySocieties.filter(s => s.createdBy === user._id);
 
   return (
     <>
       <AuthNavbar user={user} />
       <div className="dashboard-layout">
-        <Sidebar user={user} adminSocieties={adminSocieties} />
+        <Sidebar
+          user={user}
+          societies={dummySocieties}
+        />
+
 
         <div className="dashboard-page">
           <h1>Welcome, {user.username}</h1>
@@ -97,8 +90,7 @@ const UserDashboard = () => {
                 <div key={society._id} className="society-card">
                   <h3>{society.name}</h3>
                   <p className="role-tag">
-                    Role:{' '}
-                    {society.createdBy === user._id ? 'Admin' : 'Member'}
+                    Role: {society.createdBy === user._id ? 'Admin' : 'Member'}
                   </p>
                 </div>
               ))}
@@ -108,7 +100,7 @@ const UserDashboard = () => {
           <section className="user-events">
             <h2>Your Registered Events</h2>
             <ul>
-              {events.registered.map((event) => (
+              {dummyEvents.registered.map((event) => (
                 <li key={event._id}>
                   {event.title} - {event.societyName}
                   <button
@@ -125,7 +117,7 @@ const UserDashboard = () => {
           <section className="upcoming-events">
             <h2>Upcoming Events in Your Societies</h2>
             <ul>
-              {events.upcoming.map((event) => (
+              {dummyEvents.upcoming.map((event) => (
                 <li key={event._id}>
                   {event.title} - {event.date}
                 </li>
