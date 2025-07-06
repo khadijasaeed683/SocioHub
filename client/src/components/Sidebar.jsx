@@ -16,7 +16,7 @@ const Sidebar = ({ user, societies }) => {
 
   const toggleAdminDropdown = () => setAdminDropdownOpen(!adminDropdownOpen);
 
-  const adminSocieties = societies?.filter(s => Array.isArray(s.admins) && s.admins.includes(user._id)) || [];
+  const adminSocieties = societies.filter(s => s.createdBy === user._id);
 
   const handleLogout = () => {
     localStorage.removeItem('token');

@@ -11,25 +11,25 @@ const EventCard = ({ event, isRsvped, onRSVPClick }) => {
       )}
 
       <div className="event-content">
-        <h3>{event.title}</h3>
+        <h2 className='event-title'>{event.title}</h2>
 
         <p className="event-date">
           📅 {new Date(event.date).toLocaleDateString('en-US', { 
               year: 'numeric', 
               month: 'long', 
               day: 'numeric' 
-          })} {event.time ? `at ${event.time}` : ''}
+          })} {event.time ? `at ${event.time}` : ''} 📍 {event.location}
         </p>
 
-        <p className="event-location">📍 {event.location}</p>
-        <p className="event-desc">{event.description}</p>
+        <p className="event-desc">📜 {event.description}</p>
         <p className="event-society">🎓 Hosted by: {event.societyId.name}</p>
 
-        {event.openToAll && <span className="open-tag">Open to All</span>}
+        {event.isPublic && <span className="open-tag">Open to All</span>}
 
         <button
           disabled={isRsvped}
           onClick={() => onRSVPClick(event)}
+          className='rsvp-btn'
         >
           {isRsvped ? 'RSVP Pending' : 'RSVP'}
         </button>

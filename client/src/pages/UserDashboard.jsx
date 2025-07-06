@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import AuthNavbar from '../components/AuthNavbar';
 import Sidebar from '../components/Sidebar';
 import './UserDashboard.css';
+import SocietyCard from '../components/SocietyCard'; // adjust path if needed
+
 
 const UserDashboard = () => {
   const navigate = useNavigate();
@@ -68,7 +70,7 @@ const UserDashboard = () => {
   }, []);
 
   // Use dummySocieties for Sidebar testing instead of fetched societies
-  const adminSocieties = dummySocieties.filter(s => s.createdBy === user._id);
+  const adminSocieties = societies.filter(s => s.createdBy === user._id);
 
   return (
     <>
@@ -76,9 +78,8 @@ const UserDashboard = () => {
       <div className="dashboard-layout">
         <Sidebar
           user={user}
-          societies={dummySocieties}
+          societies={adminSocieties}
         />
-
 
         <div className="dashboard-page">
           <h1>Welcome, {user.username}</h1>
@@ -87,12 +88,7 @@ const UserDashboard = () => {
             <h2>Your Joined Societies</h2>
             <div className="society-list">
               {societies.map((society) => (
-                <div key={society._id} className="society-card">
-                  <h3>{society.name}</h3>
-                  <p className="role-tag">
-                    Role: {society.createdBy === user._id ? 'Admin' : 'Member'}
-                  </p>
-                </div>
+                <SocietyCard key={society._id} society={society} user={user} />
               ))}
             </div>
           </section>
