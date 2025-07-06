@@ -45,3 +45,30 @@
   padding: 40px;
   overflow-y: auto;
 }
+.admin-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: black;
+  color: white;
+  
+  padding: 15px 30px;
+}
+
+.admin-navbar h2 {
+  font-size: 1.4rem;
+  margin: 0;
+  color:white;
+}
+
+.back-btn {
+  background: transparent;
+  color: #fff;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.back-btn:hover {
+  text-decoration: underline;
+}

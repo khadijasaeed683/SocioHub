@@ -1,0 +1,126 @@
+.events-management-container {
+  padding: 30px;
+  background: #fefefe;
+  border-radius: 10px;
+  max-width: 1000px;
+  margin: auto;
+}
+
+.section-heading {
+  font-size: 1.8rem;
+  margin-bottom: 25px;
+  color: #2f3542;
+}
+
+.events-section {
+  margin-bottom: 40px;
+}
+
+.event-card {
+  background: #d6d6d6;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+  margin-bottom: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.event-banner {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.event-details {
+  padding: 20px;
+}
+
+.event-details h4 {
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+  color: #1e272e;
+}
+
+.event-date {
+  color: #57606f;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.edit-btn {
+  background-color: #393e46;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+.event-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.event-actions button {
+  background-color: #393E46;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.event-actions .cancel-btn {
+  background-color: #aaa;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: rgba(34, 40, 49, 0.85);
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-form {
+  background: #fff;
+  padding: 25px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 5px 30px rgba(0, 0, 0, 0.25);
+}
+
+.modal-form input,
+.modal-form textarea {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.modal-form textarea {
+  resize: vertical;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+}
+.events-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  margin-top: -10px; /* moves the button slightly up */
+}
