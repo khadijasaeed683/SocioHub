@@ -9,7 +9,8 @@ const { registerSociety,
         getJoinRequests,
         acceptJoinRequest,
         getSocietyMembers,
-        getSocietyById
+        getSocietyById,
+        updateSociety
       } = require('../controllers/societyController');
 const { protect , authAdmin} = require('../middleware/authMiddleware');
 const upload = require('../middleware/multer'); 
@@ -19,11 +20,11 @@ router.get(
   '/',
   getAllSocieties
 );
-router.get(
-  '/user-societies',
-  protect,
-  getUserSocieties
-);
+// router.get(
+//   '/user-societies',
+//   protect,
+//   getUserSocieties
+// );
 router.get(
   '/:id',
   getSocietyById
@@ -39,7 +40,15 @@ router.post(
   registerSociety
 );
 
-
+router.put(
+  '/:id',
+  protect,
+  upload.fields([
+    { name: 'logo', maxCount: 1 },
+    { name: 'coverImage', maxCount: 1 }
+  ]),
+  updateSociety
+);
 
 router.post(
   '/:id/join',

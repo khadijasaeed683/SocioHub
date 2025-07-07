@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Events.css';
+import { useSociety } from '../../context/SocietyContext';
 
 const initialEvents = [
   {
@@ -25,7 +26,8 @@ const initialEvents = [
 ];
 
 const Events = () => {
-  const [events, setEvents] = useState(initialEvents);
+  const { society, setSociety } = useSociety();
+  const [events, setEvents] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editEventId, setEditEventId] = useState(null);
   const [formData, setFormData] = useState({
@@ -108,6 +110,32 @@ const Events = () => {
   const upcomingEvents = events.filter((e) => new Date(e.date) >= today);
   const pastEvents = events.filter((e) => new Date(e.date) < today);
 
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/society/${society._id}/event?upcoming=true`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`, // if auth needed
+          },
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          setEvents(data);
+        } else {
+          console.error('Error fetching events:', data.message);
+        }
+      } catch (error) {
+        console.error('Server error while fetching events:', error);
+      }
+    };
+
+    fetchEvents();
+  }, [society._id]);
+
+
   return (
     <div className="events-management-container">
       <div className="events-header">
@@ -164,16 +192,20 @@ const Events = () => {
       )}
 
       <div className="events-section">
-        {/* <h3>Upcoming Events</h3> */}
+        <h3>Upcoming Events</h3>
         {upcomingEvents.length === 0 ? <p>No upcoming events.</p> : (
           upcomingEvents.map((event) => (
             <div key={event._id} className="event-card">
-              <img src={event.banner} alt={event.title} className="event-banner" />
+              <img src={event.poster} alt={event.title} className="event-banner" />
               <div className="event-details">
                 <h4>{event.title}</h4>
-                <p>📅 {event.date}</p>
+                <p>📅 {new Date(event.date).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                    })}</p>
                 <p>{event.description}</p>
-                <p>👥 Registrations: {event.registrations}</p>
+                <p>👥 Registrations: {event.participants.length}</p>
                 <p>🔓 RSVP: {event.rsvpOpen ? 'Open' : 'Closed'}</p>
                 <div className="event-actions">
                   <button onClick={() => openEditForm(event)}>✏️ Edit</button>

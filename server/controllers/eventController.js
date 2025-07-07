@@ -87,24 +87,39 @@ const createEvent = async (req, res) => {
 const getAllEvents = async (req, res) => {
   try {
     const societyId = req.params.societyId;
-    console.log("societyId", societyId);
+    const { upcoming } = req.query; // get upcoming param from query
+    console.log("societyId", societyId, "upcoming:", upcoming);
+
     if (!societyId) {
-        return res.status(400).json({ message: 'Society ID is required' });
-        }
-    // Fetch all events for the society and populate societyId with name and logo
-    
-    const events = await Event.find({ societyId })
-        .populate('societyId', 'name logo')
-        .populate('participants', 'name email')
-        .sort({ createdAt: -1 });
-    if (!events || events.length === 0) {
-        return res.status(404).json({ message: 'No events found for this society' });
+      return res.status(400).json({ message: 'Society ID is required' });
     }
+
+    const filter = { societyId };
+
+    if (upcoming === 'true') {
+      const now = new Date();
+      filter.date = { $gte: now }; // only events today or in future
+    }
+
+    const events = await Event.find(filter)
+      .populate('societyId', 'name logo')
+      .populate('participants', 'name email')
+      .sort({ date: 1, startTime: 1 }); // sort upcoming earliest first
+
+    if (!events || events.length === 0) {
+      return res.status(404).json({ message: upcoming === 'true' ? 'No upcoming events found for this society' : 'No events found for this society' });
+    }
+
     return res.status(200).json(events);
+
   } catch (error) {
+    console.error(error);
     return res.status(500).json({ message: error.message });
   }
-}
+};
+
+
+
 const getPublicEvents = async (req, res) => {
   try {
     
@@ -172,6 +187,7 @@ const registerForEvent = async (req, res) => {
           phone,
           isGuest: false
         });
+        user.registeredEvents.push(event._id);
       } else {
         event.participants.push({
           name,
@@ -191,24 +207,16 @@ const registerForEvent = async (req, res) => {
         phone,
         isGuest: false
       });
+      user.registeredEvents.push(event._id);
     }
 
-    // await event.save();
+    await event.save();
 
     //  Generate QR code
     const qrText = `Event: ${event.title}\nName: ${name}\nEmail: ${email}\nDate: ${event.date}`;
     const qrCodeDataURL = await generateQRCode(qrText);
 
-    //  Email the ticket
-    // const transporter = nodemailer.createTransport({
-    //   host: 'smtp.sendgrid.net',
-    //   port: 587,
-    //   auth: {
-    //     user: 'apikey',
-    //     pass: process.env.SENDGRID_API_KEY
-    //   }
-    // });
-
+    
     // ✅ Configure Nodemailer
     const transporter = nodemailer.createTransport({
       service: 'gmail',
@@ -338,4 +346,5 @@ const deleteEvent = async (req, res) => {
 };
 
 
-module.exports = { createEvent, getAllEvents, getEventById, registerForEvent , updateEvent , deleteEvent ,getPublicEvents};
+module.exports = { createEvent, getAllEvents, getEventById, registerForEvent , updateEvent , deleteEvent ,getPublicEvents
+};

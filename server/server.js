@@ -10,6 +10,7 @@ const cors = require('cors');
 const adminRoutes = require('./routes/adminRoutes');
 const eventRoutes = require('./routes/eventRoutes');
 const publicEventRoutes = require('./routes/publicEventRoutes');
+const userRoutes = require('./routes/userRoutes'); // Uncomment if needed
 const app = express();
 connectDB();
 // connectCloudinary();
@@ -31,6 +32,7 @@ app.use('/api/society', societyRoutes);
 app.use('/api/event', eventRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/explore-events', publicEventRoutes);
+app.use('/api/user', userRoutes); // Uncomment if needed
 
 app.listen(process.env.PORT, () => {
   console.log('server is running on port', process.env.PORT);

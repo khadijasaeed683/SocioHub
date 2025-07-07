@@ -3,37 +3,38 @@ import { useNavigate } from 'react-router-dom';
 import AuthNavbar from '../components/AuthNavbar';
 import Sidebar from '../components/Sidebar';
 import './UserDashboard.css';
-import SocietyCard from '../components/SocietyCard'; // adjust path if needed
+import SocietyCard from '../components/SocietyCard';
+import EventCard from '../components/EventCard';
+import RSVPForm from './RSVPForm'; // adjust path if needed
+import useRSVP from '../hooks/useRSVP'; // custom hook for RSVP logic
 
 
 const UserDashboard = () => {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem('user')) || { _id: 'u123', username: 'John Doe' };
-  
-  // Dummy societies for testing Admin Portal
-  const dummySocieties = [
-    { _id: 's1', name: 'Tech Society', admins: ['6868299578d684c8ef58ee45'], createdBy: '6868299578d684c8ef58ee45' },
-    { _id: 's2', name: 'Art Society', admins: ['6868299578d684c8ef58ee45'], createdBy: 'j' },
-    { _id: 's3', name: 'Science Club', admins: ['j'], createdBy: '6868299578d684c8ef58ee45' }
-  ];
+  const [user, setUser] = useState(() => {
+      const savedUser = localStorage.getItem('user');
+      return savedUser ? JSON.parse(savedUser) : { _id: 'u123', username: 'John Doe' };
+    });
+
+    useEffect(() => {
+      // Example: if you ever want to update localStorage when user changes
+      localStorage.setItem('user', JSON.stringify(user));
+    }, [user]);  
+  // // Dummy societies for testing Admin Portal
+  // const dummySocieties = [
+  //   { _id: 's1', name: 'Tech Society', admins: ['6868299578d684c8ef58ee45'], createdBy: '6868299578d684c8ef58ee45' },
+  //   { _id: 's2', name: 'Art Society', admins: ['6868299578d684c8ef58ee45'], createdBy: 'j' },
+  //   { _id: 's3', name: 'Science Club', admins: ['j'], createdBy: '6868299578d684c8ef58ee45' }
+  // ];
 
   const [societies, setSocieties] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [events, setEvents] = useState([]);
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [error, setError] = useState('');
   const [showUnregisterForm, setShowUnregisterForm] = useState(null);
   const [unregisterReason, setUnregisterReason] = useState('');
   const [password, setPassword] = useState('');
-
-  const dummyEvents = {
-    registered: [
-      { _id: 'e1', title: 'TechFest 2025', societyName: 'Tech Society' },
-      { _id: 'e2', title: 'Art Gala', societyName: 'Art Society' },
-    ],
-    upcoming: [
-      { _id: 'e3', title: 'Hackathon', date: '2025-08-01' },
-      { _id: 'e4', title: 'Painting Workshop', date: '2025-08-10' },
-    ],
-  };
+  
 
   const handleUnregister = (eventId) => {
     alert(`Unregistered from event ${eventId}. Reason: ${unregisterReason}`);
@@ -41,11 +42,77 @@ const UserDashboard = () => {
     setUnregisterReason('');
     setPassword('');
   };
+  const {
+ selectedEvent,
+    setSelectedEvent,
+    formData,
+    setFormData,
+    handleRSVPClick,
+    handleFormSubmit,
+    handleInputChange,
+} = useRSVP();
+
 
   useEffect(() => {
-    const fetchSocieties = async () => {
-      try {
-        const res = await fetch('http://localhost:5000/api/society/user-societies', {
+    if (!user?._id) return;
+
+    const fetchSocietiesAndUpcomingEvents = async () => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/user/${user._id}/societies`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.message || 'Failed to fetch societies');
+        console.error('Error fetching societies:', data.message);
+        return;
+      }
+
+      const societiesFetched = [...data.registeredSocieties, ...data.joinedSocieties];
+      setSocieties(societiesFetched);
+
+      // Fetch upcoming events for each society
+      const upcomingEventsMap = {};
+      await Promise.all(
+        societiesFetched.map(async (society) => {
+          try {
+            const eventsRes = await fetch(`http://localhost:5000/api/society/${society._id}/event?upcoming=true`, {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+              },
+            });
+            const eventsData = await eventsRes.json();
+
+            if (eventsRes.ok) {
+              upcomingEventsMap[society._id] = eventsData;
+            } else {
+              upcomingEventsMap[society._id] = [];
+            }
+          } catch (err) {
+            console.error(`Error fetching upcoming events for society ${society._id}:`, err);
+            upcomingEventsMap[society._id] = [];
+          }
+        })
+      );
+
+      setUpcomingEvents(upcomingEventsMap);
+
+    } catch (err) {
+      setError('Server error. Try again later.');
+    } 
+  };
+
+    const fetchEvents = async () => {
+      try { 
+        const res = await fetch(`http://localhost:5000/api/user/${user._id}/events`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -53,28 +120,39 @@ const UserDashboard = () => {
           },
         });
         const data = await res.json();
-
         if (!res.ok) {
-          setError(data.message || 'Failed to fetch societies');
+          setError(data.message || 'Failed to fetch events');
+          console.error('Error fetching events:', error);
         } else {
-          setSocieties([...data.registeredSocieties, ...data.joinedSocieties]);
+          setEvents(data);
         }
       } catch (err) {
         setError('Server error. Try again later.');
-      } finally {
-        setLoading(false);
       }
     };
 
-    fetchSocieties();
-  }, []);
+    fetchEvents();
+    fetchSocietiesAndUpcomingEvents();
 
+  }, [user._id, error]);
+  console.log("User Dashboard societies:", societies);
+  console.log("User Dashboard events:", events);
+  console.log("User Dashboard upcomingEvents:", upcomingEvents);
   // Use dummySocieties for Sidebar testing instead of fetched societies
   const adminSocieties = societies.filter(s => s.createdBy === user._id);
+  const allUpcomingEvents = Object.values(upcomingEvents).flat();
+
+
+  // ✅ Logout function
+  const handleSignOut = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/login');
+  };
 
   return (
     <>
-      <AuthNavbar user={user} />
+      <AuthNavbar user={user} onSignOut={handleSignOut} />
       <div className="dashboard-layout">
         <Sidebar
           user={user}
@@ -95,31 +173,45 @@ const UserDashboard = () => {
 
           <section className="user-events">
             <h2>Your Registered Events</h2>
-            <ul>
-              {dummyEvents.registered.map((event) => (
-                <li key={event._id}>
-                  {event.title} - {event.societyName}
-                  <button
-                    className="unregister-btn"
-                    onClick={() => setShowUnregisterForm(event._id)}
-                  >
-                    Unregister
-                  </button>
-                </li>
-              ))}
-            </ul>
+            {events && events.length > 0 ? (
+              <ul>
+                {events.map((event) => (
+                  <li key={event._id}>
+                    {event.title} - {event.societyId.name}
+                    <button
+                      className="unregister-btn"
+                      onClick={() => setShowUnregisterForm(event._id)}>
+                      Unregister
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No registered events to show.</p>
+            )}
           </section>
 
+
           <section className="upcoming-events">
-            <h2>Upcoming Events in Your Societies</h2>
-            <ul>
-              {dummyEvents.upcoming.map((event) => (
-                <li key={event._id}>
-                  {event.title} - {event.date}
-                </li>
-              ))}
-            </ul>
-          </section>
+  <h2>Upcoming Events in Your Societies</h2>
+
+  {allUpcomingEvents.length > 0 ? (
+    <div className="event-cards-container">
+      {allUpcomingEvents.map((event) => (
+        <EventCard
+          key={event._id}
+          event={event}
+          isRsvped={false}
+          onRSVPClick={handleRSVPClick}
+        />
+      ))}
+    </div>
+  ) : (
+    <p>No upcoming events to show.</p>
+  )}
+</section>
+
+
 
           <div className="explore-button">
             <button onClick={() => navigate('/JoinSociety')}>
@@ -167,6 +259,16 @@ const UserDashboard = () => {
           </div>
         </div>
       )}
+      {selectedEvent && (
+          <RSVPForm
+            event={selectedEvent}
+            formData={formData}
+            setFormData={setFormData}
+            onSubmit={handleFormSubmit}
+            onCancel={() => setSelectedEvent(null)}
+            onInputChange={handleInputChange}
+          />
+        )}
     </>
   );
 };

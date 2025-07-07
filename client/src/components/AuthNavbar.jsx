@@ -17,6 +17,7 @@ const AuthNavbar = ({ user, onSignOut }) => {
       .slice(0, 2)
       .join('');
   };
+  
 
   return (
     <div className="auth-navbar">

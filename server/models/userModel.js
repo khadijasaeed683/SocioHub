@@ -23,9 +23,13 @@ const userSchema = new Schema({
         default: 'guest', // Default role is 'guest'
         enum: ['guest', 'member', 'society-head', 'admin'] // Allowed roles
     },
-    joinedSociety: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Society',
+    societies: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Society',
+    }],
+    registeredEvents: [{
+        type: mongoose.Schema.Types.ObjectId,
+    ref: 'Event',
   }]
 }, { timestamps: true });
 

@@ -135,7 +135,7 @@ const approveSociety = async (req, res) => {
     // 3. Promote user to society-head
     await User.findByIdAndUpdate(pendingSociety.pendingSocietyedBy, {
       role: 'society-head',
-      joinedSociety: society._id
+      societies: society._id
     });
 
     // 4. Update pendingSociety status
@@ -201,7 +201,7 @@ const acceptJoinRequest = async (req, res) => {
     await society.save();
 
     requestedUser = await User.findByIdAndUpdate(userId);
-    requestedUser.joinedSociety.push(societyId);
+    requestedUser.societies.push(societyId);
     await requestedUser.save();
     res.status(200).json({ success: true, message: 'Request accepted', society });
   } catch (error) {
@@ -233,11 +233,87 @@ const getSocietyById = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+const updateSociety = async (req, res) => {
+  try {
+    const societyId = req.params.id;
+
+    const {
+      name,
+      description,
+      contactEmail,
+      website,
+      phone,
+      type,
+      inductionsOpen,
+      socialLinks // assume it comes as JSON string if sent via multipart/form-data
+    } = req.body;
+
+    const logoFile = req.files?.logo ? req.files.logo[0] : null;
+    const coverFile = req.files?.coverImage ? req.files.coverImage[0] : null;
+
+    // 🔍 Find existing society
+    const society = await Society.findById(societyId);
+    if (!society) {
+      return res.status(404).json({ message: 'Society not found' });
+    }
+
+    // 🔎 Check if new name is provided and it's not taken by another society
+    if (name && name !== society.name) {
+      const existing = await Society.findOne({ name });
+      if (existing) {
+        return res.status(400).json({ message: 'Society name already exists. Choose another name.' });
+      }
+      society.name = name;
+    }
+
+    // ✅ Update other fields if provided
+    if (description) society.description = description;
+    if (contactEmail) society.contactEmail = contactEmail;
+    if (website) society.website = website;
+    if (phone) society.phone = phone;
+    if (type) society.type = type;
+    if (inductionsOpen !== undefined) society.inductionsOpen = inductionsOpen === 'true' || inductionsOpen === true;
+
+    // 🔗 Update social links if provided
+    if (socialLinks) {
+      try {
+        const parsedLinks = typeof socialLinks === 'string' ? JSON.parse(socialLinks) : socialLinks;
+        society.socialLinks = parsedLinks;
+      } catch (err) {
+        return res.status(400).json({ message: 'Invalid socialLinks format. Must be JSON.' });
+      }
+    }
+
+    // 🖼️ Upload new logo if provided
+    if (logoFile) {
+      const logoUpload = await cloudinary.uploader.upload(logoFile.path, { resource_type: 'image' });
+      society.logo = logoUpload.secure_url;
+    }
+
+    // 🖼️ Upload new cover image if provided
+    if (coverFile) {
+      const coverUpload = await cloudinary.uploader.upload(coverFile.path, { resource_type: 'image' });
+      society.coverImage = coverUpload.secure_url;
+    }
+
+    // 💾 Save updated society
+    await society.save();
+
+    res.status(200).json({ message: 'Society updated successfully', society });
+
+  } catch (error) {
+    console.error('Error updating society:', error);
+    res.status(500).json({ message: 'Society update failed', error: error.message });
+  }
+};
+
 module.exports = { registerSociety, 
                   getUserSocieties, 
                   getAllSocieties, 
                   joinSociety, 
                   approveSociety, 
+                  updateSociety,
                   getJoinRequests, 
                   acceptJoinRequest,
                   getSocietyMembers,
