@@ -1,29 +1,30 @@
 .landing-container {
-  background-color: #222831;
-  color: #DFD0B8;
+  background-color: #ffffff;
+  color: #000000;
   font-family: 'Segoe UI', sans-serif;
   padding-bottom: 40px;
 }
 
 .hero {
   text-align: center;
-  padding: 80px 20px;
-  background-color: #393E46;
+  padding: 50px 20px;
+  background-color: #A67C9D;
 }
 
 .hero h1 {
   font-size: 2.8rem;
-  color: #DFD0B8;
+  color: #000000;
 }
 
 .hero p {
   font-size: 1.2rem;
   margin: 20px 0;
+  color: #000000;
 }
 
 .cta-btn {
-  background-color: #948979;
-  color: #222831;
+  background-color: #3E1A47;
+  color: #fcfdfe;
   padding: 12px 24px;
   text-decoration: none;
   font-weight: 600;
@@ -55,19 +56,19 @@
 
 .feature-text h2 {
   font-size: 2rem;
-  color: #DFD0B8;
+  color: #000000;
   margin-bottom: 10px;
 }
 
 .feature-text p {
   font-size: 1rem;
-  color: #DFD0B8;
+  color: #000000;
   margin-bottom: 20px;
 }
 
 .feature-btn {
-  background-color: #948979;
-  color: #222831;
+  background-color: #3E1A47;
+  color: #f1f1f1;
   padding: 10px 20px;
   text-decoration: none;
   font-weight: 600;
@@ -100,14 +101,14 @@
 }
 
 .society-gallery::-webkit-scrollbar-thumb {
-  background: #948979;
+  background: #A67C9D;
   border-radius: 4px;
 }
 
 .society-card {
   flex: 0 0 auto; /* prevent shrinking */
-  min-width: 200px;
-  background-color: #948979;
+  min-width: 150px;
+  background-color: #A67C9D;
   border-radius: 10px;
   padding: 10px;
   text-align: center;
@@ -145,3 +146,4 @@
 .details-btn:hover {
   background-color:rgb(90, 100, 114);
 }
+

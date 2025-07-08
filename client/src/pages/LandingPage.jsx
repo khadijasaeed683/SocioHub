@@ -86,7 +86,7 @@ const LandingPage = () => {
               </div>
             ))}
           </div>
-          <Link to="/JoinSociety" className="feature-btn">Join Now</Link>
+          <Link to="/JoinSociety" className="feature-btn">View More</Link>
         </div>
       </section>
 
@@ -103,3 +103,4 @@ const LandingPage = () => {
 };
 
 export default LandingPage;
+
