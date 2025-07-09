@@ -7,6 +7,8 @@ import { toast } from 'react-toastify';
 import societyImg from '../assets/society.png';
 import joinImg from '../assets/join.png';
 import eventsImg from '../assets/events.png';
+import eventsImg2 from '../assets/events.avif'; // adjust path as needed
+
 
 const LandingPage = () => {
     const [societies, setSocieties] = useState([]);
@@ -64,13 +66,47 @@ const LandingPage = () => {
 
       {/* Feature Sections */}
       <section className="feature-section">
-        <div className="feature-text">
-          <h2>Register a Society</h2>
-          <p>Submit official proof and get admin access to manage your events and members with ease.</p>
-          <Link to="/register-society" className="feature-btn" onClick={handleRegisterClick}>Register Now</Link>
+        <div className="feature-header">
+          <div className="feature-heading-text">
+            <h2>Why Register Your Society?</h2>
+            <p className="feature-subtitle">
+              Manage your community with powerful, easy-to-use tools designed for student societies.
+            </p>
+          </div>
+          <Link
+            to="/register-society"
+            className="feature-btn"
+            onClick={handleRegisterClick}
+          >
+            Register Now →
+          </Link>
         </div>
-        <img src={societyImg} alt="Register Society" className="feature-img" />
+
+
+        <div className="card-grid">
+          <div className="feature-card">
+            <img src="assets/events.png" alt="Manage Events" />
+            <p>Manage Events</p>
+          </div>
+          <div className="feature-card">
+            <img src="assets/members.avif" alt="Approve Members" />
+            <p>Approve Members</p>
+          </div>
+          <div className="feature-card">
+            <img src="assets/profile.png" alt="Custom Profile" />
+            <p>Custom Profile</p>
+          </div>
+          <div className="feature-card">
+            <img src="assets/role.png" alt="Assign Roles" />
+            <p>Assign Roles</p>
+          </div>
+          <div className="feature-card">
+            <img src="assets/activity.png" alt="Track Activity" />
+            <p>Track Activity</p>
+          </div>
+        </div>
       </section>
+
 
       <section className="feature-section">
         {/* <img src={joinImg} alt="Join Society" className="feature-img" /> */}
