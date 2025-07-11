@@ -5,33 +5,32 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px 32px;
-  background-color: rgba(34, 40, 49, 0.85);
-  backdrop-filter: blur(6px);
-  color: #DFD0B8;
+  background-color: #A67C9D;
+  color: #000000;
   position: sticky;
   top: 0;
   z-index: 1000;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
 }
 
 .navbar-scrolled {
   padding: 10px 32px;
-  background-color: rgba(20, 24, 30, 0.95); /* slightly darker */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  background-color: #F5F5F5;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .logo-link {
   font-size: 1.8rem;
   font-weight: bold;
   transition: font-size 0.3s ease;
+  text-decoration: none;
+  color: #000000;
 }
 
 .navbar-scrolled .logo {
   font-size: 1.4rem;
 }
-
-
 
 .navbar-right {
   display: flex;
@@ -41,18 +40,18 @@
 
 .nav-link {
   text-decoration: none;
-  color: #DFD0B8;
+  color: #000000;
   font-weight: 500;
   transition: color 0.3s ease;
 }
 
 .nav-link:hover {
-  color: #948979;
+  color: #5D3A8D; /* Optional hover tweak */
 }
 
 .nav-button {
-  background-color: #948979;
-  color: #222831;
+  background-color: #3E1A47;
+  color: #ffffff;
   padding: 8px 16px;
   border-radius: 6px;
   text-decoration: none;
@@ -61,7 +60,7 @@
 }
 
 .nav-button:hover {
-  background-color: #b3a78c;
+  background-color: #52225C;
 }
 
 /* Responsive for small screens */
@@ -83,11 +82,7 @@
     padding-left: 0;
   }
 }
-.logo-link {
-  text-decoration: none;
-  color: inherit;
-  font-weight: bold;
-}
-.avatar{
- background-color: rgba(34, 40, 49, 0.85);
+
+.avatar {
+  background-color: #E0E0E0; /* Updated to match light theme */
 }
