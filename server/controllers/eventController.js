@@ -100,11 +100,11 @@ const getAllEvents = async (req, res) => {
       const now = new Date();
       filter.date = { $gte: now }; // only events today or in future
     }
-
     const events = await Event.find(filter)
       .populate('societyId', 'name logo')
       .populate('participants', 'name email')
       .sort({ date: 1, startTime: 1 }); // sort upcoming earliest first
+    console.log("here", events)
 
     if (!events || events.length === 0) {
       return res.status(404).json({ message: upcoming === 'true' ? 'No upcoming events found for this society' : 'No events found for this society' });
@@ -250,12 +250,10 @@ const registerForEvent = async (req, res) => {
 
 const updateEvent = async (req, res) => {
   try {
-    const { title, description, startTime, endTime, location, date, isPublic } = req.body;
+    const { title, description, startTime, endTime, location, date, isPublic , rsvpOpen} = req.body;
     const eventId = req.params.id;
-    const posterFile = req.files.poster ? req.files.poster[0] : null;
-
-   
-
+    console.log(req.files);
+    const posterFile = (req.files && req.files.poster) ? req.files.poster[0] : null;
     //  Find existing event
     const event = await Event.findById(eventId);
     if (!event) {
@@ -267,6 +265,7 @@ const updateEvent = async (req, res) => {
     if (description) event.description = description;
     if (location) event.location = location;
     if (isPublic !== undefined) event.isPublic = isPublic;
+    if (rsvpOpen !== undefined) event.rsvpOpen = rsvpOpen;
 
     //  Validate and update date if provided
     if (date) {

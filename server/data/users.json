@@ -1,0 +1,92 @@
+[
+  {
+    "username": "john_doe",
+    "email": "john@example.com",
+    "password": "1122",
+    "pfp": "https://images.unsplash.com/photo-1502767089025-6572583495b4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    "role": "member",
+    "societies": [],
+    "registeredEvents": []
+  },
+  {
+    "username": "emma_watson",
+    "email": "emma@example.com",
+    "password": "1122",
+    "pfp": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    "role": "admin",
+    "societies": [],
+    "registeredEvents": []
+  },
+  {
+    "username": "michael_smith",
+    "email": "michael@example.com",
+    "password": "1122",
+    "pfp": "https://images.unsplash.com/photo-1527980965255-d3b416303d12?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    "role": "guest",
+    "societies": [],
+    "registeredEvents": []
+  },
+  {
+    "username": "sophia_jones",
+    "email": "sophia@example.com",
+    "password": "1122",
+    "pfp": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    "role": "member",
+    "societies": [],
+    "registeredEvents": []
+  },
+  {
+    "username": "william_brown",
+    "email": "william@example.com",
+    "password": "1122",
+    "pfp": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    "role": "guest",
+    "societies": [],
+    "registeredEvents": []
+  },
+  {
+    "username": "olivia_davis",
+    "email": "olivia@example.com",
+    "password": "hash11edpasswordjkl",
+    "pfp": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    "role": "member",
+    "societies": [],
+    "registeredEvents": []
+  },
+  {
+    "username": "james_miller",
+    "email": "james@example.com",
+    "password": "hashedpasswordjkl",
+    "pfp": "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    "role": "guest",
+    "societies": [],
+    "registeredEvents": []
+  },
+  {
+    "username": "isabella_wilson",
+    "email": "isabella@example.com",
+    "password": "hashedpasswordmno",
+    "pfp": "https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    "role": "member",
+    "societies": [],
+    "registeredEvents": []
+  },
+  {
+    "username": "benjamin_moore",
+    "email": "benjamin@example.com",
+    "password": "hashedpasswordpqr",
+    "pfp": "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    "role": "guest",
+    "societies": [],
+    "registeredEvents": []
+  },
+  {
+    "username": "mia_taylor",
+    "email": "mia@example.com",
+    "password": "hashedpasswordstu",
+    "pfp": "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    "role": "admin",
+    "societies": [],
+    "registeredEvents": []
+  }
+]

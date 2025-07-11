@@ -17,7 +17,7 @@ router.post(
   ]),
   createEvent
 );
-router.put(
+router.patch(
   '/:id',
   protect,
   upload.fields([

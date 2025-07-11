@@ -98,7 +98,7 @@ const getUserSocieties = async (req, res) => {
 
     // Wait for all findById calls to complete
     const societies = await Promise.all(societyPromises);
-
+    console.log(societies)
     societies.forEach(society => {
       if (!society) return; // Skip if society not found
       if (society.createdBy.toString() === user._id.toString()) {

@@ -18,10 +18,12 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
+    pfp:{
+        type: String
+    },
     role: {
         type: String,
-        default: 'guest', // Default role is 'guest'
-        enum: ['guest', 'member', 'society-head', 'admin'] // Allowed roles
+        default: 'guest', 
     },
     societies: [{
         type: mongoose.Schema.Types.ObjectId,

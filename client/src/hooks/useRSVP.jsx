@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 
 const useRSVP = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -32,14 +33,16 @@ const useRSVP = () => {
 
       if (!res.ok) {
         setError(data.message || 'Registration failed');
+        toast.info(data.message);
       } else {
-        alert('✅ ' + data.message);
+        toast.success('✅ ' + data.message);
         setSelectedEvent(null);
         setFormData({ name: '', email: '', phone: '' });
       }
     } catch (error) {
       console.error(error);
       setError('Server error. Please try again later.');
+      toast.error(error);
     }
   };
 

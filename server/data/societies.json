@@ -1,143 +1,202 @@
-  [
+[
   {
-    "name": "Innovators Hub",
-    "description": "Innovators Hub is a community of passionate tech enthusiasts, software developers, and startup-minded students who collaborate to build innovative projects, participate in hackathons, and learn emerging technologies together. The society regularly organizes coding bootcamps, guest lectures from industry leaders, and startup incubation sessions to nurture the entrepreneurial mindset within campus.",
-    "logo": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&ixid=M3w5MXwwfDF8MHx8dGVjaHxlbnwwfHx8fHwxNzE0ODI4NTQwfA&auto=format&fit=crop&w=80&h=80&q=80",
-    "coverImage": "https://images.unsplash.com/photo-1518779578993-ec3579fee39f?ixlib=rb-4.0.3&ixid=M3w5MXwwfDF8MHx8aGFja2F0aG9ufGVufDB8fHx8fDE3MTQ4Mjg2NDQ&auto=format&fit=crop&w=1200&q=80",
-    "website": "https://innovatorshub.com",
-    "contactEmail": "contact@innovatorshub.com",
-    "phone": "+923001234567",
-    "type": "academic",
+    "name": "Tech Innovators",
+    "description": "A society promoting cutting-edge tech innovations and community learning.",
+    "logo": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    "coverImage": "https://images.unsplash.com/photo-1536859355448-76f92ebdc33d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+    "website": "https://techinnovators.com",
     "socialLinks": {
-      "instagram": "https://instagram.com/innovatorshub",
-      "linkedin": "https://linkedin.com/company/innovatorshub"
-    }
+      "instagram": "https://instagram.com/techinnovators",
+      "linkedin": "https://linkedin.com/company/techinnovators"
+    },
+    "contactEmail": "contact@techinnovators.com",
+    "phone": "+1234567890",
+    "type": "technical",
+    "createdBy": "686d00eb60396dc1b9388e2c",
+    "members": [],
+    "events": [],
+    "pendingRequests": [],
+    "approved": true,
+    "inductionsOpen": true
   },
   {
-    "name": "Artistic Minds",
-    "description": "Artistic Minds is a platform for students to express their creativity and imagination through fine arts, digital illustration, crafts, and design. The society conducts art exhibitions, live painting sessions, creative workshops, and charity art auctions to showcase talent and support social causes through art.",
-    "logo": "https://images.unsplash.com/photo-1582726239753-2d3b2e39b4e2?ixlib=rb-4.0.3&ixid=M3w5MXwwfDF8MHx8YXJ0fGVufDB8fHx8fDE3MTQ4Mjg3MTg&auto=format&fit=crop&w=80&h=80&q=80",
-    "coverImage": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&ixid=M3w5MXwwfDF8MHx8YXJ0fGVufDB8fHx8fDE3MTQ4Mjg3MzU&auto=format&fit=crop&w=1200&q=80",
-    "website": "https://artisticminds.org",
-    "contactEmail": "hello@artisticminds.org",
-    "phone": "+923004567890",
-    "type": "art",
+    "name": "Artistic Souls",
+    "description": "A creative space for artists to collaborate and exhibit their works.",
+    "logo": "https://images.unsplash.com/photo-1529429611270-706f0d4d9bbf?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    "coverImage": "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+    "website": "https://artisticsouls.org",
     "socialLinks": {
-      "instagram": "https://instagram.com/artisticminds",
-      "linkedin": "https://linkedin.com/company/artisticminds"
-    }
+      "instagram": "https://instagram.com/artisticsouls",
+      "linkedin": "https://linkedin.com/company/artisticsouls"
+    },
+    "contactEmail": "info@artisticsouls.org",
+    "phone": "+1987654321",
+    "type": "arts",
+    "createdBy": "686d00eb60396dc1b9388e2d",
+    "members": [],
+    "events": [],
+    "pendingRequests": [],
+    "approved": true,
+    "inductionsOpen": true
   },
   {
-    "name": "Literary League",
-    "description": "Literary League connects students who have a love for literature, poetry, and creative writing. Members engage in weekly poetry slams, book discussions, short story competitions, and author meetups, fostering a rich literary culture within campus.",
-    "logo": "https://images.unsplash.com/photo-1509021436665-8f07dbf5bf1d?ixlib=rb-4.0.3&ixid=M3w5MXwwfDF8MHx8bGl0ZXJhdHVyZXxlbnwwfHx8fHwxNzE0ODI4NzQ1&auto=format&fit=crop&w=80&h=80&q=80",
-    "coverImage": "https://images.unsplash.com/photo-1522098543979-ffc7f79d4088?ixlib=rb-4.0.3&ixid=M3w5MXwwfDF8MHx8bGl0ZXJhdHVyZXxlbnwwfHx8fHwxNzE0ODI4NzUy&auto=format&fit=crop&w=1200&q=80",
-    "website": "https://literaryleague.com",
-    "contactEmail": "info@literaryleague.com",
-    "phone": "+923008765432",
-    "type": "literary",
+    "name": "Eco Warriors",
+    "description": "Dedicated to environmental awareness, clean-ups, and sustainability projects.",
+    "logo": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    "coverImage": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+    "website": "https://ecowarriors.net",
     "socialLinks": {
-      "instagram": "https://instagram.com/literaryleague",
-      "linkedin": "https://linkedin.com/company/literaryleague"
-    }
+      "instagram": "https://instagram.com/ecowarriors",
+      "linkedin": "https://linkedin.com/company/ecowarriors"
+    },
+    "contactEmail": "connect@ecowarriors.net",
+    "phone": "+1122334455",
+    "type": "social",
+    "createdBy": "686d00eb60396dc1b9388e2e",
+    "members": [],
+    "events": [],
+    "pendingRequests": [],
+    "approved": true,
+    "inductionsOpen": true
   },
   {
-    "name": "Fitness Freaks",
-    "description": "Fitness Freaks motivates students to adopt a healthy lifestyle by organizing regular yoga sessions, sports tournaments, fitness challenges, and seminars on nutrition and mental health to ensure overall well-being.",
-    "logo": "https://images.unsplash.com/photo-1583454110550-066f58c2b3ac?ixlib=rb-4.0.3&ixid=M3w5MXwwfDF8MHx8Zml0bmVzc3xlbnwwfHx8fHwxNzE0ODI4NzY1&auto=format&fit=crop&w=80&h=80&q=80",
-    "coverImage": "https://images.unsplash.com/photo-1546484959-f1455c0e7605?ixlib=rb-4.0.3&ixid=M3w5MXwwfDF8MHx8c3BvcnR8ZW58MHx8fHx8MTcxNDgyODc3Mg&auto=format&fit=crop&w=1200&q=80",
-    "website": "https://fitnessfreaks.club",
-    "contactEmail": "join@fitnessfreaks.club",
-    "phone": "+923006543210",
+    "name": "Sports Titans",
+    "description": "Uniting athletes and sports enthusiasts for tournaments and training sessions.",
+    "logo": "https://images.unsplash.com/photo-1531686264882-5c5e36c42a7b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    "coverImage": "https://images.unsplash.com/photo-1508780709619-79562169bc64?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+    "website": "https://sportstitans.club",
+    "socialLinks": {
+      "instagram": "https://instagram.com/sportstitans",
+      "linkedin": "https://linkedin.com/company/sportstitans"
+    },
+    "contactEmail": "sports@sportstitans.club",
+    "phone": "+1098765432",
     "type": "sports",
-    "socialLinks": {
-      "instagram": "https://instagram.com/fitnessfreaks",
-      "linkedin": "https://linkedin.com/company/fitnessfreaks"
-    }
+    "createdBy": "686d00eb60396dc1b9388e2f",
+    "members": [],
+    "events": [],
+    "pendingRequests": [],
+    "approved": true,
+    "inductionsOpen": true
   },
   {
-    "name": "Change Makers",
-    "description": "Change Makers is dedicated to social activism and community development. The society organizes charity drives, awareness campaigns, and volunteering programs to empower underprivileged communities and advocate for social justice.",
-    "logo": "https://images.unsplash.com/photo-1532635245-6e3c1d3e669c?ixlib=rb-4.0.3&ixid=M3w5MXwwfDF8MHx8c29jaWFsfGVufDB8fHx8fDE3MTQ4Mjg3ODU&auto=format&fit=crop&w=80&h=80&q=80",
-    "coverImage": "https://images.unsplash.com/photo-1494883759339-0b042055a4ee?ixlib=rb-4.0.3&ixid=M3w5MXwwfDF8MHx8Y2hhcml0eXxlbnwwfHx8fHwxNzE0ODI4Nzg4&auto=format&fit=crop&w=1200&q=80",
-    "website": "https://changemakers.org",
-    "contactEmail": "contact@changemakers.org",
-    "phone": "+923002345678",
-    "type": "social",
+    "name": "Entrepreneurs Hub",
+    "description": "Empowering future entrepreneurs through workshops, mentorship, and networking.",
+    "logo": "https://images.unsplash.com/photo-1531497865142-94853da7f35d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    "coverImage": "https://images.unsplash.com/photo-1531983412531-1d71c75d5f0f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+    "website": "https://entrepreneurshub.io",
     "socialLinks": {
-      "instagram": "https://instagram.com/changemakers",
-      "linkedin": "https://linkedin.com/company/changemakers"
-    }
-  }
-,
+      "instagram": "https://instagram.com/entrepreneurshub",
+      "linkedin": "https://linkedin.com/company/entrepreneurshub"
+    },
+    "contactEmail": "hello@entrepreneurshub.io",
+    "phone": "+1456789123",
+    "type": "business",
+    "createdBy": "686d00eb60396dc1b9388e30",
+    "members": [],
+    "events": [],
+    "pendingRequests": [],
+    "approved": true,
+    "inductionsOpen": true
+  },
   {
-    "name": "Code Warriors",
-    "description": "Competitive programming and software development society.",
-    "logo": "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?crop=entropy&cs=tinysrgb&fit=crop&h=80&w=80",
-    "coverImage": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?crop=entropy&cs=tinysrgb&fit=crop&h=300&w=600",
-    "website": "https://codewarriors.dev",
-    "contactEmail": "admin@codewarriors.dev",
-    "phone": "+923007890123",
+    "name": "Health & Wellness Club",
+    "description": "Promotes physical and mental well-being through various initiatives and events.",
+    "logo": "https://images.unsplash.com/photo-1518611012118-696072aa579a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    "coverImage": "https://images.unsplash.com/photo-1554284126-5f26d3f24c0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+    "website": "https://healthwellnessclub.org",
+    "socialLinks": {
+      "instagram": "https://instagram.com/healthwellnessclub",
+      "linkedin": "https://linkedin.com/company/healthwellnessclub"
+    },
+    "contactEmail": "care@healthwellnessclub.org",
+    "phone": "+1092837465",
+    "type": "health",
+    "createdBy": "686d00eb60396dc1b9388e2c",
+    "members": [],
+    "events": [],
+    "pendingRequests": [],
+    "approved": true,
+    "inductionsOpen": true
+  },
+  {
+    "name": "Debating Society",
+    "description": "Enhancing public speaking, critical thinking, and argumentation skills.",
+    "logo": "https://images.unsplash.com/photo-1520547515600-7fda11e51f47?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    "coverImage": "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+    "website": "https://debatingsociety.edu",
+    "socialLinks": {
+      "instagram": "https://instagram.com/debatingsociety",
+      "linkedin": "https://linkedin.com/company/debatingsociety"
+    },
+    "contactEmail": "debate@debatingsociety.edu",
+    "phone": "+1011121314",
     "type": "academic",
-    "socialLinks": {
-      "instagram": "https://instagram.com/codewarriors",
-      "linkedin": "https://linkedin.com/company/codewarriors"
-    }
+    "createdBy": "686d00eb60396dc1b9388e2d",
+    "members": [],
+    "events": [],
+    "pendingRequests": [],
+    "approved": true,
+    "inductionsOpen": true
   },
   {
-    "name": "Drama Society",
-    "description": "Performing arts, theatre, and stage performances.",
-    "logo": "https://images.unsplash.com/photo-1525026198548-4baa812f1183?crop=entropy&cs=tinysrgb&fit=crop&h=80&w=80",
-    "coverImage": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?crop=entropy&cs=tinysrgb&fit=crop&h=300&w=600",
-    "website": "https://dramasociety.org",
-    "contactEmail": "drama@dramasociety.org",
-    "phone": "+923009876543",
-    "type": "art",
+    "name": "Drama & Theatre Club",
+    "description": "For actors, directors, and drama enthusiasts to perform and produce plays.",
+    "logo": "https://images.unsplash.com/photo-1531058020387-3be344556be6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    "coverImage": "https://images.unsplash.com/photo-1526318472351-bc6c9f111d6f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+    "website": "https://dramatheatreclub.org",
     "socialLinks": {
-      "instagram": "https://instagram.com/dramasociety",
-      "linkedin": "https://linkedin.com/company/dramasociety"
-    }
+      "instagram": "https://instagram.com/dramatheatreclub",
+      "linkedin": "https://linkedin.com/company/dramatheatreclub"
+    },
+    "contactEmail": "stage@dramatheatreclub.org",
+    "phone": "+1123581321",
+    "type": "arts",
+    "createdBy": "686d00eb60396dc1b9388e2e",
+    "members": [],
+    "events": [],
+    "pendingRequests": [],
+    "approved": true,
+    "inductionsOpen": true
   },
   {
-    "name": "Business Leaders Club",
-    "description": "Empowering future entrepreneurs and business leaders.",
-    "logo": "https://images.unsplash.com/photo-1497366216548-37526070297c?crop=entropy&cs=tinysrgb&fit=crop&h=80&w=80",
-    "coverImage": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?crop=entropy&cs=tinysrgb&fit=crop&h=300&w=600",
-    "website": "https://businessleaders.club",
-    "contactEmail": "info@businessleaders.club",
-    "phone": "+923001112233",
-    "type": "academic",
+    "name": "Photography Club",
+    "description": "For photography enthusiasts to learn, collaborate, and organize exhibitions.",
+    "logo": "https://images.unsplash.com/photo-1517697471339-4aa32003c6c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    "coverImage": "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+    "website": "https://photographyclub.com",
     "socialLinks": {
-      "instagram": "https://instagram.com/businessleaders",
-      "linkedin": "https://linkedin.com/company/businessleaders"
-    }
+      "instagram": "https://instagram.com/photographyclub",
+      "linkedin": "https://linkedin.com/company/photographyclub"
+    },
+    "contactEmail": "photos@photographyclub.com",
+    "phone": "+1982736450",
+    "type": "arts",
+    "createdBy": "686d00eb60396dc1b9388e2f",
+    "members": [],
+    "events": [],
+    "pendingRequests": [],
+    "approved": true,
+    "inductionsOpen": true
   },
   {
-    "name": "Robotics Club",
-    "description": "For students passionate about robotics and automation.",
-    "logo": "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?crop=entropy&cs=tinysrgb&fit=crop&h=80&w=80",
-    "coverImage": "https://images.unsplash.com/photo-1591696205602-2db58a6b77d4?crop=entropy&cs=tinysrgb&fit=crop&h=300&w=600",
-    "website": "https://roboticsclub.tech",
-    "contactEmail": "contact@roboticsclub.tech",
-    "phone": "+923005556677",
-    "type": "academic",
+    "name": "Music Society",
+    "description": "Uniting music enthusiasts for performances, jams, and collaborations.",
+    "logo": "https://images.unsplash.com/photo-1507874457470-272b3c8d8ee2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    "coverImage": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+    "website": "https://musicsociety.org",
     "socialLinks": {
-      "instagram": "https://instagram.com/roboticsclub",
-      "linkedin": "https://linkedin.com/company/roboticsclub"
-    }
-  },
-  {
-    "name": "Environmental Society",
-    "description": "Promoting sustainability and environmental awareness.",
-    "logo": "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?crop=entropy&cs=tinysrgb&fit=crop&h=80&w=80",
-    "coverImage": "https://images.unsplash.com/photo-1465146633011-14f18c72b735?crop=entropy&cs=tinysrgb&fit=crop&h=300&w=600",
-    "website": "https://environsociety.org",
-    "contactEmail": "green@environsociety.org",
-    "phone": "+923004443322",
-    "type": "social",
-    "socialLinks": {
-      "instagram": "https://instagram.com/environsociety",
-      "linkedin": "https://linkedin.com/company/environsociety"
-    }
+      "instagram": "https://instagram.com/musicsociety",
+      "linkedin": "https://linkedin.com/company/musicsociety"
+    },
+    "contactEmail": "melody@musicsociety.org",
+    "phone": "+1091827364",
+    "type": "arts",
+    "createdBy": "686d00eb60396dc1b9388e30",
+    "members": [],
+    "events": [],
+    "pendingRequests": [],
+    "approved": true,
+    "inductionsOpen": true
   }
 ]

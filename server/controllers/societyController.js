@@ -46,12 +46,14 @@ const registerSociety = async (req, res) => {
       socialLinks: {
     instagram: req.body['socialLinks.instagram'] || '',
     linkedin: req.body['socialLinks.linkedin'] || ''
-  },
+    },
       contactEmail,
       phone,
       type,
       createdBy: user._id
     });
+    user.societies.push(newRequest._id);
+    await user.save();
     res.status(201).json({ message: 'Society registration requested', request: newRequest });
   } catch (error) {
     res.status(500).json({ message: error.message });

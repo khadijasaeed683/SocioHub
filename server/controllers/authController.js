@@ -37,8 +37,10 @@ const login = async (req, res) => {
     console.log('Login attempt:', { email, password });
     const user = await User.findOne({ email });
     if (!user)
-      return res.status(400).json({ message: 'Invalid email or password' });
+      return res.status(400).json({ message: 'There is no account registered with this email' });
 
+    const hashedPassword = await bcrypt.hash(password, 10);
+    console.log(hashedPassword);
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch)
       return res.status(400).json({ message: 'Invalid email or password' });

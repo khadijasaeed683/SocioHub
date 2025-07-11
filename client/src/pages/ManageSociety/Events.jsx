@@ -1,32 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import './Events.css';
 import { useSociety } from '../../context/SocietyContext';
+import {toast} from 'react-toastify';
+import EventForm from '../../components/EventForm';
 
-const initialEvents = [
-  {
-    _id: 'e1',
-    title: 'Tech Symposium 2025',
-    date: '2025-07-25',
-    description: 'Annual symposium featuring tech talks and panels.',
-    banner: 'https://via.placeholder.com/600x200?text=Tech+Symposium',
-    registrations: 58,
-    rsvpOpen: true,
-    registeredUsers: ['Alice', 'Bob', 'Charlie'],
-  },
-  {
-    _id: 'e2',
-    title: 'Hackathon Night',
-    date: '2025-06-20',
-    description: '12-hour overnight hackathon.',
-    banner: 'https://via.placeholder.com/600x200?text=Hackathon+Night',
-    registrations: 91,
-    rsvpOpen: false,
-    registeredUsers: ['Dana', 'Eve'],
-  },
-];
 
 const Events = () => {
-  const { society, setSociety } = useSociety();
+  const { society } = useSociety();
   const [events, setEvents] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editEventId, setEditEventId] = useState(null);
@@ -35,6 +15,8 @@ const Events = () => {
     date: '',
     description: '',
     banner: '',
+    startTime:'',
+    endTime:''
   });
 
   const [showConfirm, setShowConfirm] = useState(false);
@@ -85,20 +67,47 @@ const Events = () => {
     setShowConfirm(true);
   };
 
-  const confirmActionHandler = () => {
-    if (confirmAction === 'toggle') {
-      setEvents((prev) =>
-        prev.map((ev) =>
-          ev._id === confirmTargetId ? { ...ev, rsvpOpen: !ev.rsvpOpen } : ev
-        )
-      );
-    } else if (confirmAction === 'delete') {
-      setEvents((prev) => prev.filter((ev) => ev._id !== confirmTargetId));
+  const confirmActionHandler = async () => {
+  if (confirmAction === 'toggle') {
+    try {
+      const eventToToggle = events.find(ev => ev._id === confirmTargetId);
+      const res = await fetch(`http://localhost:5000/api/society/${society._id}/event/${confirmTargetId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ rsvpOpen: !eventToToggle.rsvpOpen })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        // Update local state to reflect backend change
+        setEvents((prev) =>
+          prev.map((ev) =>
+            ev._id === confirmTargetId ? { ...ev, rsvpOpen: data.event.rsvpOpen } : ev
+          )
+        );
+        toast.success(data.message);
+      } else {
+        console.error('Error toggling RSVP:', data.message);
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.error('Server error toggling RSVP:', error);
+      toast.error(error);
     }
-    setShowConfirm(false);
-    setConfirmTargetId(null);
-    setConfirmAction('');
-  };
+  } else if (confirmAction === 'delete') {
+    setEvents((prev) => prev.filter((ev) => ev._id !== confirmTargetId));
+    // Add your delete API call here if you implement it server-side
+  }
+
+  setShowConfirm(false);
+  setConfirmTargetId(null);
+  setConfirmAction('');
+};
+
 
   const cancelActionHandler = () => {
     setShowConfirm(false);
@@ -146,27 +155,20 @@ const Events = () => {
       </div>
 
       {showForm && (
-        <div className="modal-overlay">
-          <div className="modal-form">
-            <h3>{editEventId ? 'Edit Event' : 'Create Event'}</h3>
-            <form onSubmit={handleSubmit}>
-              <input type="text" name="title" placeholder="Event Title" value={formData.title} onChange={handleInputChange} required />
-              <input type="date" name="date" value={formData.date} onChange={handleInputChange} required />
-              <input type="text" name="banner" placeholder="Banner Image URL" value={formData.banner} onChange={handleInputChange} required />
-              <textarea name="description" placeholder="Event Description" value={formData.description} onChange={handleInputChange} required></textarea>
-              <div className="form-actions">
-                <button type="submit">{editEventId ? 'Update' : 'Create'}</button>
-                <button type="button" className="cancel-btn" onClick={() => setShowForm(false)}>Cancel</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+  <EventForm
+    formData={formData}
+    setFormData={setFormData}
+    handleSubmit={handleSubmit}
+    isEditing={!!editEventId}
+    cancelForm={() => setShowForm(false)}
+  />
+)}
+
 
       {showConfirm && (
         <div className="modal-overlay">
           <div className="modal-form">
-            <h4>Are you sure you want to {confirmAction === 'toggle' ? 'toggle RSVP' : 'delete'} this event?</h4>
+            <h4>Are you sure you want to {confirmAction === 'toggle' ? 'change RSVP' : 'delete'} this event?</h4>
             <div className="form-actions">
               <button onClick={confirmActionHandler}>Yes</button>
               <button className="cancel-btn" onClick={cancelActionHandler}>Cancel</button>
@@ -176,20 +178,25 @@ const Events = () => {
       )}
 
       {showRSVPList && (
-        <div className="modal-overlay">
-          <div className="modal-form">
-            <h4>RSVP List</h4>
-            <ul>
-              {showRSVPList.registeredUsers.map((name, idx) => (
-                <li key={idx}>{name}</li>
-              ))}
-            </ul>
-            <div className="form-actions">
-              <button className="cancel-btn" onClick={() => setShowRSVPList(null)}>Close</button>
-            </div>
-          </div>
-        </div>
-      )}
+  <div className="modal-overlay">
+    <div className="modal-form">
+      <h4>RSVP List</h4>
+      <ul>
+        {showRSVPList.participants.length > 0 ? (
+          showRSVPList.participants.map((name, idx) => (
+            <li key={idx}>{name}</li>
+          ))
+        ) : (
+          <li>No RSVPs yet.</li>
+        )}
+      </ul>
+      <div className="form-actions">
+        <button className="cancel-btn" onClick={() => setShowRSVPList(null)}>Close</button>
+      </div>
+    </div>
+  </div>
+)}
+
 
       <div className="events-section">
         <h3>Upcoming Events</h3>

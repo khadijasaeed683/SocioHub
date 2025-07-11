@@ -35,6 +35,7 @@ const eventSchema = new mongoose.Schema({
       ref: 'Task'
     }],
   isPublic: { type: Boolean, default: true },
+  rsvpOpen: { type: Boolean, default: true },
   participants: [{
     name: String,
   email: String,

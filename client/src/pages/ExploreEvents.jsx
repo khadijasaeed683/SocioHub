@@ -3,17 +3,23 @@ import Navbar from '../components/Navbar';
 import EventCard from '../components/EventCard'; // Assuming EventCard is a separate component
 import RSVPForm from './RSVPForm'; // Assuming RSVPForm is a separate component
 import './ExploreEvents.css';
-import './RSVPForm.css'; // Assuming RSVPForm styles are here
+import useRSVP from '../hooks/useRSVP'; // custom hook for RSVP logic
 
 
 const ExploreEvents = () => {
-  const [rsvpedEvents, setRsvpedEvents] = useState([]);
-  const [selectedEvent, setSelectedEvent] = useState(null);
-  const [formData, setFormData] = useState({ name: '', email: '', reason: '' });
-
+  // const [rsvpedEvents, setRsvpedEvents] = useState([]);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState(null);
+
+  const {
+  selectedEvent,
+    setSelectedEvent,
+    formData,
+    setFormData,
+    handleRSVPClick,
+    handleFormSubmit,
+} = useRSVP();
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -35,59 +41,24 @@ const ExploreEvents = () => {
 
     fetchEvents();
   }, []);
-  
-  const handleRSVPClick = (event) => {
-    setSelectedEvent(event);
-  };
 
-  const handleFormSubmit = async (e) => {
-  e.preventDefault();
-
-  try {
-    const res = await fetch(`http://localhost:5000/api/explore-events/${selectedEvent._id}/register`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-      }),
-    });
-    console.log('Submitting RSVP with data:', formData);
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      setError(data.message || 'Registration failed');
-    } else {
-      alert('✅ ' + data.message);
-      // Optionally close form or refresh events
-      setSelectedEvent(null);
-      setFormData({ name: '', email: '', phone: '' }); // Reset form data
-    }
-  } catch (error) {
-    console.error(error);
-    setError('Server error. Please try again later.');
+  if (loading) {
+    return <p>Loading events...</p>;
   }
-};
 
-
-  const handleInputChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
-
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
+  
   return (
     <>
       <Navbar />
       <div className="explore-events-page">
         <h2>Upcoming Events</h2>
         <div className="events-list">
-          {events.map((event) => (
+          {
+          console.log(events)}{
+          events.map((event) => (
             <EventCard
               key={event._id}
               event={event}
