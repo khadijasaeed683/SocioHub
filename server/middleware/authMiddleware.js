@@ -18,9 +18,13 @@ const protect = async (req, res, next) => {
     next();
     console.log("User authenticated:", req.user.username);
   } catch (err) {
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({ message: "Session expired. Please log in again." });
+    }
     res.status(401).json({ message: "Invalid token" });
   }
 };
+
 
 // Role checker middleware
 const allowRoles = (...allowedRoles) => {

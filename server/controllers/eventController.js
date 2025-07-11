@@ -24,9 +24,11 @@ const createEvent = async (req, res) => {
       return res.status(400).json({ message: 'Event date must be in the future' });
     }
 
-    //  Parse start and end times
-    const startTimeDate = parseTimeToDate(startTime);
-    const endTimeDate = parseTimeToDate(endTime);
+    console.log("st: ", startTime, "st: ", endTime )
+    //  Validate and update times if provided
+    let startTimeDate, endTimeDate;
+    // if (startTime) startTimeDate = parseTimeToDate(startTime);
+    // if (endTime) endTimeDate = parseTimeToDate(endTime);
 
     if (eventDateOnly.getTime() === todayDateOnly.getTime()) {
       const currentTime = new Date();
@@ -277,11 +279,11 @@ const updateEvent = async (req, res) => {
       }
       event.date = eventDate;
     }
-
+    console.log("st: ", startTime, "st: ", endTime )
     //  Validate and update times if provided
     let startTimeDate, endTimeDate;
-    if (startTime) startTimeDate = parseTimeToDate(startTime);
-    if (endTime) endTimeDate = parseTimeToDate(endTime);
+    // if (startTime) startTimeDate = parseTimeToDate(startTime);
+    // if (endTime) endTimeDate = parseTimeToDate(endTime);
 
     if (startTime && endTime && endTimeDate <= startTimeDate) {
       return res.status(400).json({ message: 'End time must be after start time' });

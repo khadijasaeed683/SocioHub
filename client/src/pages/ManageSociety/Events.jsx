@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Events.css';
 import { useSociety } from '../../context/SocietyContext';
-
+import {toast} from 'react-toastify'
 const Events = () => {
   const { society } = useSociety();
   const [events, setEvents] = useState([]);
