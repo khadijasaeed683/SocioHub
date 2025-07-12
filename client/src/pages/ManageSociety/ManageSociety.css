@@ -1,12 +1,12 @@
 .manage-society-layout {
   display: flex;
   height: 100vh;
-  background-color: #f5f4f2;
+  background-color: #ffffff;
   font-family: 'Segoe UI', sans-serif;
 }
 
 .manage-society-sidebar {
-  width: 220px;
+  width: 170px;
   background-color: #222831;
   color: #fff;
   padding: 30px 20px;

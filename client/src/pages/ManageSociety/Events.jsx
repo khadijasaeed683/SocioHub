@@ -193,7 +193,7 @@ const Events = () => {
   }, [society._id]);
 
   return (
-    <div className="events-management-container">
+    <div className="eventspage">
       <div className="events-header">
         <h2>Events Management</h2>
         <button className="create-event-btn" onClick={openCreateForm}>
@@ -319,7 +319,7 @@ const Events = () => {
                 <p>📅 {new Date(event.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                 <p>{event.description}</p>
                 <p>📍 Location: {event.location}</p>
-                <p>🕒 {event.startTime} – {event.endTime}</p>
+                <p>🕒 {formatTime(event.startTime)} – {formatTime(event.endTime)}</p>
                 <p>👥 Registrations: {event.participants?.length || 0}</p>
                 <p>🔓 RSVP: {event.rsvpOpen ? 'Open' : 'Closed'}</p>
                 <div className="event-actions">
@@ -340,3 +340,16 @@ const Events = () => {
 };
 
 export default Events;
+
+
+const formatTime = (timeString) => {
+  const [hour, minute] = timeString.split(':');
+  const date = new Date();
+  date.setHours(parseInt(hour));
+  date.setMinutes(parseInt(minute));
+  return date.toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
+};

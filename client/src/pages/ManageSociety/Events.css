@@ -1,3 +1,8 @@
+.events-page {
+  padding: 20px;
+  background: #ffffff;
+
+}
 .events-management-container {
   padding: 30px;
   background: #fefefe;
@@ -17,14 +22,18 @@
 }
 
 .event-card {
-  background: #d6d6d6;
+  background: #A67C9D;
   border-radius: 10px;
   box-shadow: 0 3px 10px rgba(0,0,0,0.08);
   margin-bottom: 20px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  width: 80%; /* or use max-width */
+  max-width: 900px; /* optional */
+  margin: 0 auto 20px auto; /* center horizontally */
 }
+
 
 .event-banner {
   width: 100%;

@@ -61,7 +61,7 @@ const Overview = () => {
 
   return (
     <div className="overview-container">
-      <h2 className="section-heading">Society Overview</h2>
+      {/* <h2 className="section-heading">Society Overview</h2> */}
 
       {/* ✅ Cover Image Section */}
       <div className="cover-image-section">
@@ -104,6 +104,7 @@ const Overview = () => {
       {/* ✅ Logo Section */}
       <div className="logo-section">
         <img src={society.logo} alt="Society Logo" className="society-logo" />
+        <p className='society-name'>{society.name}</p>
         {editField === 'logo' ? (
           <>
             <input
