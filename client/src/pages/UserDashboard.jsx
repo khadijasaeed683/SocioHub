@@ -20,12 +20,7 @@ const UserDashboard = () => {
       // Example: if you ever want to update localStorage when user changes
       localStorage.setItem('user', JSON.stringify(user));
     }, [user]);  
-  // // Dummy societies for testing Admin Portal
-  // const dummySocieties = [
-  //   { _id: 's1', name: 'Tech Society', admins: ['6868299578d684c8ef58ee45'], createdBy: '6868299578d684c8ef58ee45' },
-  //   { _id: 's2', name: 'Art Society', admins: ['6868299578d684c8ef58ee45'], createdBy: 'j' },
-  //   { _id: 's3', name: 'Science Club', admins: ['j'], createdBy: '6868299578d684c8ef58ee45' }
-  // ];
+
 
   const [societies, setSocieties] = useState([]);
   const [events, setEvents] = useState([]);

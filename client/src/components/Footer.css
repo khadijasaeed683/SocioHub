@@ -1,0 +1,42 @@
+/* components/Footer.css */
+.eventnest-footer {
+  background-color: #2C2A29;
+  color: #f1f1f1;
+  padding: 30px 20px;
+  font-size: 0.95rem;
+  margin-top: auto;
+}
+
+.footer-top {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.footer-links,
+.footer-socials {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.footer-link,
+.footer-socials a {
+  color: #f1f1f1;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer-link:hover,
+.footer-socials a:hover {
+  color: #1e90ff;
+}
+
+.footer-bottom {
+  text-align: center;
+  border-top: 1px solid #333;
+  padding-top: 15px;
+  font-size: 0.85rem;
+  color: #aaa;
+}

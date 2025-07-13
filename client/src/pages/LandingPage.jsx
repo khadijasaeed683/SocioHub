@@ -1,47 +1,104 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Navbar from '../components/Navbar'; // ✅ add this
+import Navbar from '../components/Navbar';
 import './LandingPage.css';
 import { toast } from 'react-toastify';
 
 import societyImg from '../assets/society.png';
 import joinImg from '../assets/join.png';
 import eventsImg from '../assets/events.png';
-import eventsImg2 from '../assets/events.avif'; // adjust path as needed
+import Footer from '../components/Footer';
+import EventCard from '../components/EventCard'; // ✅ Add this if not already imported
+
+// Dummy Events
+const dummyEvents = [
+  {
+    _id: 'e1',
+    title: 'Tech Talk 2025',
+    description: 'AI and the future of humanity.',
+    poster: 'https://via.placeholder.com/150x100?text=Tech+Talk',
+    date: '2025-07-20',
+    time: '5:00 PM',
+    location: 'Main Auditorium',
+    societyId: { name: 'AI Society' },
+    isPublic: true
+  },
+  
+  {
+    _id: 'e6',
+    title: 'Tech eewew 2025',
+    description: 'AI and the future of humanity.',
+    poster: 'https://via.placeholder.com/150x100?text=Tech+Talk',
+    date: '2025-07-20',
+    time: '5:00 PM',
+    location: 'Main Auditorium',
+    societyId: { name: 'AI Society' },
+    isPublic: true
+  },
+  {
+    _id: 'e2',
+    title: 'Music Fest',
+    poster: 'https://via.placeholder.com/150x100?text=Music+Fest',
+    date: '2025-08-01',
+    location: 'Open Grounds',
+    societyId: { name: 'Cultural Club' },
+    isPublic: true
+  },
+  {
+    _id: 'e3',
+    title: 'Startup Night',
+    description: 'Pitch your ideas!',
+    date: '2025-09-10',
+    location: 'Auditorium B',
+    societyId: { name: 'Entrepreneurship Society' },
+    isPublic: true
+  }
+];
+
+// Carousel scroll function
+const scrollEventCarousel = (scrollOffset) => {
+  const carousel = document.getElementById('event-carousel');
+  if (carousel) {
+    carousel.scrollBy({ left: scrollOffset, behavior: 'smooth' });
+  }
+};
+
 
 
 const LandingPage = () => {
-    const [societies, setSocieties] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
+  const [societies, setSocieties] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  const navigate = useNavigate();
+
   useEffect(() => {
-      const fetchSocieties = async () => {
-        try {
-          const res = await fetch('http://localhost:5000/api/society');
-          const data = await res.json();
-  
-          if (!res.ok) {
-            setError(data.message || 'Failed to fetch societies');
-          } else {
-            setSocieties(data);
-          }
-        } catch (err) {
-          setError('Server error. Try again later.');
-        } finally {
-          setLoading(false);
+    const fetchSocieties = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/society');
+        const data = await res.json();
+
+        if (!res.ok) {
+          setError(data.message || 'Failed to fetch societies');
+        } else {
+          setSocieties(data);
         }
-      };
-  
-      fetchSocieties();
-    }, []);
-    const navigate = useNavigate();
-    const handleViewDetails = (id) => {
+      } catch (err) {
+        setError('Server error. Try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSocieties();
+  }, []);
+
+  const handleViewDetails = (id) => {
     navigate(`/society/${id}`);
   };
 
   const handleRegisterClick = (e) => {
-    e.preventDefault(); 
-
+    e.preventDefault();
     const isLoggedIn = localStorage.getItem('token');
 
     if (isLoggedIn) {
@@ -52,9 +109,19 @@ const LandingPage = () => {
     }
   };
 
+  // ⬅️➡️ Scroll buttons
+  const scrollLeft = () => {
+    const container = document.getElementById('societyCarousel');
+    container.scrollBy({ left: -300, behavior: 'smooth' });
+  };
+
+  const scrollRight = () => {
+    const container = document.getElementById('societyCarousel');
+    container.scrollBy({ left: 300, behavior: 'smooth' });
+  };
+
   return (
     <div className="landing-container">
-      {/* Navbar stays fixed at the top */}
       <Navbar />
 
       {/* Hero Section */}
@@ -64,7 +131,7 @@ const LandingPage = () => {
         <Link to="/register" className="cta-btn">Get Started</Link>
       </section>
 
-      {/* Feature Sections */}
+      {/* Feature: Why Register */}
       <section className="feature-section">
         <div className="feature-header">
           <div className="feature-heading-text">
@@ -81,7 +148,6 @@ const LandingPage = () => {
             Register Now →
           </Link>
         </div>
-
 
         <div className="card-grid">
           <div className="feature-card">
@@ -107,36 +173,63 @@ const LandingPage = () => {
         </div>
       </section>
 
-
+      {/* 🔄 Society Carousel */}
       <section className="feature-section">
-        {/* <img src={joinImg} alt="Join Society" className="feature-img" /> */}
         <div className="feature-text">
           <h2>Join a Society</h2>
           <p>Find your favorite university society, send join requests, or join instantly with your edu email.</p>
-          <div className="society-gallery">
-            {societies.map(society => (
-              <div key={society.id} className="society-card">
-                <img src={society.logo} alt={society.name} />
-                <h3>{society.name}</h3>
-                <button className="details-btn" onClick={() => handleViewDetails(society._id)}>View Details</button>
-              </div>
-            ))}
+
+          <div className="society-carousel-container">
+            <button className="carousel-arrow left" onClick={scrollLeft}>&lt;</button>
+
+            <div className="society-carousel" id="societyCarousel">
+              {societies.map((society, index) => (
+                <div key={society._id || index} className="society-card">
+                  <img src={society.logo || '/assets/default-logo.png'} alt={society.name} />
+                  <h3>{society.name}</h3>
+                  <button className="details-btn" onClick={() => handleViewDetails(society._id)}>
+                    View Details
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <button className="carousel-arrow right" onClick={scrollRight}>&gt;</button>
           </div>
-          <Link to="/JoinSociety" className="feature-btn">View More</Link>
+
+          <Link to="/JoinSociety" className="feature-btn center-btn">View More</Link>
         </div>
       </section>
 
+      {/* Browse Public Events */}
       <section className="feature-section">
         <div className="feature-text">
           <h2>Browse Public Events</h2>
           <p>Explore campus-wide public events and RSVP without logging in. Stay involved, effortlessly.</p>
-          <Link to="/events" className="feature-btn">Explore Events</Link>
         </div>
-        <img src={eventsImg} alt="Browse Events" className="feature-img" />
+
+        <div className="event-carousel-container">
+          <button className="carousel-arrow left" onClick={() => scrollEventCarousel(-300)}>‹</button>
+
+          <div className="event-carousel" id="event-carousel">
+            {dummyEvents.map((event) => (
+              <EventCard key={event._id} event={event} isRsvped={false} onRSVPClick={() => {}} />
+            ))}
+          </div>
+
+          <button className="carousel-arrow right" onClick={() => scrollEventCarousel(300)}>›</button>
+        </div>
+
+        <div className="center-btn">
+          <Link to="/events" className="feature-btn">Explore More Events</Link>
+        </div>
       </section>
+
+
+
+      <Footer />
     </div>
   );
 };
 
 export default LandingPage;
-
