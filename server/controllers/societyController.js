@@ -3,43 +3,43 @@ const Society = require('../models/societyModel');
 const User = require('../models/userModel');
 const cloudinary = require('../config/cloudinary'); 
 
-// async function migratePendingRequests() {
-//   try {
+async function migratePendingRequests() {
+  try {
 
 
-//     // Find all societies
-//     const societies = await Society.find({});
-//     console.log(`Found ${societies.length} societies.`);
+    // Find all societies
+    const societies = await Society.find({});
+    console.log(`Found ${societies.length} societies.`);
 
-//     for (const society of societies) {
-//       if (Array.isArray(society.pendingRequests) && society.pendingRequests.length > 0) {
-//         // Check if already migrated (skip if it's an array of objects)
-//         const firstItem = society.pendingRequests[0];
-//         if (firstItem && typeof firstItem === 'object' && firstItem.userId) {
-//           console.log(`Society ${society._id} already migrated. Skipping...`);
-//           continue;
-//         }
+    for (const society of societies) {
+      if (Array.isArray(society.pendingRequests) && society.pendingRequests.length > 0) {
+        // Check if already migrated (skip if it's an array of objects)
+        const firstItem = society.pendingRequests[0];
+        if (firstItem && typeof firstItem === 'object' && firstItem.userId) {
+          console.log(`Society ${society._id} already migrated. Skipping...`);
+          continue;
+        }
 
-//         // Convert each userId to new object structure
-//         const migratedRequests = society.pendingRequests.map(userId => ({
-//           userId,
-//           reason: "No reason provided (migrated).",
-//           requestedAt: new Date()
-//         }));
+        // Convert each userId to new object structure
+        const migratedRequests = society.pendingRequests.map(userId => ({
+          userId,
+          reason: "No reason provided (migrated).",
+          requestedAt: new Date()
+        }));
 
-//         society.pendingRequests = migratedRequests;
-//         await society.save();
-//         console.log(`Migrated pendingRequests for society ${society._id}`);
-//       }
-//     }
+        society.pendingRequests = migratedRequests;
+        await society.save();
+        console.log(`Migrated pendingRequests for society ${society._id}`);
+      }
+    }
 
-//     console.log("Migration completed successfully.");
-//     process.exit(0);
-//   } catch (error) {
-//     console.error("Migration error:", error);
-//     process.exit(1);
-//   }
-// }
+    console.log("Migration completed successfully.");
+    process.exit(0);
+  } catch (error) {
+    console.error("Migration error:", error);
+    process.exit(1);
+  }
+}
 
 const registerSociety = async (req, res) => {
   try {
@@ -194,6 +194,7 @@ const approveSociety = async (req, res) => {
 };
 
 const getJoinRequests = async (req, res) => {
+  // migratePendingRequests();
   try {
     const societyId = req.params.id;
 
