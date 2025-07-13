@@ -274,18 +274,7 @@ html, body, #root {
 
 
 
-.carousel-arrow:hover {
-  background-color: #A67C9D;
-  transform: translateY(-50%) scale(1.05);
-}
 
-.carousel-arrow.left {
-  left: -20px; 
-}
-
-.carousel-arrow.right {
-  right: -20px;
-}
 
 .center-btn {
   margin-top: 20px;
@@ -299,18 +288,16 @@ html, body, #root {
   width: 100%;
   max-width: 1300px;
   margin: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  overflow: hidden; /* Prevent horizontal overflow */
 }
 
 .event-carousel {
   display: flex;
-  gap: 20px;
+  flex-wrap: nowrap;
   overflow-x: auto;
+  gap: 20px;
   scroll-behavior: smooth;
   padding: 10px;
-  scroll-snap-type: x mandatory;
 }
 
 .event-carousel::-webkit-scrollbar {
@@ -320,43 +307,46 @@ html, body, #root {
   background: #A67C9D;
   border-radius: 4px;
 }
+/* 
+.event-card {
+  flex: 0 0 auto;              
+  width: 80px;                
+  scroll-snap-align: start;     
+} */
 
+/* Arrows */
 .carousel-arrow {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background-color: rgba(13, 6, 15, 0.4); /* low opacity background */
+  background-color: rgba(13, 6, 15, 0.4);
   border: none;
   color: white;
-  width: 35px;
-  height: 35px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   cursor: pointer;
   z-index: 10;
-  display: none;
+  display: flex;
   align-items: center;
   justify-content: center;
+  transition: background 0.3s;
 }
 
 .carousel-arrow.left {
   left: 0;
 }
-
 .carousel-arrow.right {
   right: 0;
 }
 
-.event-carousel-container:hover .carousel-arrow {
-  display: flex;
+.carousel-arrow:hover {
+  background-color: rgba(13, 6, 15, 0.6);
 }
 
 @media (max-width: 768px) {
   .carousel-arrow {
     display: none !important;
-  }
-
-  .event-carousel {
-    scroll-padding: 0 16px;
   }
 }

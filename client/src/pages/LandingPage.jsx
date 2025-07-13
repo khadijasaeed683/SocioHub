@@ -203,27 +203,28 @@ const LandingPage = () => {
 
       {/* Browse Public Events */}
       <section className="feature-section">
-        <div className="feature-text">
-          <h2>Browse Public Events</h2>
-          <p>Explore campus-wide public events and RSVP without logging in. Stay involved, effortlessly.</p>
-        </div>
-
-        <div className="event-carousel-container">
-          <button className="carousel-arrow left" onClick={() => scrollEventCarousel(-300)}>‹</button>
-
-          <div className="event-carousel" id="event-carousel">
-            {dummyEvents.map((event) => (
-              <EventCard key={event._id} event={event} isRsvped={false} onRSVPClick={() => {}} />
-            ))}
+          <div className="feature-text">
+            <h2>Browse Public Events</h2>
+            <p>Explore campus-wide public events and RSVP without logging in. Stay involved, effortlessly.</p>
           </div>
 
-          <button className="carousel-arrow right" onClick={() => scrollEventCarousel(300)}>›</button>
-        </div>
+          <div className="event-carousel-container">
+            <button className="carousel-arrow left" onClick={() => scrollEventCarousel(-300)}>‹</button>
 
-        <div className="center-btn">
-          <Link to="/events" className="feature-btn">Explore More Events</Link>
-        </div>
-      </section>
+            <div className="event-carousel" id="event-carousel">
+              {dummyEvents.map((event) => (
+                <EventCard key={event._id} event={event} isRsvped={false} onRSVPClick={() => {}} />
+              ))}
+            </div>
+
+            <button className="carousel-arrow right" onClick={() => scrollEventCarousel(300)}>›</button>
+          </div>
+
+          <div className="center-btn">
+            <Link to="/events" className="feature-btn">Explore More Events</Link>
+          </div>
+        </section>
+
 
 
 
