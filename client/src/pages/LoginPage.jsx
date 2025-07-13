@@ -1,49 +1,51 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { loginSuccess } from '../redux/userSlice';
+import { useNavigate } from 'react-router-dom'; 
 
 import './LoginPage.css';
 import Navbar from '../components/Navbar';
 
-const LoginPage = ({ onLogin }) => {
+const LoginPage = () => {
+  const dispatch = useDispatch(); // initialize dispatch
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  
   const handleLogin = async (e) => {
-  e.preventDefault();
-  setError('');
+    e.preventDefault();
+    setError('');
 
-  try {
-    const response = await fetch('http://localhost:5000/api/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+        credentials: 'include', // if you later use httpOnly cookies
+      });
 
-    const data = await response.json();
-    console.log('Login response:', data);
-    if (!response.ok) {
-      setError(data.message || 'Login failed');
-      setEmail('');
-      setPassword('');
-      
-    } else {
-      // Call onLogin prop to set user in parent App
-      onLogin(data.user);
+      const data = await response.json();
+      console.log('Login response:', data);
 
-      // Optionally save token in localStorage for future requests
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      if (!response.ok) {
+        setError(data.message || 'Login failed');
+        setEmail('');
+        setPassword('');
+      } else {
+        // Dispatch to Redux
+        dispatch(loginSuccess(data.user));
+        navigate('/dashboard');
+        // Optionally save token if using localStorage (skip if using cookies)
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Server error. Try again later.');
     }
-  } catch (err) {
-    console.error(err);
-    setError('Server error. Try again later.');
-  }
-};
-
+  };
 
   return (
     <>
@@ -76,12 +78,6 @@ const LoginPage = ({ onLogin }) => {
               Don't have an account? <Link to="/register">Sign up</Link>
             </p>
           </form>
-
-          <p className="dummy-tip">
-            <strong>Test Credentials:</strong><br />
-            Email: user@sociohub.com<br />
-            Password: 123456
-          </p>
         </div>
       </div>
     </>

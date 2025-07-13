@@ -1,5 +1,6 @@
 const Event = require('../models/eventModel');
 const User = require('../models/userModel');
+const Society = require('../models/societyModel');
 const cloudinary = require('../config/cloudinary'); 
 const nodemailer = require('nodemailer');
 const generateQRCode = require('../utils/generateQRCode');
@@ -14,7 +15,7 @@ const createEvent = async (req, res) => {
     const posterFile = req.files.poster ? req.files.poster[0] : null;
     let posterUrl = '';
 
-    //  Convert date to Date object and set today's date for comparison
+    // Convert date to Date object and set today's date for comparison
     const eventDate = new Date(date);
     const today = new Date();
     const todayDateOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -24,11 +25,19 @@ const createEvent = async (req, res) => {
       return res.status(400).json({ message: 'Event date must be in the future' });
     }
 
-    console.log("st: ", startTime, "st: ", endTime )
-    //  Validate and update times if provided
-    let startTimeDate, endTimeDate;
-    // if (startTime) startTimeDate = parseTimeToDate(startTime);
-    // if (endTime) endTimeDate = parseTimeToDate(endTime);
+    // Validate and convert start and end times
+    if (!startTime || !endTime) {
+      return res.status(400).json({ message: 'Start and end times are required' });
+    }
+
+    const [startHour, startMinute] = startTime.split(':').map(Number);
+    const [endHour, endMinute] = endTime.split(':').map(Number);
+
+    const startTimeDate = new Date(eventDate);
+    startTimeDate.setHours(startHour, startMinute, 0, 0);
+
+    const endTimeDate = new Date(eventDate);
+    endTimeDate.setHours(endHour, endMinute, 0, 0);
 
     if (eventDateOnly.getTime() === todayDateOnly.getTime()) {
       const currentTime = new Date();
@@ -41,6 +50,7 @@ const createEvent = async (req, res) => {
       return res.status(400).json({ message: 'End time must be after start time' });
     }
 
+    // Upload poster to Cloudinary if provided
     if (posterFile) {
       const posterUpload = await cloudinary.uploader.upload(posterFile.path, { resource_type: 'image' });
       posterUrl = posterUpload.secure_url;
@@ -51,10 +61,7 @@ const createEvent = async (req, res) => {
       location,
       date: eventDate,
       $or: [
-        {
-          startTime: { $lt: endTime },
-          endTime: { $gt: startTime }
-        }
+        { startTime: { $lt: endTime }, endTime: { $gt: startTime } }
       ]
     });
 
@@ -63,8 +70,8 @@ const createEvent = async (req, res) => {
         message: `Location is already booked for another event (${conflictingEvent.title}) at this date and time.`
       });
     }
-    // posterUrl = await generateEventPoster({ title, description, startTime, endTime, location, date: eventDate, societyId });
-    //  Create new event
+
+    // Create new event
     const newEvent = await Event.create({
       title,
       poster: posterUrl,
@@ -76,14 +83,29 @@ const createEvent = async (req, res) => {
       societyId,
       isPublic
     });
-     // Generate poster using OpenAI
-    res.status(201).json({ message: 'Event created successfully', event: newEvent });
+
+    // Add event to society's events list
+    const society = await Society.findByIdAndUpdate(
+      societyId,
+      { $push: { events: newEvent._id } },
+      { new: true }
+    );
+
+    if (!society) {
+      return res.status(404).json({ message: 'Society not found' });
+    }
+
+    return res.status(201).json({
+      message: 'Event created successfully and added to society',
+      event: newEvent
+    });
 
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: error.message });
   }
 };
+
 
 
 const getAllEvents = async (req, res) => {
@@ -329,22 +351,32 @@ const updateEvent = async (req, res) => {
 };
 
 const deleteEvent = async (req, res) => {
+  const { id } = req.params;
+
   try {
-    const eventId = req.params.id;
+    // Delete event from Event collection
+    const deletedEvent = await Event.findByIdAndDelete(id);
+    if (!deletedEvent) return res.status(404).json({ message: "Event not found" });
 
-    const event = await Event.findById(eventId);
-    if (!event) {
-      return res.status(404).json({ message: 'Event not found' });
-    }
+    // Remove event from Society's events array
+    await Society.updateMany(
+      { events: id },
+      { $pull: { events: id } }
+    );
 
-    await Event.findByIdAndDelete(eventId);
+    // Remove event from Users' registeredEvents array
+    await User.updateMany(
+      { registeredEvents: id },
+      { $pull: { registeredEvents: id } }
+    );
 
-    res.status(200).json({ message: 'Event deleted successfully' });
+    res.status(200).json({ message: "Event deleted from all references successfully" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Event deletion failed', error: error.message });
+    res.status(500).json({ message: "Server error deleting event" });
   }
 };
+
 
 
 module.exports = { createEvent, getAllEvents, getEventById, registerForEvent , updateEvent , deleteEvent ,getPublicEvents

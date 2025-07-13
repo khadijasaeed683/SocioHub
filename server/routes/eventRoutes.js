@@ -4,6 +4,7 @@ const { createEvent,
         updateEvent,
        getAllEvents,
        getEventById,
+       deleteEvent
       } = require('../controllers/eventController');
 const { protect , authAdmin} = require('../middleware/authMiddleware');
 const upload = require('../middleware/multer'); 
@@ -36,6 +37,11 @@ router.get(
   '/:id',
   protect,
   getEventById
+);  
+router.delete(
+  '/:id',
+  protect,
+  deleteEvent
 );  
 
 module.exports = router;    

@@ -5,33 +5,14 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
 
-const dummySocieties = [
-  {
-    _id: 's1',
-    name: 'Tech Society',
-    description: 'Technology & coding events throughout the year.',
-    inductionsOpen: true,
-  },
-  {
-    _id: 's2',
-    name: 'Art Society',
-    description: 'Visual arts, creativity and painting competitions.',
-    inductionsOpen: false,
-  },
-  {
-    _id: 's3',
-    name: 'Literary Society',
-    description: 'Debates, poetry slams and literary talks.',
-    inductionsOpen: true,
-  },
-];
-
 const JoinSociety = () => {
   const [societies, setSocieties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedSociety, setSelectedSociety] = useState(null);
   const [formData, setFormData] = useState({ name: '', email: '', reason: '' });
+  
+  
   useEffect(() => {
       const fetchSocieties = async () => {
         try {

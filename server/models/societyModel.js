@@ -43,9 +43,21 @@ const societySchema = new mongoose.Schema({
     ref: 'Event'
   }],
   pendingRequests: [{
+  userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  }],
+    ref: 'User',
+    required: true
+  },
+  reason: {
+    type: String,
+    required: true
+  },
+  requestedAt: {
+    type: Date,
+    default: Date.now
+  }
+}],
+
   approved: { type: Boolean, default: false },
   description: { type: String, required: true },
   inductionsOpen: { type: Boolean, default: true }

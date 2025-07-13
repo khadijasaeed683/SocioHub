@@ -52,7 +52,6 @@ const UserDashboard = () => {
     handleInputChange,
 } = useRSVP();
 
-
   useEffect(() => {
     if (!user?._id) return;
 
@@ -69,10 +68,10 @@ const UserDashboard = () => {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.message || 'Failed to fetch societies');
-        console.error('Error fetching societies:', data.message);
-        return;
-      }
+      const message = data.message || 'Failed to fetch events';
+      setError(message);
+      console.error('Error fetching events:', message);
+    }
 
       const societiesFetched = [...data.registeredSocieties, ...data.joinedSocieties];
       setSocieties(societiesFetched);
@@ -135,9 +134,9 @@ const UserDashboard = () => {
     fetchSocietiesAndUpcomingEvents();
 
   }, [user._id, error]);
-  console.log("User Dashboard societies:", societies);
-  console.log("User Dashboard events:", events);
-  console.log("User Dashboard upcomingEvents:", upcomingEvents);
+  // console.log("User Dashboard societies:", societies);
+  // console.log("User Dashboard events:", events);
+  // console.log("User Dashboard upcomingEvents:", upcomingEvents);
   // Use dummySocieties for Sidebar testing instead of fetched societies
   const adminSocieties = societies.filter(s => s.createdBy === user._id);
   const allUpcomingEvents = Object.values(upcomingEvents).flat();

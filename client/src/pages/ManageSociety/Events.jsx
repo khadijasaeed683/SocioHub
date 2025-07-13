@@ -100,11 +100,12 @@ const Events = () => {
         });
 
         setEvents((prev) =>
-          editEventId ? prev.map((ev) => (ev._id === editEventId ? data : ev)) : [data, ...prev]
+          editEventId ? prev.map((ev) => (ev._id === editEventId ? data : ev)) : [data.event, ...prev]
         );
       } else {
         console.error('Error:', data.message);
       }
+      toast.success(data.message);
     } catch (error) {
       console.error('Submission error:', error);
     }
@@ -148,9 +149,30 @@ const Events = () => {
       toast.error(error);
     }
   } else if (confirmAction === 'delete') {
-    setEvents((prev) => prev.filter((ev) => ev._id !== confirmTargetId));
-    // Add your delete API call here if you implement it server-side
+  try {
+    const res = await fetch(`http://localhost:5000/api/event/${confirmTargetId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      // Update local state to remove the deleted event
+      setEvents((prev) => prev.filter((ev) => ev._id !== confirmTargetId));
+      toast.success(data.message);
+    } else {
+      console.error('Error deleting event:', data.message);
+      toast.error(data.message);
+    }
+  } catch (error) {
+    console.error('Server error deleting event:', error);
+    toast.error(error);
   }
+}
+
 
   setShowConfirm(false);
   setConfirmTargetId(null);
@@ -293,8 +315,10 @@ const Events = () => {
       <h4>RSVP List</h4>
       <ul>
         {showRSVPList.participants.length > 0 ? (
-          showRSVPList.participants.map((name, idx) => (
-            <li key={idx}>{name}</li>
+          showRSVPList.participants.map((participant, idx) => (
+            <li key={idx}>
+        {participant.name} ({participant.email}) {/* adjust fields as needed */}
+      </li>
           ))
         ) : (
           <li>No RSVPs yet.</li>

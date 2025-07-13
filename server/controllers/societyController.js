@@ -3,6 +3,43 @@ const Society = require('../models/societyModel');
 const User = require('../models/userModel');
 const cloudinary = require('../config/cloudinary'); 
 
+// async function migratePendingRequests() {
+//   try {
+
+
+//     // Find all societies
+//     const societies = await Society.find({});
+//     console.log(`Found ${societies.length} societies.`);
+
+//     for (const society of societies) {
+//       if (Array.isArray(society.pendingRequests) && society.pendingRequests.length > 0) {
+//         // Check if already migrated (skip if it's an array of objects)
+//         const firstItem = society.pendingRequests[0];
+//         if (firstItem && typeof firstItem === 'object' && firstItem.userId) {
+//           console.log(`Society ${society._id} already migrated. Skipping...`);
+//           continue;
+//         }
+
+//         // Convert each userId to new object structure
+//         const migratedRequests = society.pendingRequests.map(userId => ({
+//           userId,
+//           reason: "No reason provided (migrated).",
+//           requestedAt: new Date()
+//         }));
+
+//         society.pendingRequests = migratedRequests;
+//         await society.save();
+//         console.log(`Migrated pendingRequests for society ${society._id}`);
+//       }
+//     }
+
+//     console.log("Migration completed successfully.");
+//     process.exit(0);
+//   } catch (error) {
+//     console.error("Migration error:", error);
+//     process.exit(1);
+//   }
+// }
 
 const registerSociety = async (req, res) => {
   try {
@@ -114,7 +151,7 @@ const joinSociety = async (req, res) => {
     if (!society.inductionsOpen) {
       return res.status(400).json({ message: 'Inductions for this society are currently closed' });
     }
-    society.pendingRequests.push(user._id);
+    society.pendingRequests.push({userId: user._id, reason: req.body.reason});
     await society.save();
     res.status(200).json({ message: 'Join request sent!', society });
   } catch (error) {
@@ -155,23 +192,38 @@ const approveSociety = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 const getJoinRequests = async (req, res) => {
-  const user = req.user;
-  const societyId = req.params.id;
-  console.log("User trying to join society:", societyId, user._id);
   try {
-    const society = await Society.findById(societyId).populate('pendingRequests', 'username email');
+    const societyId = req.params.id;
+
+    const society = await Society.findById(societyId)
+      .populate('pendingRequests.userId', 'username email pfp');
+
     if (!society) {
-      return res.status(404).json({ error: 'Society not found' });
+      return res.status(404).json({ message: 'Society not found' });
     }
-    if (society.createdBy.toString() != user._id.toString()) {
-      return res.status(403).json({ message: 'Only head can view requests' });
-    }
-    res.status(200).json({ requests: society.pendingRequests });
+    console.log(society.pendingRequests);
+    // Format each pending request with user credentials
+    const requests = society.pendingRequests.map((request) => ({
+      _id: request._id,
+      userId: request.userId._id,
+      name: request.userId.username,
+      email: request.userId.email,
+      avatar: request.userId.pfp || '', // or .avatar if your User schema uses 'avatar'
+      reason: request.reason,
+      requestedAt: request.requestedAt,
+    }));
+
+    return res.status(200).json({ requests });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in getJoinRequests:', error);
+    return res.status(500).json({ message: 'Server error' });
   }
 };
+
+
+
 
 const acceptJoinRequest = async (req, res) => {
   const user = req.user;
@@ -214,17 +266,29 @@ const acceptJoinRequest = async (req, res) => {
 };
 
 const getSocietyMembers = async (req, res) => {
-  const societyId = req.params.id;
   try {
-    const society = await Society.findById(societyId).populate('members', 'username email');
+    const societyId = req.params.id;
+    const society = await Society.findById(societyId).populate('members', 'username email pfp');
+
     if (!society) {
-      return res.status(404).json({ error: 'Society not found' });
+      return res.status(404).json({ message: 'Society not found' });
     }
-    res.status(200).json({ members: society.members });
+    console.log(society.members);
+    const members = society.members.map((m) => ({
+      _id: m._id,
+      name: m.username,
+      email: m.email,
+      role: m.role,
+      avatar: m.pfp || '',
+    }));
+
+    return res.status(200).json({ members });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error(error);
+    return res.status(500).json({ message: 'Server error' });
   }
 };
+
 const getSocietyById = async (req, res) => {
   const societyId = req.params.id;
   try {

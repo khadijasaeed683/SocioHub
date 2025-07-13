@@ -1,37 +1,59 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSociety } from '../../context/SocietyContext';
+import {toast} from 'react-toastify';
 import './Members.css';
 
-const dummyApplications = [
-  {
-    _id: 'app1',
-    name: 'Ali Khan',
-    email: 'ali@example.com',
-    reason: 'I want to improve my skills and contribute.',
-    avatar: '',
-  },
-];
-
-const dummyMembers = [
-  {
-    _id: 'mem1',
-    name: 'Zain Raza',
-    email: 'zain@example.com',
-    role: 'Admin',
-    avatar: '',
-  },
-  {
-    _id: 'mem2',
-    name: 'Hiba Noor',
-    email: 'hiba@example.com',
-    role: 'Member',
-    avatar: '',
-  },
-];
 
 const Members = () => {
+  const { society } = useSociety(); // get current society from context
+  const [members, setMembers] = useState([]);
   const [selectedApp, setSelectedApp] = useState(null);
   const [selectedMember, setSelectedMember] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [pendingRequests, setPendingRequests] = useState([]);
+  // Fetch members
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/society/${society._id}/members`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setMembers(data.members);
+        } else {
+          toast.error(data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching members:', error);
+        toast.error('Failed to fetch members');
+      }
+    };
+
+    const fetchApplications = async () => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/society/${society._id}/requests`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setPendingRequests(data.requests);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching applications:', error);
+      toast.error('Failed to fetch applications');
+    }
+  };
+
+    fetchApplications();
+    fetchMembers();
+  }, [society._id]);
 
   const handleApprove = (id) => {
     alert(`Approved application: ${id}`);
@@ -53,18 +75,18 @@ const Members = () => {
     setSelectedMember(null);
   };
 
-  const filteredMembers = dummyMembers.filter((member) =>
+  const filteredMembers = members.filter((member) =>
     member.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div className="members-page">
-      <h2>Pending Applications ({dummyApplications.length})</h2>
+      <h2>Pending Applications ({pendingRequests.length})</h2>
       <div className="application-list">
-        {dummyApplications.length === 0 ? (
+        {pendingRequests.length === 0 ? (
           <p>No pending applications.</p>
         ) : (
-          dummyApplications.map((app) => (
+          pendingRequests.map((app) => (
             <div
               key={app._id}
               className="application-card"
