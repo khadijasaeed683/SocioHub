@@ -7,7 +7,7 @@ import SocietyCard from '../components/SocietyCard';
 import EventCard from '../components/EventCard';
 import RSVPForm from './RSVPForm'; // adjust path if needed
 import useRSVP from '../hooks/useRSVP'; // custom hook for RSVP logic
-
+import {toast} from 'react-toastify';
 
 const UserDashboard = () => {
   const navigate = useNavigate();
@@ -66,6 +66,9 @@ const UserDashboard = () => {
       const message = data.message || 'Failed to fetch events';
       setError(message);
       console.error('Error fetching events:', message);
+      toast.error(data.message);
+      navigate('/login');
+      return;
     }
 
       const societiesFetched = [...data.registeredSocieties, ...data.joinedSocieties];
@@ -76,7 +79,7 @@ const UserDashboard = () => {
       await Promise.all(
         societiesFetched.map(async (society) => {
           try {
-            const eventsRes = await fetch(`http://localhost:5000/api/society/${society._id}/event?upcoming=true`, {
+            const eventsRes = await fetch(`http://localhost:5000/api/society/${society._id}/event?upcomig=true`, {
               method: 'GET',
               headers: {
                 'Content-Type': 'application/json',
@@ -128,7 +131,7 @@ const UserDashboard = () => {
     fetchEvents();
     fetchSocietiesAndUpcomingEvents();
 
-  }, [user._id, error]);
+  }, [user._id, error, navigate]);
   // console.log("User Dashboard societies:", societies);
   // console.log("User Dashboard events:", events);
   // console.log("User Dashboard upcomingEvents:", upcomingEvents);

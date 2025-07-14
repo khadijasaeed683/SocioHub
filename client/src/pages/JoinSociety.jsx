@@ -34,11 +34,25 @@ const JoinSociety = () => {
       fetchSocieties();
     }, []);
 
-  const handleApplyClick = async (society) => {
-    setSelectedSociety(society);
-    console.log('Selected society:', society);
+  const handleApplyClick = (society) => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    toast.info('Please login to join this society.');
+    navigate('/login');
+    return;
+  }
 
-  };
+  const user = JSON.parse(localStorage.getItem('user'));
+  setFormData({
+    name: user?.username || '',
+    email: user?.email || '',
+    reason: '',
+  });
+
+  setSelectedSociety(society);
+  console.log('Selected society:', society);
+};
+
 
   const handleFormChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));

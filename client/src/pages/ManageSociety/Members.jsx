@@ -5,7 +5,7 @@ import './Members.css';
 
 
 const Members = () => {
-  const { society } = useSociety(); // get current society from context
+  const { society , setSociety} = useSociety(); // get current society from context
   const [members, setMembers] = useState([]);
   const [selectedApp, setSelectedApp] = useState(null);
   const [selectedMember, setSelectedMember] = useState(null);
@@ -55,15 +55,49 @@ const Members = () => {
     fetchMembers();
   }, [society._id]);
 
-  const handleApprove = (id) => {
-    alert(`Approved application: ${id}`);
+  const handleRequestAction = async (reqId, action) => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/society/${society._id}/requests/${reqId}/${action}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.message || `${action} failed`);
+      } else {
+        toast.success(`Request ${action}ed successfully`);
+        // Update context and local state
+        setSociety(data.society);
+        setPendingRequests(data.society.pendingRequests);
+        // Optionally refetch members to update new member list
+        const updatedMembers = await fetch(`http://localhost:5000/api/society/${society._id}/members`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        const updatedMembersData = await updatedMembers.json();
+        setMembers(updatedMembersData.members);
+      }
+    } catch (err) {
+      console.error(`Error on ${action}ing request:`, err);
+      toast.error('Server error');
+    }
     setSelectedApp(null);
   };
 
-  const handleReject = (id) => {
-    alert(`Rejected application: ${id}`);
-    setSelectedApp(null);
-  };
+  // const handleApprove = (id) => {
+  //   alert(`Approved application: ${id}`);
+  //   setSelectedApp(null);
+  // };
+
+  // const handleReject = (id) => {
+  //   alert(`Rejected application: ${id}`);
+  //   setSelectedApp(null);
+  // };
 
   const handleRemoveMember = (id) => {
     alert(`Removed member: ${id}`);
@@ -106,8 +140,8 @@ const Members = () => {
             <p><strong>Email:</strong> {selectedApp.email}</p>
             <p><strong>Why join:</strong> {selectedApp.reason}</p>
             <div className="actions">
-              <button onClick={() => handleApprove(selectedApp._id)}>✅ Approve</button>
-              <button className="reject-btn" onClick={() => handleReject(selectedApp._id)}>❌ Reject</button>
+              <button className="accept-btn" onClick={() => handleRequestAction(selectedApp._id, 'accept')}>Accept</button>
+              <button className="reject-btn" onClick={() => handleRequestAction(selectedApp._id, 'reject')}>Reject</button>
               <button onClick={() => setSelectedApp(null)}>Close</button>
             </div>
           </div>

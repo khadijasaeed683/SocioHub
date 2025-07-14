@@ -7,7 +7,7 @@ const { registerSociety,
         getAllSocieties, 
         approveSociety, 
         getJoinRequests,
-        acceptJoinRequest,
+        handleJoinRequest,
         getSocietyMembers,
         getSocietyById,
         updateSociety
@@ -67,11 +67,13 @@ router.get(
   protect,
   getJoinRequests
 );
+
 router.post(
-  '/:societyId/requests/:userId/accept',
+  '/:societyId/requests/:userId/:action',
   protect,
-  acceptJoinRequest
+  handleJoinRequest
 );
+
 
 router.get(
   '/:id/members',

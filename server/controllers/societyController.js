@@ -226,45 +226,54 @@ const getJoinRequests = async (req, res) => {
 
 
 
-const acceptJoinRequest = async (req, res) => {
+const handleJoinRequest = async (req, res) => {
   const user = req.user;
-  const {societyId, userId} = req.params;
-  console.log("User trying to join society:", societyId, userId);
+  const { societyId, reqId, action } = req.params;
+
   try {
-    const society = await Society.findById(societyId).populate('pendingRequests', 'username email');
+    const society = await Society.findById(societyId).populate('pendingRequests.userId');
     if (!society) {
       return res.status(404).json({ error: 'Society not found' });
     }
-   
-   if (society.createdBy.toString() != user._id.toString()) {
-      return res.status(403).json({ message: 'Only head can accept requests' });
+
+    if (society.createdBy.toString() !== user._id.toString()) {
+      return res.status(403).json({ message: 'Only head can accept/reject requests' });
     }
-    console.log("Pending Requests:", society.pendingRequests);
-    // Check if userId exists in pendingRequests
-    const requestExists = society.pendingRequests.some(
-      request => request._id.toString() === userId
-    );
-    
-    if (!requestExists) {
-      return res.status(400).json({ message: 'User has not requested to join this society' });
-    }
-    
-    // Remove user from pending requests and add to members
+
+    console.log("Pending Requests:", user._id.toString(), society.pendingRequests);
+
+    // const requestExists = society.pendingRequests.some(
+    //   request => request.userId._id.toString() === user._id
+    // );
+
+    // if (!requestExists) {
+    //   return res.status(400).json({ message: 'User has not requested to join this society' });
+    // }
+
+    // Remove the request from pendingRequests
     society.pendingRequests = society.pendingRequests.filter(
-      request => request._id.toString() !== userId
+      request => request.userId._id.toString() !== user._id
     );
-    
-    society.members.push(userId);
+    //adding current user to members innstead of user who requested
+    if (action === 'accept') {
+      // Add to members
+      society.members.push(user._id);
+
+      const requestedUser = await User.findById(user._id);
+      requestedUser.societies.push(societyId);
+      await requestedUser.save();
+    }
+
     await society.save();
 
-    requestedUser = await User.findByIdAndUpdate(userId);
-    requestedUser.societies.push(societyId);
-    await requestedUser.save();
-    res.status(200).json({ success: true, message: 'Request accepted', society });
+    res.status(200).json({ success: true, message: `Request ${action}ed`, society });
   } catch (error) {
+    console.error('Error in handleJoinRequest:', error);
     res.status(500).json({ error: error.message });
   }
 };
+
+
 
 const getSocietyMembers = async (req, res) => {
   try {
@@ -384,7 +393,7 @@ module.exports = { registerSociety,
                   approveSociety, 
                   updateSociety,
                   getJoinRequests, 
-                  acceptJoinRequest,
+                  handleJoinRequest,
                   getSocietyMembers,
                   getSocietyById
                   };

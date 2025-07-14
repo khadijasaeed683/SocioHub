@@ -85,6 +85,10 @@
   background-color: #d9534f;
   color: white;
 }
+.actions .accept-btn {
+  background-color: #29b071ff;
+  color: white;
+}
 .member-search {
   padding: 8px 12px;
   width: 100%;
