@@ -1,0 +1,25 @@
+.admin-dashboard {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-body {
+  display: flex;
+  flex: 1;
+  transition: all 0.3s ease;
+}
+
+.dashboard-main {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.sidebar-open .dashboard-main {
+  margin-left: 200px;
+}
+
+.sidebar-closed .dashboard-main {
+  margin-left: 60px;
+}

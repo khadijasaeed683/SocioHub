@@ -1,0 +1,36 @@
+.admin-sidebar {
+  width: 240px;
+  background-color: #222831;
+  min-height: 100vh;
+  padding: 20px 0;
+  color: white;
+  position: fixed;
+  top: 60px; /* Adjust based on navbar height */
+  left: 0;
+  z-index: 999;
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.2);
+}
+
+.admin-sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-left: 20px;
+}
+
+.admin-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #eeeeee;
+  text-decoration: none;
+  font-size: 1rem;
+  padding: 10px;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.admin-link:hover,
+.admin-link.active {
+  background-color: #393e46;
+}

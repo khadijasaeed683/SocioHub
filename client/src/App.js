@@ -21,7 +21,10 @@ import Members from './pages/ManageSociety/Members';
 import Events from './pages/ManageSociety/Events';
 import Settings from './pages/ManageSociety/Settings';
 
+import AdminLogin from './admin/AdminLogin';
+
 import { SidebarProvider } from './context/SidebarContext';
+import AdminDashboard from './admin/AdminDashboard';
 
 const AppWrapper = () => {
   const [loggedInUser, setLoggedInUser] = useState(null);
@@ -100,6 +103,10 @@ const AppWrapper = () => {
         <Route path="settings" element={<Settings />} />
       </Route>
 
+    {/* Admin Panel Routes */}
+
+    <Route path="/admin/login" element={<AdminLogin />} />
+    <Route path="/admin/Dashboard" element={<AdminDashboard/>}/>
 
     </Routes>
     </>

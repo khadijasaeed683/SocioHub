@@ -1,12 +1,13 @@
 // components/Footer.jsx
 import './Footer.css';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
     <footer className="eventnest-footer">
       <div className="footer-top">
         <div className="footer-links">
-          <a href="/manage" className="footer-link">Management</a>
+          <Link to="/admin/login" className="footer-link">Management</Link>
           <a href="https://forms.gle/your-feedback-form-link" target="_blank" rel="noreferrer" className="footer-link">Feedback</a>
         </div>
         <div className="footer-socials">
