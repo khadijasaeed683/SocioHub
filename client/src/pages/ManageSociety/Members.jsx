@@ -55,6 +55,7 @@ const Members = () => {
     fetchMembers();
   }, [society._id]);
 
+  
   const handleRequestAction = async (reqId, action) => {
     try {
       const res = await fetch(`http://localhost:5000/api/society/${society._id}/requests/${reqId}/${action}`, {
@@ -73,14 +74,7 @@ const Members = () => {
         // Update context and local state
         setSociety(data.society);
         setPendingRequests(data.society.pendingRequests);
-        // Optionally refetch members to update new member list
-        const updatedMembers = await fetch(`http://localhost:5000/api/society/${society._id}/members`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        const updatedMembersData = await updatedMembers.json();
-        setMembers(updatedMembersData.members);
+        setMembers(prev => [...prev, data.newMember]);
       }
     } catch (err) {
       console.error(`Error on ${action}ing request:`, err);
@@ -89,20 +83,36 @@ const Members = () => {
     setSelectedApp(null);
   };
 
-  // const handleApprove = (id) => {
-  //   alert(`Approved application: ${id}`);
-  //   setSelectedApp(null);
-  // };
+  const handleRemoveMember = async (memberId) => {
+  if (!window.confirm('Are you sure you want to remove this member?')) return;
 
-  // const handleReject = (id) => {
-  //   alert(`Rejected application: ${id}`);
-  //   setSelectedApp(null);
-  // };
+  try {
+    const res = await fetch(`http://localhost:5000/api/society/${society._id}/members/${memberId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+    });
 
-  const handleRemoveMember = (id) => {
-    alert(`Removed member: ${id}`);
-    setSelectedMember(null);
-  };
+    const data = await res.json();
+
+    if (!res.ok) {
+      toast.error(data.message || 'Failed to remove member');
+    } else {
+      toast.success('Member removed successfully');
+      // Update local members state by removing the member
+      setMembers(prev => prev.filter(member => member._id !== memberId));
+      // Optionally update society context if needed
+      setSociety(data.society);
+    }
+  } catch (err) {
+    console.error('Error removing member:', err);
+    toast.error('Server error');
+  }
+
+  setSelectedMember(null);
+};
+
 
   const handleChangeRole = (id, newRole) => {
     alert(`Changed role of ${id} to ${newRole}`);
@@ -110,8 +120,13 @@ const Members = () => {
   };
 
   const filteredMembers = members.filter((member) =>
-    member.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  (member.username || '').toLowerCase().includes(searchTerm.toLowerCase())
+);
+
+useEffect(() => {
+  console.log("Members updated: ", members);
+}, [members]);
+
 
   return (
     <div className="members-page">
@@ -122,12 +137,12 @@ const Members = () => {
         ) : (
           pendingRequests.map((app) => (
             <div
-              key={app._id}
+              key={app.userId._id}
               className="application-card"
               onClick={() => setSelectedApp(app)}
             >
-              <div className="avatar">{app.avatar ? <img src={app.avatar} alt="" /> : app.name[0]}</div>
-              <span>{app.name}</span>
+              <div className="avatar">{app.userId.pfp ? <img src={app.userId.pfp} alt="" /> : app.userId.username[0]}</div>
+              <span>{app.userId.username}</span>
             </div>
           ))
         )}
@@ -136,8 +151,8 @@ const Members = () => {
       {selectedApp && (
         <div className="app-details-modal">
           <div className="app-details">
-            <h3>{selectedApp.name}</h3>
-            <p><strong>Email:</strong> {selectedApp.email}</p>
+            <h3>{selectedApp.username}</h3>
+            <p><strong>Email:</strong> {selectedApp.userId.email}</p>
             <p><strong>Why join:</strong> {selectedApp.reason}</p>
             <div className="actions">
               <button className="accept-btn" onClick={() => handleRequestAction(selectedApp._id, 'accept')}>Accept</button>
@@ -165,9 +180,15 @@ const Members = () => {
             className="member-card"
             onClick={() => setSelectedMember(member)}
           >
-            <div className="avatar">{member.avatar ? <img src={member.avatar} alt="" /> : member.name[0]}</div>
+          <div className="avatar">
+            {member.pfp ? (
+              <img src={member.pfp} alt="" />
+            ) : (
+              member.username ? member.username[0] : '?'
+            )}
+          </div>
             <div>
-              <h4>{member.name}</h4>
+              <h4>{member.username}</h4>
               <p className="role">{member.role}</p>
             </div>
           </div>
@@ -177,7 +198,7 @@ const Members = () => {
       {selectedMember && (
         <div className="app-details-modal">
           <div className="app-details">
-            <h3>{selectedMember.name}</h3>
+            <h3>{selectedMember.username}</h3>
             <p><strong>Email:</strong> {selectedMember.email}</p>
             <p><strong>Role:</strong></p>
             <select

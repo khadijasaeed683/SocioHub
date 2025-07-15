@@ -163,6 +163,7 @@ const JoinSociety = () => {
                   value={formData.reason}
                   onChange={handleFormChange}
                   placeholder="Why do you want to join?"
+                  required="true"
                 ></textarea>
                 <div className="form-actions">
                   <button type="submit">Submit</button>

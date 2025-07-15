@@ -138,9 +138,10 @@ const joinSociety = async (req, res) => {
     if (!society) {
       return res.status(404).json({ error: 'Society not found' });
     }
-    if(society.pendingRequests.includes(user._id)) {
-      return res.status(400).json({ message: 'You have already sent a join request' });
-    }
+  if (society.pendingRequests.some(req => req.userId.toString() === user._id.toString())) {
+    return res.status(400).json({ message: 'You have already sent a join request' });
+  }
+
     if (society.members.includes(user._id)) {
       return res.status(400).json({ message: 'You are already a member of this society' });
     }
@@ -199,22 +200,13 @@ const getJoinRequests = async (req, res) => {
     const societyId = req.params.id;
 
     const society = await Society.findById(societyId)
-      .populate('pendingRequests.userId', 'username email pfp');
+      .populate('pendingRequests.userId');
 
     if (!society) {
       return res.status(404).json({ message: 'Society not found' });
     }
     console.log(society.pendingRequests);
-    // Format each pending request with user credentials
-    const requests = society.pendingRequests.map((request) => ({
-      _id: request._id,
-      userId: request.userId._id,
-      name: request.userId.username,
-      email: request.userId.email,
-      avatar: request.userId.pfp || '', // or .avatar if your User schema uses 'avatar'
-      reason: request.reason,
-      requestedAt: request.requestedAt,
-    }));
+    const requests = society.pendingRequests;
 
     return res.status(200).json({ requests });
   } catch (error) {
@@ -224,12 +216,10 @@ const getJoinRequests = async (req, res) => {
 };
 
 
-
-
 const handleJoinRequest = async (req, res) => {
-  const user = req.user;
+  const user = req.user; // Society head
   const { societyId, reqId, action } = req.params;
-
+  console.log("Reg id: ", reqId);
   try {
     const society = await Society.findById(societyId).populate('pendingRequests.userId');
     if (!society) {
@@ -240,33 +230,39 @@ const handleJoinRequest = async (req, res) => {
       return res.status(403).json({ message: 'Only head can accept/reject requests' });
     }
 
-    console.log("Pending Requests:", user._id.toString(), society.pendingRequests);
+    const requestIndex = society.pendingRequests.findIndex(
+      request => request._id.toString() === reqId
+    );
 
-    // const requestExists = society.pendingRequests.some(
-    //   request => request.userId._id.toString() === user._id
-    // );
+    if (requestIndex === -1) {
+      return res.status(400).json({ message: 'Request not found in pending requests' });
+    }
 
-    // if (!requestExists) {
-    //   return res.status(400).json({ message: 'User has not requested to join this society' });
-    // }
+    const requestedUserId = society.pendingRequests[requestIndex].userId._id;
 
     // Remove the request from pendingRequests
-    society.pendingRequests = society.pendingRequests.filter(
-      request => request.userId._id.toString() !== user._id
-    );
-    //adding current user to members innstead of user who requested
-    if (action === 'accept') {
-      // Add to members
-      society.members.push(user._id);
+    society.pendingRequests.splice(requestIndex, 1);
 
-      const requestedUser = await User.findById(user._id);
+    let requestedUser = null;
+
+    if (action === 'accept') {
+      // Add the requested user to members
+      society.members.push(requestedUserId);
+
+      requestedUser = await User.findById(requestedUserId); // fetch full user data
+
       requestedUser.societies.push(societyId);
       await requestedUser.save();
     }
-
     await society.save();
 
-    res.status(200).json({ success: true, message: `Request ${action}ed`, society });
+    res.status(200).json({ 
+      success: true, 
+      message: `Request ${action}ed`, 
+      society,
+      newMember: requestedUser // send back the added user
+    });
+
   } catch (error) {
     console.error('Error in handleJoinRequest:', error);
     res.status(500).json({ error: error.message });
@@ -274,23 +270,16 @@ const handleJoinRequest = async (req, res) => {
 };
 
 
-
 const getSocietyMembers = async (req, res) => {
   try {
     const societyId = req.params.id;
-    const society = await Society.findById(societyId).populate('members', 'username email pfp');
+    const society = await Society.findById(societyId).populate('members');
 
     if (!society) {
       return res.status(404).json({ message: 'Society not found' });
     }
     console.log(society.members);
-    const members = society.members.map((m) => ({
-      _id: m._id,
-      name: m.username,
-      email: m.email,
-      role: m.role,
-      avatar: m.pfp || '',
-    }));
+    const members = society.members;
 
     return res.status(200).json({ members });
   } catch (error) {
@@ -308,6 +297,49 @@ const getSocietyById = async (req, res) => {
     }
     res.status(200).json( society );
   } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+const removeMember = async (req, res) => {
+  const user = req.user; // Society head
+  const { societyId, memberId } = req.params;
+  console.log("socid ", societyId , "memid ", memberId);
+  try {
+    const society = await Society.findById(societyId);
+    if (!society) {
+      return res.status(404).json({ error: 'Society not found' });
+    }
+
+    // Only society head can remove members
+    if (society.createdBy.toString() !== user._id.toString()) {
+      return res.status(403).json({ message: 'Only head can remove members' });
+    }
+
+    // Check if member exists in members list
+    const isMember = society.members.includes(memberId);
+    if (!isMember) {
+      return res.status(400).json({ message: 'User is not a member of this society' });
+    }
+
+    // Remove from society members
+    society.members = society.members.filter(
+      id => id.toString() !== memberId
+    );
+
+    await society.save();
+
+    // Also remove society from user's societies list
+    const memberUser = await User.findById(memberId);
+    if (memberUser) {
+      memberUser.societies = memberUser.societies.filter(
+        id => id.toString() !== societyId
+      );
+      await memberUser.save();
+    }
+
+    res.status(200).json({ success: true, message: 'Member removed successfully' , society});
+  } catch (error) {
+    console.error('Error in removeMember:', error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -395,5 +427,6 @@ module.exports = { registerSociety,
                   getJoinRequests, 
                   handleJoinRequest,
                   getSocietyMembers,
-                  getSocietyById
+                  getSocietyById,
+                  removeMember
                   };

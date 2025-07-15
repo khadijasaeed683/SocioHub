@@ -10,7 +10,8 @@ const { registerSociety,
         handleJoinRequest,
         getSocietyMembers,
         getSocietyById,
-        updateSociety
+        updateSociety,
+        removeMember
       } = require('../controllers/societyController');
 const { protect , authAdmin} = require('../middleware/authMiddleware');
 const upload = require('../middleware/multer'); 
@@ -69,7 +70,7 @@ router.get(
 );
 
 router.post(
-  '/:societyId/requests/:userId/:action',
+  '/:societyId/requests/:reqId/:action',
   protect,
   handleJoinRequest
 );
@@ -80,6 +81,11 @@ router.get(
   protect,
   upload.none(),  
   getSocietyMembers
+);
+router.delete(
+  '/:societyId/members/:memberId',
+  protect,
+  removeMember
 );
 
 router.use('/:societyId/event', protect, eventRoutes);
