@@ -12,12 +12,12 @@
 
 .dashboard-main {
   flex: 1;
-  padding: 2rem;
+  padding: 1rem;
   overflow-y: auto;
 }
 
 .sidebar-open .dashboard-main {
-  margin-left: 200px;
+  margin-left: 100px;
 }
 
 .sidebar-closed .dashboard-main {

@@ -1,14 +1,17 @@
+
 .admin-sidebar {
-  width: 240px;
+  width: 200px;
   background-color: #222831;
-  min-height: 100vh;
-  padding: 20px 0;
   color: white;
-  position: fixed;
-  top: 60px; /* Adjust based on navbar height */
+  padding-top: 1rem;
+  height: 100%;
+  /* 🔁 Changed this: */
+  position: relative;
+  top: 0;
   left: 0;
-  z-index: 999;
+  transition: width 0.3s ease;
   box-shadow: 2px 0 6px rgba(0, 0, 0, 0.2);
+
 }
 
 .admin-sidebar nav {
