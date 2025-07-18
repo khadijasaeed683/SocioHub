@@ -8,10 +8,10 @@ const AdminSidebar = () => {
     <aside className="admin-sidebar">
       <nav>
         <NavLink to="/admin/dashboard/requests" className="admin-link">
-          <FaClipboardList /> <span>Society Requests</span>
+          <FaClipboardList /> <span>Pending Requests</span>
         </NavLink>
         <NavLink to="/admin/dashboard/societies" className="admin-link">
-          <FaBuilding /> <span>Manage Societies</span>
+          <FaBuilding /> <span>View Societies</span>
         </NavLink>
         <NavLink to="/admin/dashboard/users" className="admin-link">
           <FaUsers /> <span>Manage Users</span>

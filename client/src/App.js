@@ -23,6 +23,8 @@ import Settings from './pages/ManageSociety/Settings';
 
 import AdminLogin from './admin/AdminLogin';
 import SocietyRequests from './admin/pages/SocietyRequests';
+import ManageSocieties from './admin/pages/ManageSocieties';
+import ManageUsers from './admin/pages/ManageUsers';
 
 import { SidebarProvider } from './context/SidebarContext';
 import AdminDashboard from './admin/AdminDashboard';
@@ -113,8 +115,8 @@ const AppWrapper = () => {
     <Route path="/admin/login" element={<AdminLogin />} />
     <Route path="/admin/dashboard" element={<AdminDashboard />} />
     <Route path="/admin/dashboard/requests" element={<SocietyRequests />} />
-
-
+    <Route path="/admin/dashboard/societies" element={<ManageSocieties />} />
+    <Route path="/admin/dashboard/users" element={<ManageUsers />} />
 
     </Routes>
     </>

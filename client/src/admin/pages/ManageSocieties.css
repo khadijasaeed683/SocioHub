@@ -52,13 +52,13 @@
   cursor: pointer;
 }
 
-/* .search-bar {
+.search-bar {
   width: 300px;
   padding: 8px 12px;
   margin-bottom: 1.5rem;
   border-radius: 5px;
   border: 1px solid #ccc;
-} */
+}
 
 .details-modal {
   position: fixed;
@@ -185,18 +185,21 @@
   margin-top: 1.5rem;
 }
 
-.approve-btn {
-  background-color: #28a745;
-  color: white;
-  padding: 8px 14px;
-  border: none;
+.deactivate-btn {
+  background-color: #ffc107;
+  color: #000;
+  padding: 0.5rem 1rem;
   border-radius: 5px;
+  border: none;
+  margin-right: 0.5rem;
+  cursor: pointer;
 }
 
-.reject-btn {
+.delete-btn {
   background-color: #dc3545;
-  color: white;
-  padding: 8px 14px;
-  border: none;
+  color: #fff;
+  padding: 0.5rem 1rem;
   border-radius: 5px;
+  border: none;
+  cursor: pointer;
 }
