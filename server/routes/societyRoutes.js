@@ -5,7 +5,6 @@ const { registerSociety,
         getUserSocieties, 
         joinSociety, 
         getAllSocieties, 
-        approveSociety, 
         getJoinRequests,
         handleJoinRequest,
         getSocietyMembers,
@@ -55,12 +54,6 @@ router.post(
   '/:id/join',
   protect,
   joinSociety
-);
-
-router.post(
-  '/:id/approve',
-  authAdmin,
-  approveSociety
 );
 
 router.get(

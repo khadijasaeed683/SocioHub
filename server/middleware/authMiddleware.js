@@ -42,28 +42,23 @@ const allowRoles = (...allowedRoles) => {
 const authAdmin = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
-  if (!authHeader || !authHeader.startsWith("Bearer "))
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json({ message: "No token provided" });
-  const atoken = authHeader.split(' ')[1];
-
-  if(!atoken)
-  {
-    return res.status(401).json({ success: false, message: 'Not Authorized login' });
   }
-  const token_decoded = jwt.verify(atoken, process.env.JWT_SECRET);
-  try {
 
-    if(token_decoded == process.env.ADMIN_EMAIL + process.env.ADMIN_PWD)
-    {
-      return next();
-    }
-    else
-    {
-      return res.status(403).json({ message: 'Not Authorized login' });
+  const token = authHeader.split(' ')[1];
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (decoded.role === 'admin') {
+      next();
+    } else {
+      return res.status(403).json({ message: 'Not authorized as admin' });
     }
   } catch (error) {
-    res.status(401).json({ message: error.message });
+    res.status(401).json({ message: 'Invalid token' });
   }
-  
 };
+
 module.exports = { protect, allowRoles , authAdmin};

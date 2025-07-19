@@ -5,31 +5,40 @@ const cloudinary = require('../config/cloudinary');
 
 async function migratePendingRequests() {
   try {
-
-
-    // Find all societies
     const societies = await Society.find({});
     console.log(`Found ${societies.length} societies.`);
 
     for (const society of societies) {
-      if (Array.isArray(society.pendingRequests) && society.pendingRequests.length > 0) {
-        // Check if already migrated (skip if it's an array of objects)
-        const firstItem = society.pendingRequests[0];
-        if (firstItem && typeof firstItem === 'object' && firstItem.userId) {
-          console.log(`Society ${society._id} already migrated. Skipping...`);
-          continue;
-        }
+      let updated = false; // Flag to save only if any change occurs
 
-        // Convert each userId to new object structure
-        const migratedRequests = society.pendingRequests.map(userId => ({
-          userId,
-          reason: "No reason provided (migrated).",
-          requestedAt: new Date()
-        }));
+      // ✅ Migrate pendingRequests if needed
+      // if (Array.isArray(society.pendingRequests) && society.pendingRequests.length > 0) {
+      //   const firstItem = society.pendingRequests[0];
+      //   if (!(firstItem && typeof firstItem === 'object' && firstItem.userId)) {
+      //     const migratedRequests = society.pendingRequests.map(userId => ({
+      //       userId,
+      //       reason: "No reason provided (migrated).",
+      //       requestedAt: new Date()
+      //     }));
+      //     society.pendingRequests = migratedRequests;
+      //     updated = true;
+      //     console.log(`Migrated pendingRequests for society ${society._id}`);
+      //   } else {
+      //     console.log(`Society ${society._id} pendingRequests already migrated. Skipping...`);
+      //   }
+      // }
 
-        society.pendingRequests = migratedRequests;
+      // ✅ Add deactivated field if not exists
+      if (society.deactivated === undefined) {
+        society.deactivated = false;
+        updated = true;
+        console.log(`Added deactivated field to society ${society.name}`);
+      }
+
+      // ✅ Save only if updated
+      if (updated) {
+        console.log(`saving society ${society.name}`);
         await society.save();
-        console.log(`Migrated pendingRequests for society ${society._id}`);
       }
     }
 
@@ -40,6 +49,7 @@ async function migratePendingRequests() {
     process.exit(1);
   }
 }
+
 
 const registerSociety = async (req, res) => {
   try {
@@ -100,13 +110,13 @@ const registerSociety = async (req, res) => {
 };
 
 const getAllSocieties = async (req, res) => {
-    
+  // migratePendingRequests();
   try {
     const societies = await Society.find();
     if (!societies.length) {
       return res.status(404).json({ message: 'No societies found' });
     }
-    res.status(200).json(societies);
+    res.status(200).json({societies});
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -126,6 +136,28 @@ const getUserSocieties = async (req, res) => {
     return res.status(200).json({ registeredSocieties, joinedSocieties });
   } catch (error) {
     return res.status(500).json({ error: error.message });
+  }
+};
+const getUserSocietyRegistrationRequests = async (req, res) => {
+  console.log("[DEBUG] User fetching their society registration requests.");
+  const user = req.user;
+  console.log("[DEBUG] Current user:", user.username, user._id);
+
+  try {
+    // Find societies created by the user that are pending approval
+    const pendingRegistrationRequests = await Society.find({
+      createdBy: user._id,
+      approved: false, // Assuming 'approved' field is false for pending requests
+    });
+
+    if (!pendingRegistrationRequests.length) {
+      return res.status(404).json({ message: 'You have no pending society registration requests.' });
+    }
+
+    return res.status(200).json({ pendingRegistrationRequests });
+  } catch (error) {
+    console.error("[ERROR] Fetching user registration requests failed:", error);
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -160,39 +192,70 @@ const joinSociety = async (req, res) => {
   }
 };
 
-const approveSociety = async (req, res) => {
+const handleSocietyRegistrationRequest = async (req, res) => {
   try {
-    const pendingSocietyId = req.params.id;
-    console.log("Pending Society ID:", pendingSocietyId);
-    // 1. Find the pendingSociety
-    const pendingSociety = await Society.findById(pendingSocietyId);
+    const { societyId, action } = req.params;
+    console.log("[DEBUG] Handle Society Request called with ID:", societyId, "Action:", action);
 
-    if (!pendingSociety || pendingSociety.approved) {
-      return res.status(404).json({ message: 'Society not found or already registered' });
+    // 1. Find the pendingSociety
+    const pendingSociety = await Society.findById(societyId);
+    console.log("[DEBUG] Fetched pendingSociety:", pendingSociety);
+
+    if (!pendingSociety) {
+      console.log("[DEBUG] Society not found in DB.");
+      return res.status(404).json({ message: 'Society not found' });
     }
 
-    await Society.findByIdAndUpdate(pendingSocietyId,{
-      approved: true
-    });
-    // 3. Promote user to society-head
-    await User.findByIdAndUpdate(pendingSociety.pendingSocietyedBy, {
-      role: 'society-head',
-      societies: society._id
-    });
+    if (action === 'approve') {
+      if (pendingSociety.approved) {
+        console.log("[DEBUG] Society already approved.");
+        return res.status(400).json({ message: 'Society already approved' });
+      }
 
-    // 4. Update pendingSociety status
-    pendingSociety.status = 'approved';
-    await pendingSociety.save();
+      // Update approval status
+      pendingSociety.approved = true;
+      await pendingSociety.save();
+      console.log("[DEBUG] Society approved status updated and saved.");
 
-    return res.status(200).json({
-      message: 'Society approved and user promoted to society-head.',
-      society
-    });
+      // Promote user to society-head
+      const updatedUser = await User.findByIdAndUpdate(
+        pendingSociety.createdBy,
+        {
+          role: 'society-head',
+          $push: { societies: pendingSociety._id },
+        },
+        { new: true }
+      );
+      console.log("[DEBUG] User promoted to society-head:", updatedUser);
+
+      return res.status(200).json({
+        message: 'Society approved and user promoted to society-head.',
+        society: pendingSociety,
+        user: updatedUser,
+      });
+    }
+
+    else if (action === 'reject') {
+      // Delete society document or mark as rejected
+      await Society.findByIdAndDelete(societyId);
+      console.log("[DEBUG] Society registration request rejected and deleted.");
+
+      return res.status(200).json({
+        message: 'Society registration request rejected and deleted.',
+      });
+    }
+
+    else {
+      console.log("[DEBUG] Invalid action:", action);
+      return res.status(400).json({ message: 'Invalid action. Use approve or reject.' });
+    }
 
   } catch (error) {
+    console.error("[ERROR] Handle Society Request failed:", error);
     res.status(500).json({ message: error.message });
   }
 };
+
 
 const getJoinRequests = async (req, res) => {
   // migratePendingRequests();
@@ -417,16 +480,73 @@ const updateSociety = async (req, res) => {
     res.status(500).json({ message: 'Society update failed', error: error.message });
   }
 };
+const getAllSocietyRegistrationRequests = async (req, res) => {
+  try {
+    // Fetch all societies where approved is false (pending approval)
+    const pendingSocieties = await Society.find({ approved: false })
+      .populate('createdBy', 'username email') // populate requested user info
+      .sort({ createdAt: -1 }); // latest requests first
 
+    return res.status(200).json({
+      message: 'Pending society registration requests fetched successfully.',
+      count: pendingSocieties.length,
+      pendingSocieties,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+const toggleSocietyActivation = async (req, res) => {
+  try {
+    const societyId = req.params.societyId;
+
+    const society = await Society.findById(societyId);
+    if (!society) {
+      return res.status(404).json({ message: 'Society not found' });
+    }
+
+    society.deactivated = !society.deactivated;
+    await society.save();
+
+    res.status(200).json({
+      message: `Society has been ${society.deactivated ? 'deactivated' : 'activated'}.`,
+      deactivated: society.deactivated,
+    });
+  } catch (error) {
+    console.error("[ERROR] Toggle Society Activation:", error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+const deleteSociety = async (req, res) => {
+  try {
+    const societyId = req.params.id;
+
+    const society = await Society.findById(societyId);
+    if (!society) {
+      return res.status(404).json({ message: 'Society not found' });
+    }
+
+    await Society.findByIdAndDelete(societyId);
+
+    res.status(200).json({ message: 'Society deleted successfully.' });
+  } catch (error) {
+    console.error("[ERROR] Delete Society:", error);
+    res.status(500).json({ message: 'Server error while deleting society.' });
+  }
+};
 module.exports = { registerSociety, 
                   getUserSocieties, 
                   getAllSocieties, 
                   joinSociety, 
-                  approveSociety, 
+                  handleSocietyRegistrationRequest, 
                   updateSociety,
                   getJoinRequests, 
                   handleJoinRequest,
                   getSocietyMembers,
                   getSocietyById,
-                  removeMember
+                  removeMember,
+                  getAllSocietyRegistrationRequests,
+                  getUserSocietyRegistrationRequests,
+                  toggleSocietyActivation,
+                  deleteSociety
                   };

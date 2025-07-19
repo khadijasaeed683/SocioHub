@@ -5,12 +5,14 @@ const mongoose = require('mongoose');
 // get all Users
 const getUsers = async (req, res) => {
   try {
-    const Users = await User.find({});
-    res.status(200).json(Users);
-    
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+      const users = await User.find();
+      if (!users.length) {
+        return res.status(404).json({ message: 'No users found' });
+      }
+      res.status(200).json({users});
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
 };
 
 // get a single User

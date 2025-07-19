@@ -57,7 +57,7 @@ const societySchema = new mongoose.Schema({
     default: Date.now
   }
 }],
-
+  deactivated: { type: Boolean, default: false },
   approved: { type: Boolean, default: false },
   description: { type: String, required: true },
   inductionsOpen: { type: Boolean, default: true }

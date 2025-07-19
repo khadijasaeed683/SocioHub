@@ -14,7 +14,14 @@
   flex-direction: column;
   justify-content: space-between;
 }
-
+ .activate-btn {
+  background-color: #28a745; /* green */
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+}
 .card-header {
   display: flex;
   align-items: center;
@@ -116,6 +123,7 @@
 
 
 .society-card {
+  position: relative; /* add this */
   display: flex;
   align-items: center;
   padding: 1rem;
@@ -126,6 +134,7 @@
   box-shadow: 0 2px 4px rgba(0,0,0,0.06);
   justify-content: space-between;
 }
+
 
 .society-logo {
   width: 50px;
@@ -203,3 +212,14 @@
   border: none;
   cursor: pointer;
 }
+.deactivated-badge {
+  background: #dc3545; /* bright red */
+  color: white;
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  border-radius: 5px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+

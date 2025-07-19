@@ -81,7 +81,7 @@ const LandingPage = () => {
         if (!res.ok) {
           setError(data.message || 'Failed to fetch societies');
         } else {
-          setSocieties(data);
+          setSocieties(data.societies);
         }
       } catch (err) {
         setError('Server error. Try again later.');

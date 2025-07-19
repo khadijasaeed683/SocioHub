@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './AdminLogin.css';
 
 const AdminLogin = () => {
@@ -8,19 +9,14 @@ const AdminLogin = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-
-    // ✅ TEMP: Hardcoded admin credentials
-    const adminEmail = 'admin@eventnest.com';
-    const adminPassword = 'admin123';
-
-    if (email === adminEmail && password === adminPassword) {
-      // Store basic session info (you can switch to token/session later)
-      localStorage.setItem('isAdmin', 'true');
+    try {
+      const res = await axios.post('http://localhost:5000/api/admin/login', { email, password });
+      localStorage.setItem('adminToken', res.data.token);
       navigate('/admin/Dashboard');
-    } else {
-      setError('Invalid credentials');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Login failed');
     }
   };
 
@@ -36,7 +32,6 @@ const AdminLogin = () => {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-
           <input
             type="password"
             placeholder="Admin Password"
@@ -44,9 +39,7 @@ const AdminLogin = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-
           {error && <p className="error-msg">{error}</p>}
-
           <button type="submit">Login</button>
         </form>
       </div>
