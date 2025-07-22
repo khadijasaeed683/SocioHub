@@ -63,11 +63,7 @@ const AppWrapper = () => {
       <Route
         path="/profile-settings"
         element={
-          loggedInUser ? (
-            <ProfileSettings user={loggedInUser} onSignOut={handleSignOut} />
-          ) : (
-            <Navigate to="/login" />
-          )
+          <ProfileSettings user={loggedInUser} onSignOut={handleSignOut} />
         }
       />
 

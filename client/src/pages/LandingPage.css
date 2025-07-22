@@ -49,14 +49,7 @@ html, body, #root {
   color: #b3a78c;
 }
 
-.feature-section {
-  display: flex;
-  align-items: left;
-  justify-content: space-between;
-  padding: 60px 10%;
-  gap: 40px;
-  flex-wrap: wrap;
-}
+
 
 .feature-section.reverse {
   flex-direction: row-reverse;
@@ -79,19 +72,7 @@ html, body, #root {
   margin-bottom: 20px;
 }
 
-.feature-btn {
-  background-color: #3E1A47;
-  color: #f1f1f1;
-  padding: 10px 20px;
-  text-decoration: none;
-  font-weight: 600;
-  border-radius: 5px;
-  transition: background 0.3s ease;
-}
 
-.feature-btn:hover {
-  background-color: #b3a78c;
-}
 
 .feature-img {
   flex: 1;
@@ -152,7 +133,7 @@ html, body, #root {
 }
 
 .feature-section {
-  background-color: #ffffff;
+  background-color: #f8f8f8;
   padding: 2.5rem 1rem;
   border-radius: 0.75rem;
   display: flex;
@@ -178,8 +159,9 @@ html, body, #root {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  align-items: flex-start; /* ✅ Left-align heading and subtitle */
+  text-align: left;        /* ✅ Ensure text is also left-aligned */
 }
-
 .feature-subtitle {
   font-size: 0.95rem;
   color: #555;

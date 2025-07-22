@@ -50,7 +50,7 @@ const Navbar = () => {
   return (
     <nav className={`navbar ${scrolled ? 'navbar-scrolled' : ''}`}>
       <div className="navbar-left">
-        <Link to="/" className="logo-link">SocioHub</Link>
+        <Link to="/" className="logo-link">EventNest</Link>
       </div>
 
       <div className="navbar-right">
@@ -65,7 +65,7 @@ const Navbar = () => {
                 <span>{getInitials(user.username)}</span>
               )}
             </div>
-            <span className="username">{user.username}</span>
+            <span >{user.username}</span>
 
             {dropdownOpen && (
               <div className="dropdown-menu">

@@ -28,6 +28,8 @@ const ProfileSettings = ({ user, onSignOut }) => {
     }
   };
 
+  
+
   return (
     <>
       <AuthNavbar user={user} onSignOut={onSignOut} />

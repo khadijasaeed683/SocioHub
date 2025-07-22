@@ -14,7 +14,10 @@
   box-shadow: 0 2px 5px rgba(0,0,0,0.3);
   font-family: 'Segoe UI', sans-serif;
 }
-
+.logo-link{
+  font-size: 24px;
+  color: #f1f1f1;
+}
 .navbar-left {
   display: flex;
   align-items: center;

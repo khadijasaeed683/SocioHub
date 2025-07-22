@@ -60,7 +60,7 @@ const Sidebar = ({ user, societies }) => {
         </div>
 
         {/* Settings */}
-        <div className="sidebar-item" onClick={() => navigate('/settings')}>
+        <div className="sidebar-item" onClick={() => navigate('/profile-settings')}>
           <FaCog />
           {isOpen ? <span>Settings</span> : <span className="tooltip">Settings</span>}
         </div>

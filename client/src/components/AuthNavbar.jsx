@@ -1,7 +1,9 @@
+//This is the navabr of user dashboard named authnavbar because authorized users access it
 import React, { useContext, useState } from 'react';
 import './AuthNavbar.css';
 import { SidebarContext } from '../context/SidebarContext';
 import { Link, useNavigate } from 'react-router-dom';
+
 
 const AuthNavbar = ({ user, onSignOut }) => {
   const { toggleSidebar } = useContext(SidebarContext);
@@ -25,7 +27,7 @@ const AuthNavbar = ({ user, onSignOut }) => {
         <button className="hamburger" onClick={toggleSidebar}>
           ☰
         </button>
-        <Link to="/" className="logo-link">SocioHub</Link>
+        <Link to="/" className="logo-link">EventNest</Link>
       </div>
 
       <div className="navbar-right">
@@ -42,7 +44,9 @@ const AuthNavbar = ({ user, onSignOut }) => {
 
         {dropdownOpen && (
           <div className="dropdown-menu">
-            <button>👤 My Profile</button>
+            <Link to="/profile-settings">
+              <button>👤 My Profile</button>
+            </Link>
             <button>⚙️ Settings</button>
             <button onClick={onSignOut}>🚪 Sign Out</button>
           </div>
