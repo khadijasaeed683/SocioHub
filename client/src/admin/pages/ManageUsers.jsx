@@ -114,12 +114,12 @@ const ManageUsers = () => {
                       )}
                     </div>
 
-                    <div className="card-body">
+                    <div className="user-card-body">
                       <h3>{user.username}</h3>
                       <p><strong>Email:</strong> {user.email}</p>
                       <p><strong>Role:</strong> {user.role}</p>
                       <button
-                        className="view-details-btn"
+                        className="user-view-details-btn"
                         onClick={() => setSelectedUser(user)}
                       >
                         View Details
@@ -135,7 +135,7 @@ const ManageUsers = () => {
           {selectedUser && (
             <div className="user-details-popup-overlay">
               <div className="user-details-popup">
-                <div className="details-header">
+                <div className="user-details-header">
                   <h3>{selectedUser.username}</h3>
                   <button className="close-btn" onClick={() => setSelectedUser(null)}>✖</button>
                 </div>

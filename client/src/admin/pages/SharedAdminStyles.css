@@ -1,0 +1,58 @@
+/* SharedAdminStyles.css */
+.admin-dashboard {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  /* gap:1.5px */
+}
+
+.dashboard-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.dashboard-main {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+  background-color: #f9f9f9;
+}
+
+.search-bar-container {
+  position: relative;
+  margin-bottom: 1.5rem;
+  width: 100%;
+  max-width: 1050px;
+}
+
+.search-bar {
+  padding: 0.5rem 1rem 0.5rem 2.5rem;
+  width: 100%;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #777;
+  font-size: 1rem;
+}
+
+.error-msg {
+  color: #dc3545;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .dashboard-body {
+    flex-direction: column;
+  }
+
+  .dashboard-main {
+    padding: 1rem;
+  }
+}

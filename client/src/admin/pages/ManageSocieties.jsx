@@ -1,3 +1,4 @@
+// ViewSocieties button
 import React, { useState, useEffect } from 'react'; // Added useEffect
 import { FaSearch } from 'react-icons/fa';
 import AdminNavbar from '../components/AdminNavbar';
@@ -5,7 +6,7 @@ import AdminSidebar from '../components/AdminSidebar';
 import axiosAdmin from '../axiosAdmin';
 import {toast} from 'react-toastify';
 
-import './SocietyRequests.css';
+import './ManageSocieties.css';
 
 const SocietyRequests = () => {
   const [societies, setSocieties] = useState([]);

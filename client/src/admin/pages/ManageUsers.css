@@ -130,7 +130,7 @@
   position: relative;
 }
 
-.details-header {
+.user-details-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -217,7 +217,7 @@
   color: #555;
 }
 
-.card-body {
+.user-card-body {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -238,7 +238,7 @@
   min-width: 200px;
 }
 
-.view-details-btn {
+.user-view-details-btn {
   background-color: #4a6bff;
   color: white;
   border: none;
@@ -249,9 +249,10 @@
   flex-shrink: 0;
 }
 
-.view-details-btn:hover {
+.user-view-details-btn:hover {
   background-color: #3a5bef;
 }
+
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
