@@ -182,6 +182,20 @@ const unregisterEvent = async (req, res) => {
   }
 };
 
+const getCurrentUser = async(req, res) =>{
+  const token = req.cookies.token; // 'token' is the cookie name
+
+  if (!token) {
+    return res.status(401).json({ error: 'No token' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    res.json({ user: decoded });
+  } catch (err) {
+    return res.status(401).json({ error: 'Invalid token' });
+  }
+};
 module.exports = {
     getUsers,
     getUser,
@@ -190,5 +204,6 @@ module.exports = {
     updateUser,
     getUserSocieties,
     getUserEvents,
-    unregisterEvent
+    unregisterEvent,
+    getCurrentUser
 }

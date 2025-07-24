@@ -34,19 +34,31 @@ const signup = (async (req, res) => {
 const login = async (req, res) => {
   const { email, password } = req.body;
   try {
-    console.log('Login attempt:', { email, password });
     const user = await User.findOne({ email });
     if (!user)
-      return res.status(400).json({ message: 'There is no account registered with this email' });
+      return res.status(400).json({ message: 'No account registered with this email' });
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    console.log(hashedPassword);
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch)
       return res.status(400).json({ message: 'Invalid email or password' });
 
-    const token = generateToken(user);
-    res.status(200).json({ user, token });
+    const token = generateToken(user); // now it just generates token
+
+    // Set token in cookie
+    res.cookie("token", token, {
+      httpOnly: true,
+      sameSite: "strict",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    // Send response
+    res.status(200).json({
+      success: true,
+      message: "Welcome",
+      user: user,
+      token
+    });
+
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

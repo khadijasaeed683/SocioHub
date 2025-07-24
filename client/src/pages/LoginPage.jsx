@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { loginSuccess } from '../redux/userSlice';
+import { userLoggedIn } from '../features/authSlice';
 import { useNavigate } from 'react-router-dom'; 
 
 import './LoginPage.css';
@@ -35,9 +35,9 @@ const LoginPage = () => {
         setPassword('');
       } else {
         // Dispatch to Redux
-        dispatch(loginSuccess(data.user));
+        dispatch(userLoggedIn({ user: data.user }));
         navigate('/dashboard');
-        // Optionally save token if using localStorage (skip if using cookies)
+        // // Optionally save token if using localStorage (skip if using cookies)
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
       }
