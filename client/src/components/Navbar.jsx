@@ -1,21 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import './Navbar.css';
 import { Link, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import useLogout from '../hooks/useLogout'; // adjust path
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
-  const [user, setUser] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
-
-  // ✅ Check token and user data on mount
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userData = JSON.parse(localStorage.getItem('user')); // Assuming you store user data in localStorage
-    if (token && userData) {
-      setUser(userData);
-    }
-  }, []);
+  const user = useSelector(state => state.auth.user);
 
   // ✅ Handle scroll styling
   useEffect(() => {
@@ -26,13 +19,7 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // ✅ Logout function
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setUser(null);
-    navigate('/login');
-  };
+  const logout = useLogout();
 
   // ✅ Toggle profile dropdown
   const toggleDropdown = () => setDropdownOpen((prev) => !prev);
@@ -71,7 +58,7 @@ const Navbar = () => {
               <div className="dropdown-menu">
                 <button onClick={() => navigate('/dashboard')}>👤 My Account</button>
                 <button onClick={() => navigate('/settings')}>⚙️ Settings</button>
-                <button onClick={handleLogout}>🚪 Sign Out</button>
+                <button onClick={logout}>🚪 Sign Out</button>
               </div>
             )}
           </div>

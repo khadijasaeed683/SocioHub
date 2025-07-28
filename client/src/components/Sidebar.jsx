@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import './Sidebar.css';
 import {
   FaUsersCog,
@@ -16,12 +16,17 @@ const Sidebar = ({ user, societies }) => {
 
   const toggleAdminDropdown = () => setAdminDropdownOpen(!adminDropdownOpen);
 
-  const adminSocieties = societies.filter(s => s.createdBy === user._id);
+  // ✅ Efficient filtering
+  const adminSocieties = useMemo(() => {
+    if (!user?._id) return [];
+    return societies.filter(s => s.createdBy === user._id);
+  }, [societies, user?._id]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/login');
   };
+
   console.log("Sidebar user._id:", user?._id);
   console.log("Received societies:", societies);
   console.log("Filtered adminSocieties:", adminSocieties);
@@ -29,7 +34,7 @@ const Sidebar = ({ user, societies }) => {
   return (
     <div className={`sidebar ${!isOpen ? 'collapsed' : ''}`}>
       <div className="sidebar-links">
-        {/* Societies Administration Dropdown */}
+
         <div className="sidebar-item" onClick={toggleAdminDropdown}>
           <FaUsersCog />
           {isOpen ? <span>Society Admin Portal</span> : <span className="tooltip">Societies</span>}
@@ -53,19 +58,16 @@ const Sidebar = ({ user, societies }) => {
           </div>
         )}
 
-        {/* Create Society */}
         <div className="sidebar-item" onClick={() => navigate('/register-society')}>
           <FaPlusCircle />
           {isOpen ? <span>Create Society</span> : <span className="tooltip">Create</span>}
         </div>
 
-        {/* Settings */}
         <div className="sidebar-item" onClick={() => navigate('/profile-settings')}>
           <FaCog />
           {isOpen ? <span>Settings</span> : <span className="tooltip">Settings</span>}
         </div>
 
-        {/* Logout */}
         <div className="sidebar-item" onClick={handleLogout}>
           <FaSignOutAlt />
           {isOpen ? <span>Logout</span> : <span className="tooltip">Logout</span>}

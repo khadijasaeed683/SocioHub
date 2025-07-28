@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-import { Navigate } from 'react-router-dom';
-
+import { useEffect , useState} from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { userLoggedIn } from './features/authSlice';
+import axios from 'axios';
 import LandingPage from './pages/LandingPage';
 import RegisterSociety from './pages/RegisterSociety';
 import LoginPage from './pages/LoginPage';
@@ -30,20 +31,43 @@ import { SidebarProvider } from './context/SidebarContext';
 import AdminDashboard from './admin/AdminDashboard';
 
 const AppWrapper = () => {
-  const [loggedInUser, setLoggedInUser] = useState(null);
+  const dispatch = useDispatch();
+  const currentUser = useSelector(state => state.auth.user);
+  const [loading, setLoading] = useState(true); 
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get('http://localhost:5000/api/user/profile', {
+          withCredentials: true,
+        });
+        dispatch(userLoggedIn(res.data));
+      } catch (err) {
+        console.error('Failed to auto-fetch user:', err);
+      } finally {
+        setLoading(false); // ✅ done loading
+      }
+    };
+
+    fetchUser();
+  }, [dispatch]);
+
+  if (loading) {
+    return <div>Loading...</div>; // or a spinner
+  }
+
   const handleLogin = (userData) => {
-    setLoggedInUser(userData);
+    userLoggedIn(userData);
     navigate('/dashboard');
   };
 
   const handleSignup = (userData) => {
-    setLoggedInUser(userData);
+    userLoggedIn(userData);
     navigate('/dashboard');
   };
   const handleSignOut = () => {
-    setLoggedInUser(null);
+    userLoggedIn(null);
     navigate('/login');
   };
 
@@ -63,7 +87,7 @@ const AppWrapper = () => {
       <Route
         path="/profile-settings"
         element={
-          <ProfileSettings user={loggedInUser} onSignOut={handleSignOut} />
+          <ProfileSettings user={currentUser} onSignOut={handleSignOut} />
         }
       />
 
@@ -75,12 +99,12 @@ const AppWrapper = () => {
         path="/dashboard"
         element={
           <UserDashboard
-            user={loggedInUser}
+            user={currentUser}
             societies={[
               {
                 _id: 'dummy123', // 👈 this is used in the route
                 name: 'Tech Society',
-                admins: [loggedInUser?._id] // make sure user is admin
+                admins: [currentUser?._id] // make sure user is admin
               },
               {
                 _id: 'dummy456',

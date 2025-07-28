@@ -1,10 +1,10 @@
 const Event = require('../models/eventModel');
 const User = require('../models/userModel');
 const Society = require('../models/societyModel');
-const cloudinary = require('../config/cloudinary'); 
+const cloudinary = require('../config/cloudinary');
 const nodemailer = require('nodemailer');
 const generateQRCode = require('../utils/generateQRCode');
-const parseTimeToDate = require('../utils/parseTime'); 
+const parseTimeToDate = require('../utils/parseTime');
 const generateEventPoster = require('../utils/generateEventPoster'); // Assuming you have a utility to generate posters
 
 const createEvent = async (req, res) => {
@@ -146,13 +146,13 @@ const getAllEvents = async (req, res) => {
 
 const getPublicEvents = async (req, res) => {
   try {
-    
-    const events = await Event.find({  })
-        .populate('societyId', 'name logo')
-        .populate('participants', 'name email')
-        .sort({ createdAt: -1 });
+
+    const events = await Event.find({})
+      .populate('societyId', 'name logo')
+      .populate('participants', 'name email')
+      .sort({ createdAt: -1 });
     if (!events || events.length === 0) {
-        return res.status(404).json({ message: 'No events found for this society' });
+      return res.status(404).json({ message: 'No events found for this society' });
     }
     return res.status(200).json(events);
   } catch (error) {
@@ -166,18 +166,18 @@ const getEventById = async (req, res) => {
     if (!eventId) {
       return res.status(400).json({ message: 'Event ID is required' });
     }
-    
+
     const event = await Event.findById(eventId)
       .populate('societyId', 'name logo')
       .populate('participants', 'name email');
     if (!event) {
-        return res.status(404).json({ message: 'Event not found' });
-        }
+      return res.status(404).json({ message: 'Event not found' });
+    }
     return res.status(200).json(event);
-    }
-    catch (error) {
+  }
+  catch (error) {
     return res.status(500).json({ message: error.message });
-    }
+  }
 }
 
 const registerForEvent = async (req, res) => {
@@ -205,6 +205,7 @@ const registerForEvent = async (req, res) => {
       console.log("public event")
       // Public event: allow guest or registered user
       if (user) {
+        console.log("registered user")
         event.participants.push({
           name,
           email,
@@ -212,6 +213,7 @@ const registerForEvent = async (req, res) => {
           isGuest: false
         });
         user.registeredEvents.push(event._id);
+        await user.save();
       } else {
         event.participants.push({
           name,
@@ -240,7 +242,7 @@ const registerForEvent = async (req, res) => {
     const qrText = `Event: ${event.title}\nName: ${name}\nEmail: ${email}\nDate: ${event.date}`;
     const qrCodeDataURL = await generateQRCode(qrText);
 
-    
+
     // ✅ Configure Nodemailer
     const transporter = nodemailer.createTransport({
       service: 'gmail',
@@ -274,7 +276,7 @@ const registerForEvent = async (req, res) => {
 
 const updateEvent = async (req, res) => {
   try {
-    const { title, description, startTime, endTime, location, date, isPublic , rsvpOpen} = req.body;
+    const { title, description, startTime, endTime, location, date, isPublic, rsvpOpen } = req.body;
     const eventId = req.params.id;
     console.log(req.files);
     const posterFile = (req.files && req.files.poster) ? req.files.poster[0] : null;
@@ -301,7 +303,7 @@ const updateEvent = async (req, res) => {
       }
       event.date = eventDate;
     }
-    console.log("st: ", startTime, "st: ", endTime )
+    console.log("st: ", startTime, "st: ", endTime)
     //  Validate and update times if provided
     let startTimeDate, endTimeDate;
     // if (startTime) startTimeDate = parseTimeToDate(startTime);
@@ -379,5 +381,6 @@ const deleteEvent = async (req, res) => {
 
 
 
-module.exports = { createEvent, getAllEvents, getEventById, registerForEvent , updateEvent , deleteEvent ,getPublicEvents
+module.exports = {
+  createEvent, getAllEvents, getEventById, registerForEvent, updateEvent, deleteEvent, getPublicEvents
 };

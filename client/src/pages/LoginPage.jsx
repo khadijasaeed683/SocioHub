@@ -37,9 +37,6 @@ const LoginPage = () => {
         // Dispatch to Redux
         dispatch(userLoggedIn({ user: data.user }));
         navigate('/dashboard');
-        // // Optionally save token if using localStorage (skip if using cookies)
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
       }
     } catch (err) {
       console.error(err);

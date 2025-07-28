@@ -4,22 +4,23 @@ import EventCard from '../components/EventCard'; // Assuming EventCard is a sepa
 import RSVPForm from './RSVPForm'; // Assuming RSVPForm is a separate component
 import './ExploreEvents.css';
 import useRSVP from '../hooks/useRSVP'; // custom hook for RSVP logic
-
+import { useSelector } from 'react-redux';
 
 const ExploreEvents = () => {
   // const [rsvpedEvents, setRsvpedEvents] = useState([]);
+  const currentUser = useSelector(state => state.auth.user);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const {
-  selectedEvent,
+    selectedEvent,
     setSelectedEvent,
     formData,
     setFormData,
     handleRSVPClick,
     handleFormSubmit,
-} = useRSVP();
+  } = useRSVP();
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -49,7 +50,7 @@ const ExploreEvents = () => {
   if (error) {
     return <p>Error: {error}</p>;
   }
-  
+
   return (
     <>
       <Navbar />
@@ -57,15 +58,16 @@ const ExploreEvents = () => {
         <h2>Upcoming Events</h2>
         <div className="events-list">
           {
-          console.log(events)}{
-          events.map((event) => (
-            <EventCard
-              key={event._id}
-              event={event}
-              isRsvped={false} // Replace with your RSVP state logic
-              onRSVPClick={handleRSVPClick}
-            />
-          ))}
+            console.log(events)}{
+            events.map((event) => (
+              <EventCard
+                key={event._id}
+                event={event}
+                isRsvped={event.participants?.some(p => p.email === currentUser?.email)}
+                onRSVPClick={handleRSVPClick}
+              />
+
+            ))}
         </div>
 
         {/* RSVP Form Modal */}

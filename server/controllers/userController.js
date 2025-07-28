@@ -125,8 +125,8 @@ const getUserSocieties = async (req, res) => {
 };
 
 const getUserEvents = async (req, res) => {
-  const { id } = req.params;
-
+  const id  = req.user.id;
+  console.log("Fetching events for user ID:", id);
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ error: 'Invalid User ID' });
   }
@@ -183,7 +183,7 @@ const unregisterEvent = async (req, res) => {
 };
 
 const getCurrentUser = async(req, res) =>{
-  const token = req.cookies.token; // 'token' is the cookie name
+  const token = req.cookies.token; 
 
   if (!token) {
     return res.status(401).json({ error: 'No token' });
@@ -196,6 +196,21 @@ const getCurrentUser = async(req, res) =>{
     return res.status(401).json({ error: 'Invalid token' });
   }
 };
+
+const getProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password'); // remove password
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
     getUsers,
     getUser,
@@ -205,5 +220,6 @@ module.exports = {
     getUserSocieties,
     getUserEvents,
     unregisterEvent,
-    getCurrentUser
+    getCurrentUser,
+    getProfile
 }

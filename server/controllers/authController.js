@@ -51,6 +51,7 @@ const login = async (req, res) => {
       maxAge: 24 * 60 * 60 * 1000,
     });
 
+    console.log("saved token in cookie:", req.cookies.token);
     // Send response
     res.status(200).json({
       success: true,
@@ -64,4 +65,13 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { signup, login };
+const logout = async (req, res) => {
+  res.clearCookie('token', {
+    httpOnly: true,
+    sameSite: 'strict',
+    secure: process.env.NODE_ENV === 'production'
+  });
+  res.status(200).json({ message: 'Logged out successfully' });
+};
+
+module.exports = { signup, login, logout };

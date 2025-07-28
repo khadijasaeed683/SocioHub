@@ -7,21 +7,12 @@ import SocietyCard from '../components/SocietyCard';
 import EventCard from '../components/EventCard';
 import RSVPForm from './RSVPForm'; // adjust path if needed
 import useRSVP from '../hooks/useRSVP'; // custom hook for RSVP logic
-import {toast} from 'react-toastify';
+import { toast } from 'react-toastify';
+import { useSelector } from 'react-redux';
 
 const UserDashboard = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState(() => {
-      const savedUser = localStorage.getItem('user');
-      return savedUser ? JSON.parse(savedUser) : { _id: 'u123', username: 'John Doe' };
-    });
-
-    useEffect(() => {
-      // Example: if you ever want to update localStorage when user changes
-      localStorage.setItem('user', JSON.stringify(user));
-    }, [user]);  
-
-
+  const user = useSelector(state => state.auth.user);
   const [societies, setSocieties] = useState([]);
   const [events, setEvents] = useState([]);
   const [upcomingEvents, setUpcomingEvents] = useState([]);
@@ -29,7 +20,7 @@ const UserDashboard = () => {
   const [showUnregisterForm, setShowUnregisterForm] = useState(null);
   const [unregisterReason, setUnregisterReason] = useState('');
   const [password, setPassword] = useState('');
-  
+
 
   const handleUnregister = (eventId) => {
     alert(`Unregistered from event ${eventId}. Reason: ${unregisterReason}`);
@@ -38,100 +29,78 @@ const UserDashboard = () => {
     setPassword('');
   };
   const {
- selectedEvent,
+    selectedEvent,
     setSelectedEvent,
     formData,
     setFormData,
     handleRSVPClick,
     handleFormSubmit,
     handleInputChange,
-} = useRSVP();
+  } = useRSVP();
 
   useEffect(() => {
     if (!user?._id) return;
 
-    const fetchSocietiesAndUpcomingEvents = async () => {
-    try {
-      const res = await fetch(`http://localhost:5000/api/user/${user._id}/societies`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-      const message = data.message || 'Failed to fetch events';
-      setError(message);
-      console.error('Error fetching events:', message);
-      toast.error(data.message);
-      navigate('/login');
-      return;
-    }
-
-      const societiesFetched = [...data.registeredSocieties, ...data.joinedSocieties];
-      setSocieties(societiesFetched);
-
-      // Fetch upcoming events for each society
-      const upcomingEventsMap = {};
-      await Promise.all(
-        societiesFetched.map(async (society) => {
-          try {
-            const eventsRes = await fetch(`http://localhost:5000/api/society/${society._id}/event?upcomig=true`, {
-              method: 'GET',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-              },
-            });
-            const eventsData = await eventsRes.json();
-
-            if (eventsRes.ok) {
-              upcomingEventsMap[society._id] = eventsData;
-            } else {
-              upcomingEventsMap[society._id] = [];
-            }
-          } catch (err) {
-            console.error(`Error fetching upcoming events for society ${society._id}:`, err);
-            upcomingEventsMap[society._id] = [];
-          }
-        })
-      );
-
-      setUpcomingEvents(upcomingEventsMap);
-
-    } catch (err) {
-      setError('Server error. Try again later.');
-    } 
-  };
-
-    const fetchEvents = async () => {
-      try { 
-        const res = await fetch(`http://localhost:5000/api/user/${user._id}/events`, {
+    const fetchData = async () => {
+      try {
+        const res1 = await fetch(`http://localhost:5000/api/user/events`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            // don't send Authorization if you're using cookies only
           },
+          credentials: 'include'
         });
-        const data = await res.json();
-        if (!res.ok) {
-          setError(data.message || 'Failed to fetch events');
-          console.error('Error fetching events:', error);
-        } else {
-          setEvents(data);
+
+        const data1 = await res1.json();
+        if (res1.ok) {
+          setEvents(data1);
+        }
+
+        // 🔸 Societies + upcoming events
+        const res2 = await fetch(`http://localhost:5000/api/user/societies`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        });
+
+        const data2 = await res2.json();
+        if (res2.ok) {
+          const societiesFetched = [...data2.registeredSocieties, ...data2.joinedSocieties];
+          setSocieties(societiesFetched);
+
+          const upcomingEventsMap = {};
+
+          await Promise.all(
+            societiesFetched.map(async (society) => {
+              try {
+                const eventsRes = await fetch(`http://localhost:5000/api/society/${society._id}/event?upcomig=true`, {
+                  method: 'GET',
+                  headers: { 'Content-Type': 'application/json' },
+                  credentials: 'include',
+                });
+
+                const eventsData = await eventsRes.json();
+                if (eventsRes.ok) {
+                  upcomingEventsMap[society._id] = eventsData;
+                }
+              } catch (err) {
+
+                upcomingEventsMap[society._id] = [];
+              }
+            })
+          );
+
+          setUpcomingEvents(upcomingEventsMap);
         }
       } catch (err) {
-        setError('Server error. Try again later.');
+        setError('Something went wrong', err.message);
       }
     };
 
-    fetchEvents();
-    fetchSocietiesAndUpcomingEvents();
+    fetchData();
+  }, [user._id]); // ✅ only after user is loaded
 
-  }, [user._id, error, navigate]);
   // console.log("User Dashboard societies:", societies);
   // console.log("User Dashboard events:", events);
   // console.log("User Dashboard upcomingEvents:", upcomingEvents);
@@ -190,23 +159,23 @@ const UserDashboard = () => {
 
 
           <section className="upcoming-events">
-  <h2>Upcoming Events in Your Societies</h2>
+            <h2>Upcoming Events in Your Societies</h2>
 
-  {allUpcomingEvents.length > 0 ? (
-    <div className="event-cards-container">
-      {allUpcomingEvents.map((event) => (
-        <EventCard
-          key={event._id}
-          event={event}
-          isRsvped={false}
-          onRSVPClick={handleRSVPClick}
-        />
-      ))}
-    </div>
-  ) : (
-    <p>No upcoming events to show.</p>
-  )}
-</section>
+            {allUpcomingEvents.length > 0 ? (
+              <div className="event-cards-container">
+                {allUpcomingEvents.map((event) => (
+                  <EventCard
+                    key={event._id}
+                    event={event}
+                    isRsvped={false}
+                    onRSVPClick={handleRSVPClick}
+                  />
+                ))}
+              </div>
+            ) : (
+              <p>No upcoming events to show.</p>
+            )}
+          </section>
 
 
 
@@ -257,15 +226,15 @@ const UserDashboard = () => {
         </div>
       )}
       {selectedEvent && (
-          <RSVPForm
-            event={selectedEvent}
-            formData={formData}
-            setFormData={setFormData}
-            onSubmit={handleFormSubmit}
-            onCancel={() => setSelectedEvent(null)}
-            onInputChange={handleInputChange}
-          />
-        )}
+        <RSVPForm
+          event={selectedEvent}
+          formData={formData}
+          setFormData={setFormData}
+          onSubmit={handleFormSubmit}
+          onCancel={() => setSelectedEvent(null)}
+          onInputChange={handleInputChange}
+        />
+      )}
     </>
   );
 };
