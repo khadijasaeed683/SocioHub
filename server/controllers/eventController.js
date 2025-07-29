@@ -128,7 +128,6 @@ const getAllEvents = async (req, res) => {
       .populate('societyId', 'name logo')
       .populate('participants', 'name email')
       .sort({ date: 1, startTime: 1 }); // sort upcoming earliest first
-    console.log("here", events)
 
     if (!events || events.length === 0) {
       return res.status(404).json({ message: upcoming === 'true' ? 'No upcoming events found for this society' : 'No events found for this society' });

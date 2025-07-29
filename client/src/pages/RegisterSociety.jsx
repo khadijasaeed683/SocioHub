@@ -37,9 +37,7 @@ const RegisterSociety = () => {
     try {
       const res = await fetch(`http://localhost:5000/api/society/`, {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
+        credentials: 'include',
         body: data,
       });
 
@@ -60,6 +58,7 @@ const RegisterSociety = () => {
         setLinkedin('');
         setType('');
       } else {
+        console.error('Registration failed:', result);
         toast.error(result.message || 'Registration failed.');
       }
 

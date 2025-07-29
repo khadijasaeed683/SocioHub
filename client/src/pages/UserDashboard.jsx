@@ -14,12 +14,14 @@ const UserDashboard = () => {
   const navigate = useNavigate();
   const user = useSelector(state => state.auth.user);
   const [societies, setSocieties] = useState([]);
+  const [UnregisteredSocieties, setUnregisteredSocieties] = useState([]);
   const [events, setEvents] = useState([]);
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [error, setError] = useState('');
   const [showUnregisterForm, setShowUnregisterForm] = useState(null);
   const [unregisterReason, setUnregisterReason] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(true);
 
 
   const handleUnregister = (eventId) => {
@@ -41,7 +43,7 @@ const UserDashboard = () => {
   useEffect(() => {
     if (!user?._id) return;
 
-    const fetchData = async () => {
+    const fetchRegisteredSocitiesData = async () => {
       try {
         const res1 = await fetch(`http://localhost:5000/api/user/events`, {
           method: 'GET',
@@ -58,7 +60,7 @@ const UserDashboard = () => {
         }
 
         // 🔸 Societies + upcoming events
-        const res2 = await fetch(`http://localhost:5000/api/user/societies`, {
+        const res2 = await fetch(`http://localhost:5000/api/user/societies?registered=true`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -66,7 +68,7 @@ const UserDashboard = () => {
 
         const data2 = await res2.json();
         if (res2.ok) {
-          const societiesFetched = [...data2.registeredSocieties, ...data2.joinedSocieties];
+          const societiesFetched = [...data2.societies];
           setSocieties(societiesFetched);
 
           const upcomingEventsMap = {};
@@ -74,7 +76,7 @@ const UserDashboard = () => {
           await Promise.all(
             societiesFetched.map(async (society) => {
               try {
-                const eventsRes = await fetch(`http://localhost:5000/api/society/${society._id}/event?upcomig=true`, {
+                const eventsRes = await fetch(`http://localhost:5000/api/society/${society._id}/event?upcoming=true`, {
                   method: 'GET',
                   headers: { 'Content-Type': 'application/json' },
                   credentials: 'include',
@@ -98,10 +100,33 @@ const UserDashboard = () => {
       }
     };
 
-    fetchData();
-  }, [user._id]); // ✅ only after user is loaded
+    fetchRegisteredSocitiesData();
+  }, [user._id]);
 
-  // console.log("User Dashboard societies:", societies);
+  useEffect(() => {
+    const fetchSocietyRegistrationRequests = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/user/societies/?registered=false', {
+          credentials: 'include',
+        });
+
+        const data = await res.json();
+        // console.log("User Dashboard societies:", data);
+        if (!res.ok) {
+          setError(data.message || 'Failed to fetch societies');
+        } else {
+          setUnregisteredSocieties(data.societies);
+        }
+      } catch (err) {
+        setError('Server error. Try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSocietyRegistrationRequests();
+  }, []);
+  console.log("User Dashboard societies:", UnregisteredSocieties);
   // console.log("User Dashboard events:", events);
   // console.log("User Dashboard upcomingEvents:", upcomingEvents);
   // Use dummySocieties for Sidebar testing instead of fetched societies
@@ -115,7 +140,12 @@ const UserDashboard = () => {
     localStorage.removeItem('user');
     navigate('/login');
   };
-
+  if (loading) {
+    return <p>Loading societies...</p>;
+  }
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
   return (
     <>
       <AuthNavbar user={user} onSignOut={handleSignOut} />
@@ -129,16 +159,39 @@ const UserDashboard = () => {
           <h1>Welcome, {user.username}</h1>
 
           <section className="joined-societies">
-            <h2>Your Joined Societies</h2>
+            <h2>Active Societies</h2>
             <div className="society-list">
-              {societies.map((society) => (
+              {societies
+                .filter((society) => society.deactivated === false)
+                .map((society) => (
+                  <SocietyCard key={society._id} society={society} user={user} />
+                ))}
+            </div>
+          </section>
+
+          <section className="joined-societies">
+            <h2>Deactivated Societies</h2>
+            <div className="society-list">
+              {societies
+                .filter((society) => society.deactivated === true)
+                .map((society) => (
+                  <SocietyCard key={society._id} society={society} user={user} />
+                ))}
+            </div>
+          </section>
+
+          <section className="joined-societies">
+            <h2>Pending Societies</h2>
+            <div className="society-list">
+              {UnregisteredSocieties.map((society) => (
                 <SocietyCard key={society._id} society={society} user={user} />
               ))}
             </div>
           </section>
 
+
           <section className="user-events">
-            <h2>Your Registered Events</h2>
+            <h2>Registered Events</h2>
             {events && events.length > 0 ? (
               <ul>
                 {events.map((event) => (

@@ -1,4 +1,4 @@
-import React, { useState , useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import './JoinSociety.css';
 import { toast } from 'react-toastify';
@@ -11,90 +11,90 @@ const JoinSociety = () => {
   const [error, setError] = useState('');
   const [selectedSociety, setSelectedSociety] = useState(null);
   const [formData, setFormData] = useState({ name: '', email: '', reason: '' });
-  
-  
+
+
   useEffect(() => {
-      const fetchSocieties = async () => {
-        try {
-          const res = await fetch('http://localhost:5000/api/society');
-          const data = await res.json();
-  
-          if (!res.ok) {
-            setError(data.message || 'Failed to fetch societies');
-          } else {
-            setSocieties(data);
-          }
-        } catch (err) {
-          setError('Server error. Try again later.');
-        } finally {
-          setLoading(false);
+    const fetchSocieties = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/society');
+        const data = await res.json();
+
+        if (!res.ok) {
+          setError(data.message || 'Failed to fetch societies');
+        } else {
+          setSocieties(data);
         }
-      };
-  
-      fetchSocieties();
-    }, []);
+      } catch (err) {
+        setError('Server error. Try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSocieties();
+  }, []);
 
   const handleApplyClick = (society) => {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    toast.info('Please login to join this society.');
-    navigate('/login');
-    return;
-  }
+    const token = localStorage.getItem('token');
+    if (!token) {
+      toast.info('Please login to join this society.');
+      navigate('/login');
+      return;
+    }
 
-  const user = JSON.parse(localStorage.getItem('user'));
-  setFormData({
-    name: user?.username || '',
-    email: user?.email || '',
-    reason: '',
-  });
+    const user = JSON.parse(localStorage.getItem('user'));
+    setFormData({
+      name: user?.username || '',
+      email: user?.email || '',
+      reason: '',
+    });
 
-  setSelectedSociety(society);
-  console.log('Selected society:', society);
-};
+    setSelectedSociety(society);
+    console.log('Selected society:', society);
+  };
 
 
   const handleFormChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-        const response = await fetch(`http://localhost:5000/api/society/${selectedSociety._id}/join`, {
-          method: 'POST',
-          credentials: 'include', // ✅ include cookies if using JWT httpOnly
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          },
-          body: JSON.stringify({
-            name: formData.name,
-            email: formData.email,
-            reason: formData.reason,
-          }),
-        });
-    
-        const data = await response.json();
-    
-        if (!response.ok) {
-          console.error('Join society failed:', data);
-    
-          if (response.status === 401) {
-            toast.error('Please login to join this society.');
-            navigate('/login');
-            return;
-          }
-          
-          toast.error(data.message || data.error || 'Failed to join society');
-        } else {
-          toast.success('Join request sent successfully!');
-          
+      const response = await fetch(`http://localhost:5000/api/society/${selectedSociety._id}/join`, {
+        method: 'POST',
+        credentials: 'include', // ✅ include cookies if using JWT httpOnly
+        headers: {
+          'Content-Type': 'application/json',
+          // Authorization: `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          reason: formData.reason,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error('Join society failed:', data);
+
+        if (response.status === 401) {
+          toast.error('Please login to join this society.');
+          navigate('/login');
+          return;
         }
-      } catch (err) {
-        console.error('Error joining society:', err);
-        toast.error('Server error. Please try again later.');
+
+        toast.error(data.message || data.error || 'Failed to join society');
+      } else {
+        toast.success('Join request sent successfully!');
+
       }
+    } catch (err) {
+      console.error('Error joining society:', err);
+      toast.error('Server error. Please try again later.');
+    }
     setSelectedSociety(null);
     setFormData({ name: '', email: '', reason: '' });
   };
@@ -113,10 +113,10 @@ const JoinSociety = () => {
           {societies.map((society) => (
             <div key={society._id} className="society-card">
               <img
-  src={society.logo || 'https://via.placeholder.com/80x80?text=No+Logo'}
-  alt={`${society.name} logo`}
-  className="society-logo"
-/>
+                src={society.logo || 'https://via.placeholder.com/80x80?text=No+Logo'}
+                alt={`${society.name} logo`}
+                className="society-logo"
+              />
               <h3>{society.name}</h3>
               <p>{society.description}</p>
               {society.inductionsOpen && <span className="open-tag">Inductions Open</span>}

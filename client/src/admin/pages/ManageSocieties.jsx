@@ -4,7 +4,7 @@ import { FaSearch } from 'react-icons/fa';
 import AdminNavbar from '../components/AdminNavbar';
 import AdminSidebar from '../components/AdminSidebar';
 import axiosAdmin from '../axiosAdmin';
-import {toast} from 'react-toastify';
+import { toast } from 'react-toastify';
 
 import './ManageSocieties.css';
 
@@ -18,7 +18,7 @@ const SocietyRequests = () => {
   useEffect(() => {
     const fetchSocieties = async () => {
       try {
-        const res = await axiosAdmin.get('/society');
+        const res = await axiosAdmin.get('/society?status=approved');
         setSocieties(res.data.societies);
       } catch (err) {
         console.error("[ERROR] Fetching societies failed:", err);
@@ -36,41 +36,41 @@ const SocietyRequests = () => {
   );
 
   const handleDelete = async (id) => {
-  if (window.confirm('Are you sure you want to delete this society? This action cannot be undone.')) {
-    try {
-      const res = await axiosAdmin.delete(`/society/${id}`);
-      setSocieties(prev => prev.filter(s => s._id !== id));
-      if (selectedSociety && selectedSociety._id === id) {
-        setSelectedSociety(null);
+    if (window.confirm('Are you sure you want to delete this society? This action cannot be undone.')) {
+      try {
+        const res = await axiosAdmin.delete(`/society/${id}`);
+        setSocieties(prev => prev.filter(s => s._id !== id));
+        if (selectedSociety && selectedSociety._id === id) {
+          setSelectedSociety(null);
+        }
+        toast.success(res.data.message);
+      } catch (err) {
+        console.error("[ERROR] Deleting society failed:", err);
+        toast.error('Failed to delete society.');
       }
-      toast.success(res.data.message);
-    } catch (err) {
-      console.error("[ERROR] Deleting society failed:", err);
-      toast.error('Failed to delete society.');
     }
-  }
-};
+  };
 
 
   const handleToggleActivation = async (id) => {
-  if (window.confirm('Are you sure you want to toggle activation status for this society?')) {
-    try {
-      const res = await axiosAdmin.patch(`/society/${id}/toggle-activation`);
-      setSocieties(prev =>
-        prev.map(soc =>
-          soc._id === id ? { ...soc, deactivated: res.data.deactivated } : soc
-        )
-      );
-      if (selectedSociety && selectedSociety._id === id) {
-        setSelectedSociety(prev => ({ ...prev, deactivated: res.data.deactivated }));
+    if (window.confirm('Are you sure you want to toggle activation status for this society?')) {
+      try {
+        const res = await axiosAdmin.patch(`/society/${id}/toggle-activation`);
+        setSocieties(prev =>
+          prev.map(soc =>
+            soc._id === id ? { ...soc, deactivated: res.data.deactivated } : soc
+          )
+        );
+        if (selectedSociety && selectedSociety._id === id) {
+          setSelectedSociety(prev => ({ ...prev, deactivated: res.data.deactivated }));
+        }
+        toast.success(res.data.message);
+      } catch (err) {
+        console.error("[ERROR] Toggling activation failed:", err);
+        toast.error('Failed to toggle activation.');
       }
-      toast.success(res.data.message);
-    } catch (err) {
-      console.error("[ERROR] Toggling activation failed:", err);
-      toast.error('Failed to toggle activation.');
     }
-  }
-};
+  };
 
 
   return (
@@ -93,36 +93,36 @@ const SocietyRequests = () => {
           </div>
 
           {loading ? (
-  <p>Loading societies...</p>
-) : error ? (
-  <p className="error-msg">{error}</p>
-) : (
-  <div className="society-cards-container">
-    {filteredSocieties?.length === 0 ? (
-      <p>No matching societies.</p>
-    ) : (
-      filteredSocieties?.map((society) => (
-        <div key={society._id} className="society-card">
-          <img src={society.logo} alt="Logo" className="society-logo" />
-          {society.deactivated && (<span className="deactivated-badge">Deactivated</span>)}
-          <div className="card-body">
-            <h3>
-              {society.name}
-            </h3>
-              
-            <p className="society-type">{society.type}</p>
-            <button
-              className="view-details-btn"
-              onClick={() => setSelectedSociety(society)}
-            >
-              View Details
-            </button>
-          </div>
-        </div>
-      ))
-    )}
-  </div>
-)}
+            <p>Loading societies...</p>
+          ) : error ? (
+            <p className="error-msg">{error}</p>
+          ) : (
+            <div className="society-cards-container">
+              {filteredSocieties?.length === 0 ? (
+                <p>No matching societies.</p>
+              ) : (
+                filteredSocieties?.map((society) => (
+                  <div key={society._id} className="society-card">
+                    <img src={society.logo} alt="Logo" className="society-logo" />
+                    {society.deactivated && (<span className="deactivated-badge">Deactivated</span>)}
+                    <div className="card-body">
+                      <h3>
+                        {society.name}
+                      </h3>
+
+                      <p className="society-type">{society.type}</p>
+                      <button
+                        className="view-details-btn"
+                        onClick={() => setSelectedSociety(society)}
+                      >
+                        View Details
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
 
 
           {selectedSociety && (

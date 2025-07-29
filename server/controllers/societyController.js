@@ -121,6 +121,35 @@ const getAllSocieties = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+const getSocietiesByApprovalStatus = async (req, res) => {
+  const { status } = req.query;
+
+  let filter = {};
+
+  if (status === 'approved') {
+    filter = { approved: true };
+  } else if (status === 'active') {
+    filter = { approved: true, deactivated: { $ne: true } };
+  } else if (status === 'inactive') {
+    filter = { approved: true, deactivated: true };
+  } else {
+    return res.status(400).json({ message: 'Invalid status. Use one of: approved, active, inactive' });
+  }
+
+  try {
+    const societies = await Society.find(filter);
+
+    if (!societies.length) {
+      return res.status(404).json({ message: 'No societies found for given status' });
+    }
+
+    res.status(200).json({ societies });
+  } catch (error) {
+    console.error('Error fetching societies:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 
 const getUserSocieties = async (req, res) => {
   console.log("User trying to get societies:");
@@ -548,5 +577,5 @@ module.exports = { registerSociety,
                   getAllSocietyRegistrationRequests,
                   getUserSocietyRegistrationRequests,
                   toggleSocietyActivation,
-                  deleteSociety
+                  deleteSociety, getSocietiesByApprovalStatus
                   };

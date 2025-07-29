@@ -3,57 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import './LandingPage.css';
 import { toast } from 'react-toastify';
-
-import societyImg from '../assets/society.png';
-import joinImg from '../assets/join.png';
-import eventsImg from '../assets/events.png';
 import Footer from '../components/Footer';
 import EventCard from '../components/EventCard'; // ✅ Add this if not already imported
-
-// Dummy Events
-const dummyEvents = [
-  {
-    _id: 'e1',
-    title: 'Tech Talk 2025',
-    description: 'AI and the future of humanity.',
-    poster: 'https://via.placeholder.com/150x100?text=Tech+Talk',
-    date: '2025-07-20',
-    time: '5:00 PM',
-    location: 'Main Auditorium',
-    societyId: { name: 'AI Society' },
-    isPublic: true
-  },
-  
-  {
-    _id: 'e6',
-    title: 'Tech eewew 2025',
-    description: 'AI and the future of humanity.',
-    poster: 'https://via.placeholder.com/150x100?text=Tech+Talk',
-    date: '2025-07-20',
-    time: '5:00 PM',
-    location: 'Main Auditorium',
-    societyId: { name: 'AI Society' },
-    isPublic: true
-  },
-  {
-    _id: 'e2',
-    title: 'Music Fest',
-    poster: 'https://via.placeholder.com/150x100?text=Music+Fest',
-    date: '2025-08-01',
-    location: 'Open Grounds',
-    societyId: { name: 'Cultural Club' },
-    isPublic: true
-  },
-  {
-    _id: 'e3',
-    title: 'Startup Night',
-    description: 'Pitch your ideas!',
-    date: '2025-09-10',
-    location: 'Auditorium B',
-    societyId: { name: 'Entrepreneurship Society' },
-    isPublic: true
-  }
-];
+import { useSelector } from 'react-redux';
+import useRSVP from '../hooks/useRSVP'; 
+import RSVPForm from './RSVPForm'; 
 
 // Carousel scroll function
 const scrollEventCarousel = (scrollOffset) => {
@@ -67,15 +21,38 @@ const scrollEventCarousel = (scrollOffset) => {
 
 const LandingPage = () => {
   const [societies, setSocieties] = useState([]);
+  const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const currentUser = useSelector(state => state.auth.user);
 
   const navigate = useNavigate();
 
   useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/explore-events');
+        const data = await res.json();
+
+        if (!res.ok) {
+          setError(data.message || 'Failed to fetch events');
+        } else {
+          setEvents(data);
+        }
+      } catch (err) {
+        setError('Server error. Try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  useEffect(() => {
     const fetchSocieties = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/society');
+        const res = await fetch('http://localhost:5000/api/society/?status=active');
         const data = await res.json();
 
         if (!res.ok) {
@@ -120,6 +97,22 @@ const LandingPage = () => {
     container.scrollBy({ left: 300, behavior: 'smooth' });
   };
 
+  const {
+    selectedEvent,
+    setSelectedEvent,
+    formData,
+    setFormData,
+    handleRSVPClick,
+    handleFormSubmit,
+  } = useRSVP();
+
+  if (loading) {
+    return <p>Loading events...</p>;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
   return (
     <div className="landing-container">
       <Navbar />
@@ -203,30 +196,40 @@ const LandingPage = () => {
 
       {/* Browse Public Events */}
       <section className="feature-section">
-          <div className="feature-text">
-            <h2>Browse Public Events</h2>
-            <p>Explore campus-wide public events and RSVP without logging in. Stay involved, effortlessly.</p>
+        <div className="feature-text">
+          <h2>Browse Public Events</h2>
+          <p>Explore campus-wide public events and RSVP without logging in. Stay involved, effortlessly.</p>
+        </div>
+
+        <div className="event-carousel-container">
+          <button className="carousel-arrow left" onClick={() => scrollEventCarousel(-300)}>‹</button>
+
+          <div className="event-carousel" id="event-carousel">
+            {events.map((event) => (
+              <EventCard key={event._id} event={event} isRsvped={event.participants?.some(p => p.email === currentUser?.email)} onRSVPClick={handleRSVPClick} />
+            ))}
           </div>
 
-          <div className="event-carousel-container">
-            <button className="carousel-arrow left" onClick={() => scrollEventCarousel(-300)}>‹</button>
+          <button className="carousel-arrow right" onClick={() => scrollEventCarousel(300)}>›</button>
+        </div>
 
-            <div className="event-carousel" id="event-carousel">
-              {dummyEvents.map((event) => (
-                <EventCard key={event._id} event={event} isRsvped={false} onRSVPClick={() => {}} />
-              ))}
-            </div>
-
-            <button className="carousel-arrow right" onClick={() => scrollEventCarousel(300)}>›</button>
-          </div>
-
-          <div className="center-btn">
-            <Link to="/events" className="feature-btn">Explore More Events</Link>
-          </div>
-        </section>
+        <div className="center-btn">
+          <Link to="/events" className="feature-btn">Explore More Events</Link>
+        </div>
+      </section>
 
 
+            {/* RSVP Form Modal */}
+        {selectedEvent && (
+          <RSVPForm
+            event={selectedEvent}
+            formData={formData}
+            setFormData={setFormData}
+            onSubmit={handleFormSubmit}
+            onCancel={() => setSelectedEvent(null)}
+          />
 
+        )}
 
       <Footer />
     </div>

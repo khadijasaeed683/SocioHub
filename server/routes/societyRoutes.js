@@ -1,30 +1,27 @@
 // routes/societyRoutes.js
 const express = require('express');
 const router = express.Router();
-const { registerSociety, 
-        getUserSocieties, 
-        joinSociety, 
-        getAllSocieties, 
-        getJoinRequests,
-        handleJoinRequest,
-        getSocietyMembers,
-        getSocietyById,
-        updateSociety,
-        removeMember
-      } = require('../controllers/societyController');
-const { protect , authAdmin} = require('../middleware/authMiddleware');
-const upload = require('../middleware/multer'); 
+const { registerSociety,
+  getUserSocieties,
+  joinSociety,
+  getAllSocieties,
+  getJoinRequests,
+  handleJoinRequest,
+  getSocietyMembers,
+  getSocietyById,
+  updateSociety,
+  removeMember,
+  getSocietiesByApprovalStatus
+} = require('../controllers/societyController');
+const { protect, authAdmin } = require('../middleware/authMiddleware');
+const upload = require('../middleware/multer');
 const eventRoutes = require('./eventRoutes');
 
 router.get(
   '/',
-  getAllSocieties
+  getSocietiesByApprovalStatus
 );
-// router.get(
-//   '/user-societies',
-//   protect,
-//   getUserSocieties
-// );
+
 router.get(
   '/:id',
   getSocietyById
@@ -32,11 +29,11 @@ router.get(
 
 router.post(
   '/',
-    protect,
+  protect,
   upload.fields([
     { name: 'logo', maxCount: 1 },
     { name: 'coverImage', maxCount: 1 }
-  ]), 
+  ]),
   registerSociety
 );
 
@@ -72,7 +69,7 @@ router.post(
 router.get(
   '/:id/members',
   protect,
-  upload.none(),  
+  upload.none(),
   getSocietyMembers
 );
 router.delete(

@@ -1,11 +1,22 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
+import { useSelector } from 'react-redux';
 
 const useRSVP = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [formData, setFormData] = useState({ name: '', email: '', phone: '' });
   const [error, setError] = useState('');
+  const currentUser = useSelector(state => state.auth.user);
 
+  useEffect(() => {
+    if (currentUser) {
+      setFormData({
+        name: currentUser.username || '',
+        email: currentUser.email || '',
+        phone: currentUser.contact || '' // or use profile.phone, if phone is nested
+      });
+    }
+  }, [currentUser]);
   const handleRSVPClick = (event) => {
     setSelectedEvent(event);
   };

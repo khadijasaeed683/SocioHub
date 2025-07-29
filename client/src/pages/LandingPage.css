@@ -1,5 +1,7 @@
 /* Ensure full-height layout */
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
   margin: 0;
   padding: 0;
@@ -15,13 +17,10 @@ html, body, #root {
   flex-grow: 1;
 }
 
-
-
-
 .hero {
   text-align: center;
   padding: 50px 20px;
-  background-color: #A67C9D;
+  background-color: #a67c9d;
 }
 
 .hero h1 {
@@ -36,7 +35,7 @@ html, body, #root {
 }
 
 .cta-btn {
-  background-color: #3E1A47;
+  background-color: #3e1a47;
   color: #fcfdfe;
   padding: 12px 24px;
   text-decoration: none;
@@ -48,8 +47,6 @@ html, body, #root {
 .cta-btn:hover {
   color: #b3a78c;
 }
-
-
 
 .feature-section.reverse {
   flex-direction: row-reverse;
@@ -72,15 +69,13 @@ html, body, #root {
   margin-bottom: 20px;
 }
 
-
-
 .feature-img {
   flex: 1;
-  max-width: 300px;       
+  max-width: 300px;
   width: 100%;
-  height: auto;          
+  height: auto;
   border-radius: 10px;
-  object-fit: contain;    /* ✅ avoid stretching */
+  object-fit: contain; /* ✅ avoid stretching */
 }
 .society-gallery {
   display: flex;
@@ -95,11 +90,9 @@ html, body, #root {
 }
 
 .society-gallery::-webkit-scrollbar-thumb {
-  background: #A67C9D;
+  background: #a67c9d;
   border-radius: 4px;
 }
-
-
 
 .society-card:hover {
   transform: translateY(-5px);
@@ -120,7 +113,7 @@ html, body, #root {
 
 .details-btn {
   background-color: #222831;
-  color:rgb(212, 198, 178);
+  color: rgb(212, 198, 178);
   padding: 12px 24px;
   text-decoration: none;
   font-weight: 550;
@@ -129,7 +122,7 @@ html, body, #root {
 }
 
 .details-btn:hover {
-  background-color:rgb(90, 100, 114);
+  background-color: rgb(90, 100, 114);
 }
 
 .feature-section {
@@ -160,7 +153,7 @@ html, body, #root {
   flex-direction: column;
   gap: 0.25rem;
   align-items: flex-start; /* ✅ Left-align heading and subtitle */
-  text-align: left;        /* ✅ Ensure text is also left-aligned */
+  text-align: left; /* ✅ Ensure text is also left-aligned */
 }
 .feature-subtitle {
   font-size: 0.95rem;
@@ -199,15 +192,14 @@ html, body, #root {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
   text-align: center;
   transition: box-shadow 0.3s ease;
-   /* Add these lines 👇 */
-  width: 200px;         /* Reduce width */
-  height: 160px;        /* Increase height */
+  /* Add these lines 👇 */
+  width: 200px; /* Reduce width */
+  height: 160px; /* Increase height */
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
-
 
 .feature-card:hover {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
@@ -216,7 +208,6 @@ html, body, #root {
 .feature-card img {
   height: 58px;
   margin-bottom: 0.5rem;
-  
 }
 
 .feature-card p {
@@ -251,18 +242,13 @@ html, body, #root {
   padding: 10px;
   border-radius: 10px;
   text-align: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
-
-
-
-
 
 .center-btn {
   margin-top: 20px;
   text-align: center;
 }
-
 
 .event-carousel-container {
   position: relative;
@@ -286,7 +272,7 @@ html, body, #root {
   height: 8px;
 }
 .event-carousel::-webkit-scrollbar-thumb {
-  background: #A67C9D;
+  background: #a67c9d;
   border-radius: 4px;
 }
 /* 

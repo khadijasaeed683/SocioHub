@@ -5,33 +5,33 @@ const mongoose = require('mongoose');
 // get all Users
 const getUsers = async (req, res) => {
   try {
-      const users = await User.find();
-      if (!users.length) {
-        return res.status(404).json({ message: 'No users found' });
-      }
-      res.status(200).json({users});
-    } catch (error) {
-      res.status(500).json({ message: error.message });
+    const users = await User.find();
+    if (!users.length) {
+      return res.status(404).json({ message: 'No users found' });
     }
+    res.status(200).json({ users });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 // get a single User
 const getUser = async (req, res) => {
-    const { id } = req.params;
+  const { id } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ error: 'Invalid User ID' });
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ error: 'Invalid User ID' });
+  }
+  try {
+    const User = await User.findById(id);
+    if (!User) {
+      return res.status(404).json({ error: 'User not found' });
     }
-    try {
-        const User = await User.findById(id);
-        if (!User) {
-        return res.status(404).json({ error: 'User not found' });
-        }
-        res.status(200).json(User);
-    } 
-    catch (error) {
-        res.status(500).json({ error: error.message });
-    }
+    res.status(200).json(User);
+  }
+  catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 }
 
 // create a new User
@@ -87,22 +87,29 @@ const updateUser = async (req, res) => {
 const getUserSocieties = async (req, res) => {
   console.log("Fetching user societies...");
   try {
-    const user = req.user; 
-    console.log("User trying to get societies:", user, user._id);
+    const user = req.user;
+    const registered = req.query.registered; // e.g., active, inactive, pending
 
     const registeredSocieties = [];
     const joinedSocieties = [];
 
-    // Map over society IDs to create an array of promises
+    // 🔍 Build query filter based on registered
+    let queryFilter = {};
+
+    if (registered === 'true') {
+      queryFilter = { approved: true };
+    }  else {
+      // Default to approved only if no status specified
+      queryFilter = { approved: false };
+    }
+
     const societyPromises = user.societies.map(societyId =>
-      Society.findById(societyId)
+      Society.findOne({ _id: societyId, ...queryFilter })
     );
 
-    // Wait for all findById calls to complete
-    const societies = await Promise.all(societyPromises);
-    console.log(societies)
+    const societies = (await Promise.all(societyPromises)).filter(Boolean);
+
     societies.forEach(society => {
-      if (!society) return; // Skip if society not found
       if (society.createdBy.toString() === user._id.toString()) {
         registeredSocieties.push(society);
       } else {
@@ -110,12 +117,11 @@ const getUserSocieties = async (req, res) => {
       }
     });
 
-    console.log("Registered Societies:", registeredSocieties);
-    console.log("Joined Societies:", joinedSocieties);
+    // console.log("Registered Societies:", registeredSocieties);
+    // console.log("Joined Societies:", joinedSocieties);
 
     res.status(200).json({
-      registeredSocieties,
-      joinedSocieties
+      societies: societies,
     });
 
   } catch (error) {
@@ -124,8 +130,9 @@ const getUserSocieties = async (req, res) => {
   }
 };
 
+
 const getUserEvents = async (req, res) => {
-  const id  = req.user.id;
+  const id = req.user.id;
   console.log("Fetching events for user ID:", id);
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ error: 'Invalid User ID' });
@@ -182,8 +189,8 @@ const unregisterEvent = async (req, res) => {
   }
 };
 
-const getCurrentUser = async(req, res) =>{
-  const token = req.cookies.token; 
+const getCurrentUser = async (req, res) => {
+  const token = req.cookies.token;
 
   if (!token) {
     return res.status(401).json({ error: 'No token' });
@@ -210,16 +217,38 @@ const getProfile = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const getUserSocietyRegistrationRequests = async (req, res) => {
+  console.log("[DEBUG] User fetching their society registration requests.");
+  const user = req.user;
+  console.log("[DEBUG] Current user:", user.username, user._id);
 
+  try {
+    // Find societies created by the user that are pending approval
+    const pendingRegistrationRequests = await Society.find({
+      createdBy: user._id,
+      approved: false, // Assuming 'approved' field is false for pending requests
+    });
+
+    if (!pendingRegistrationRequests.length) {
+      return res.status(404).json({ message: 'You have no pending society registration requests.' });
+    }
+
+    return res.status(200).json({ pendingRegistrationRequests });
+  } catch (error) {
+    console.error("[ERROR] Fetching user registration requests failed:", error);
+    return res.status(500).json({ message: error.message });
+  }
+};
 module.exports = {
-    getUsers,
-    getUser,
-    createUser,
-    deleteUser,
-    updateUser,
-    getUserSocieties,
-    getUserEvents,
-    unregisterEvent,
-    getCurrentUser,
-    getProfile
+  getUsers,
+  getUser,
+  createUser,
+  deleteUser,
+  updateUser,
+  getUserSocieties,
+  getUserEvents,
+  unregisterEvent,
+  getCurrentUser,
+  getProfile,
+  getUserSocietyRegistrationRequests
 }

@@ -10,6 +10,8 @@ const Overview = () => {
   const [editValue, setEditValue] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const isDeactivated = society?.deactivated === true;
+
   const [socials, setSocials] = useState({
     website: society?.website || '',
     instagram: society?.socialLinks?.instagram || '',
@@ -19,6 +21,11 @@ const Overview = () => {
   });
 
   const handleUpdateField = async (field, value) => {
+    if (isDeactivated) {
+      alert("This society is deactivated. You cannot update any information.");
+      return;
+    }
+
     setLoading(true);
     try {
       const formData = new FormData();
@@ -61,7 +68,13 @@ const Overview = () => {
 
   return (
     <div className="overview-container">
-      {/* <h2 className="section-heading">Society Overview</h2> */}
+      {isDeactivated && (
+        <div className="deactivated-warning">
+          <p style={{ color: 'red', fontWeight: 'bold' }}>
+            Your society is currently <strong>deactivated</strong>. All editing is disabled. Please contact the administrator.
+          </p>
+        </div>
+      )}
 
       {/* ✅ Cover Image Section */}
       <div className="cover-image-section">
@@ -72,11 +85,12 @@ const Overview = () => {
               type="file"
               accept="image/*"
               onChange={(e) => setEditValue(e.target.files[0])}
+              disabled={isDeactivated}
             />
             <button
               className="save-btn inline"
               onClick={() => handleUpdateField('coverImage', editValue)}
-              disabled={loading}
+              disabled={loading || isDeactivated}
             >
               {loading ? 'Saving...' : 'Save'}
             </button>
@@ -88,16 +102,18 @@ const Overview = () => {
             </button>
           </>
         ) : (
-          <button
-            className="edit-btn"
-            onClick={() => {
-              setEditField('coverImage');
-              setEditValue('');
-              setIsEditing(true);
-            }}
-          >
-            Change Cover Image
-          </button>
+          !isDeactivated && (
+            <button
+              className="edit-btn"
+              onClick={() => {
+                setEditField('coverImage');
+                setEditValue('');
+                setIsEditing(true);
+              }}
+            >
+              Change Cover Image
+            </button>
+          )
         )}
       </div>
 
@@ -111,11 +127,12 @@ const Overview = () => {
               type="file"
               accept="image/*"
               onChange={(e) => setEditValue(e.target.files[0])}
+              disabled={isDeactivated}
             />
             <button
               className="save-btn inline"
               onClick={() => handleUpdateField('logo', editValue)}
-              disabled={loading}
+              disabled={loading || isDeactivated}
             >
               {loading ? 'Saving...' : 'Save'}
             </button>
@@ -127,16 +144,18 @@ const Overview = () => {
             </button>
           </>
         ) : (
-          <button
-            className="edit-btn"
-            onClick={() => {
-              setEditField('logo');
-              setEditValue('');
-              setIsEditing(true);
-            }}
-          >
-            Change Logo
-          </button>
+          !isDeactivated && (
+            <button
+              className="edit-btn"
+              onClick={() => {
+                setEditField('logo');
+                setEditValue('');
+                setIsEditing(true);
+              }}
+            >
+              Change Logo
+            </button>
+          )
         )}
       </div>
 
@@ -144,7 +163,7 @@ const Overview = () => {
       <div className="about-section">
         <div className="about-header">
           <h3>About Society</h3>
-          {editField !== 'description' && !isEditing && (
+          {editField !== 'description' && !isEditing && !isDeactivated && (
             <button className="edit-btn" onClick={() => {
               setEditField('description');
               setEditValue(about);
@@ -161,12 +180,13 @@ const Overview = () => {
               rows="5"
               value={editValue}
               onChange={(e) => setEditValue(e.target.value)}
+              disabled={isDeactivated}
             />
             <div className="about-actions">
               <button
                 className="save-btn"
                 onClick={() => handleUpdateField(editField, editValue)}
-                disabled={loading}
+                disabled={loading || isDeactivated}
               >
                 {loading ? 'Saving...' : 'Save'}
               </button>
@@ -196,11 +216,12 @@ const Overview = () => {
                     type="text"
                     value={editValue}
                     onChange={(e) => setEditValue(e.target.value)}
+                    disabled={isDeactivated}
                   />
                   <button
                     className="save-btn inline"
                     onClick={() => handleUpdateField(platform, editValue)}
-                    disabled={loading}
+                    disabled={loading || isDeactivated}
                   >
                     {loading ? 'Saving...' : 'Save'}
                   </button>
@@ -214,16 +235,18 @@ const Overview = () => {
               ) : (
                 <>
                   <a href={url} target="_blank" rel="noreferrer">{url || 'Not set'}</a>
-                  <button
-                    className="edit-btn inline"
-                    onClick={() => {
-                      setEditField(platform);
-                      setEditValue(url);
-                      setIsEditing(true);
-                    }}
-                  >
-                    Edit
-                  </button>
+                  {!isDeactivated && (
+                    <button
+                      className="edit-btn inline"
+                      onClick={() => {
+                        setEditField(platform);
+                        setEditValue(url);
+                        setIsEditing(true);
+                      }}
+                    >
+                      Edit
+                    </button>
+                  )}
                 </>
               )}
             </li>

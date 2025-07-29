@@ -20,7 +20,8 @@ const SignupPage = ({ onSignup }) => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ username, email, password }), // updated here
+      body: JSON.stringify({ username, email, password }),
+      credentials: 'include',
     });
 
     const data = await response.json();

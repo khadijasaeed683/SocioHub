@@ -38,7 +38,6 @@ const SocietyDetails = () => {
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
         },
         body: JSON.stringify({
           name: formData.name,
