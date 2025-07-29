@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
+import Sidebar from '../components/Sidebar';
 import './RegisterSociety.css';
-import societyIllustration from '../assets/society-illustration.png';
 import { toast } from 'react-toastify';
 
-const RegisterSociety = () => {
-  // Separate individual states for each field
+const RegisterSociety = ({ user, societies }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [logo, setLogo] = useState(null);
@@ -32,8 +31,6 @@ const RegisterSociety = () => {
     data.append('socialLinks.instagram', instagram);
     data.append('socialLinks.linkedin', linkedin);
 
-    console.log('Submitting society registration:', Object.fromEntries(data.entries()));
-
     try {
       const res = await fetch(`http://localhost:5000/api/society/`, {
         method: 'POST',
@@ -45,8 +42,6 @@ const RegisterSociety = () => {
 
       if (res.ok) {
         toast.success('Society registration submitted successfully!');
-        console.log(result);
-        // Optional: Reset form fields
         setName('');
         setDescription('');
         setLogo(null);
@@ -58,10 +53,8 @@ const RegisterSociety = () => {
         setLinkedin('');
         setType('');
       } else {
-        console.error('Registration failed:', result);
         toast.error(result.message || 'Registration failed.');
       }
-
     } catch (err) {
       console.error(err);
       toast.error('Registration failed. Please try again.');
@@ -71,17 +64,15 @@ const RegisterSociety = () => {
   return (
     <>
       <Navbar />
-      <div className="register-page">
-        <div className="register-wrapper">
-          <div className="register-illustration">
-            <img src={societyIllustration} alt="Register Society" />
-          </div>
+      <div className="register-layout">
+        {/* Sidebar */}
+        <Sidebar user={user} societies={societies || []} />
 
+        {/* Main Content */}
+        <div className="register-content">
           <div className="register-society-container">
             <h1>🎓 Register Your Society</h1>
-            <p className="subtext">
-              Provide complete details and valid logos to get approved.
-            </p>
+            <p className="subtext">Provide complete details and valid logos to get approved.</p>
 
             <form className="society-form" onSubmit={handleSubmit}>
               <label>Society Name</label>

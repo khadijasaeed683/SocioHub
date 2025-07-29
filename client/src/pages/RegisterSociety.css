@@ -1,91 +1,66 @@
-/* Page background */
-.register-page {
-  background-color: #948979;
+/* === Layout with Sidebar === */
+.register-layout {
+  display: flex;
   min-height: 100vh;
-  padding: 60px 0;
+  background: #f9f6f0;
 }
 
-/* Form + Illustration wrapper */
-.register-wrapper {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: stretch;
-  gap: 40px;
-  margin: 0 auto;
-  padding: 40px;
-  max-width: 1200px;
-  flex-wrap: wrap;
-}
-
-/* Illustration styles */
-.register-illustration {
+.register-content {
   flex: 1;
-  min-width: 260px;
-  max-width: 350px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  padding: 40px;
+  transition: margin-left 0.3s ease;
 }
 
-.register-illustration img {
-  width: 100%;
-  max-height: 320px;
-  object-fit: contain;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+.sidebar.collapsed ~ .register-content {
+  margin-left: 60px;
 }
 
-/* Form container */
+.sidebar:not(.collapsed) ~ .register-content {
+  margin-left: 200px;
+}
+
+/* === Main Container === */
 .register-society-container {
-  flex: 1;
-  min-width: 320px;
-  padding: 40px;
-  background-color: rgba(57, 62, 70, 0.95);
-  color: #DFD0B8;
-  border-radius: 12px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  max-width: 700px;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin: 0 auto;
 }
 
-/* Headings and text */
 .register-society-container h1 {
-  font-size: 2rem;
   margin-bottom: 10px;
-  color: #DFD0B8;
+  color: #222831;
 }
 
-.subtext {
-  font-size: 1rem;
-  margin-bottom: 30px;
-  color: #cfc6b2;
+.register-society-container .subtext {
+  margin-bottom: 20px;
+  color: #666;
+  font-size: 0.95rem;
 }
 
-/* Form styling */
+/* === Form Styling === */
 .society-form {
   display: flex;
   flex-direction: column;
 }
 
 .society-form label {
-  margin-bottom: 6px;
-  font-weight: 500;
-  color: #DFD0B8;
+  font-weight: bold;
+  margin-top: 10px;
+  color: #333;
 }
 
-.society-form input[type="text"],
-.society-form input[type="email"],
-.society-form input[type="password"],
-.society-form input[type="file"],
-.society-form input[type="url"],
-.society-form input[type="tel"],
-.society-form select,
-.society-form textarea {
+.society-form input,
+.society-form textarea,
+.society-form select {
+  width: 100%;
   padding: 10px;
-  margin-bottom: 20px;
   border-radius: 6px;
-  border: none;
-  background-color: #222831;
-  color: #DFD0B8;
+  border: 1px solid #ccc;
+  margin-top: 5px;
+  margin-bottom: 15px;
   font-size: 0.95rem;
 }
 
@@ -94,32 +69,35 @@
   min-height: 80px;
 }
 
-/* Submit button */
 .society-form button {
-  padding: 12px;
-  background-color: #948979;
-  color: #222831;
-  font-weight: bold;
+  background: #393e46;
+  color: white;
+  padding: 10px 20px;
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  transition: background-color color 0.3s ease;
+  font-size: 1rem;
+  transition: background 0.3s ease;
 }
 
 .society-form button:hover {
-  background-color: #b3a78c;
-  color: #222831;
+  background: #222831;
 }
 
-/* Responsive adjustments */
+/* === File Inputs === */
+.society-form input[type="file"] {
+  padding: 5px;
+  background: #fafafa;
+  border: 1px solid #ccc;
+}
+
+/* === Responsive === */
 @media (max-width: 768px) {
-  .register-wrapper {
-    flex-direction: column;
-    align-items: center;
+  .register-content {
     padding: 20px;
   }
 
-  .register-illustration {
-    margin-bottom: 30px;
+  .register-society-container {
+    padding: 1.5rem;
   }
 }
