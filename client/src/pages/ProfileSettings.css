@@ -1,3 +1,27 @@
+/* ===== Layout with Sidebar ===== */
+.profile-settings-layout {
+  display: flex;
+  height: 100vh;
+}
+
+.profile-settings-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left 0.3s ease;
+}
+
+/* When sidebar is collapsed */
+.sidebar.collapsed ~ .profile-settings-content {
+  margin-left: 60px;
+}
+
+/* When sidebar is expanded */
+.sidebar:not(.collapsed) ~ .profile-settings-content {
+  margin-left: 200px;
+}
+
+/* ===== Page Container ===== */
 .profile-settings-page {
   padding: 80px;
   background-color: #f9f6f0;
@@ -10,6 +34,7 @@
   color: #222831;
 }
 
+/* ===== Profile Section ===== */
 .profile-section {
   display: flex;
   gap: 30px;
@@ -43,6 +68,11 @@
   justify-content: center;
 }
 
+.avatar-preview input[type="file"] {
+  margin-top: 10px;
+}
+
+/* ===== Info Fields ===== */
 .info-fields {
   flex: 1;
   display: flex;
@@ -60,6 +90,7 @@
   border: 1px solid #ccc;
   border-radius: 6px;
   margin-top: 5px;
+  font-size: 1rem;
 }
 
 textarea {
@@ -76,7 +107,7 @@ textarea {
   cursor: pointer;
 }
 
-/* Certificates Section */
+/* ===== Certificates Section ===== */
 .certificates-section {
   margin-bottom: 40px;
   padding: 25px;
@@ -117,7 +148,7 @@ textarea {
   font-size: 0.9rem;
 }
 
-/* Danger Zone */
+/* ===== Danger Zone ===== */
 .danger-zone {
   padding: 25px;
   background-color: #fff;
@@ -145,4 +176,24 @@ textarea {
   border: none;
   border-radius: 6px;
   cursor: pointer;
+}
+
+/* ===== Responsive Adjustments ===== */
+@media (max-width: 768px) {
+  .profile-settings-page {
+    padding: 40px 20px;
+  }
+
+  .profile-section {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .info-fields {
+    width: 100%;
+  }
+
+  .profile-settings-content {
+    margin-left: 60px !important; /* Ensure enough space for collapsed sidebar */
+  }
 }
