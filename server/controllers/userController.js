@@ -88,23 +88,12 @@ const getUserSocieties = async (req, res) => {
   console.log("Fetching user societies...");
   try {
     const user = req.user;
-    const registered = req.query.registered; // e.g., active, inactive, pending
 
     const registeredSocieties = [];
     const joinedSocieties = [];
 
-    // 🔍 Build query filter based on registered
-    let queryFilter = {};
-
-    if (registered === 'true') {
-      queryFilter = { approved: true };
-    }  else {
-      // Default to approved only if no status specified
-      queryFilter = { approved: false };
-    }
-
     const societyPromises = user.societies.map(societyId =>
-      Society.findOne({ _id: societyId, ...queryFilter })
+      Society.findOne({ _id: societyId})
     );
 
     const societies = (await Promise.all(societyPromises)).filter(Boolean);
@@ -121,7 +110,8 @@ const getUserSocieties = async (req, res) => {
     // console.log("Joined Societies:", joinedSocieties);
 
     res.status(200).json({
-      societies: societies,
+      registeredSocieties: registeredSocieties,
+      joinedSocieties: joinedSocieties
     });
 
   } catch (error) {
@@ -161,33 +151,41 @@ const getUserEvents = async (req, res) => {
 };
 
 const unregisterEvent = async (req, res) => {
-  const { userId, eventId } = req.params;
-
-  if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(eventId)) {
-    return res.status(400).json({ error: 'Invalid ID' });
-  }
-
   try {
-    const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ error: 'User not found' });
+    const eventId = req.params.eventId;
+    const user = req.user;
 
-    // Remove eventId from user's registeredEvents
-    user.registeredEvents = user.registeredEvents.filter(
-      (id) => id.toString() !== eventId
+    if (!user) return res.status(401).json({ message: 'Unauthorized' });
+
+    const event = await Event.findById(eventId);
+    if (!event) return res.status(404).json({ message: 'Event not found' });
+
+    const participantIndex = event.participants.findIndex(
+      p => p.email === user.email
     );
-    await user.save();
 
-    // OPTIONAL: Remove userId from event’s participants
-    await Event.findByIdAndUpdate(eventId, {
-      $pull: { participants: userId }
-    });
+    if (participantIndex === -1) {
+      return res.status(400).json({ message: 'You are not registered for this event.' });
+    }
 
-    res.status(200).json({ message: 'Successfully unregistered from event.' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Server error' });
+    // Remove participant from event
+    event.participants.splice(participantIndex, 1);
+    await event.save();
+
+    // Remove event from user's registeredEvents
+    const dbUser = await User.findById(user._id);
+    dbUser.registeredEvents = dbUser.registeredEvents.filter(
+      evId => !evId.equals(event._id)
+    );
+    await dbUser.save();
+
+    res.status(200).json({ message: 'Unregistered successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Unregistration failed', error: err.message });
   }
 };
+
 
 const getCurrentUser = async (req, res) => {
   const token = req.cookies.token;

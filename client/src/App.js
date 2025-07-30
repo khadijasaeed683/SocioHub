@@ -58,16 +58,16 @@ const AppWrapper = () => {
   }
 
   const handleLogin = (userData) => {
-    userLoggedIn(userData);
+    dispatch(userLoggedIn(userData));
     navigate('/dashboard');
   };
 
   const handleSignup = (userData) => {
-    userLoggedIn(userData);
+    dispatch(userLoggedIn(userData));
     navigate('/dashboard');
   };
   const handleSignOut = () => {
-    userLoggedIn(null);
+   dispatch(userLoggedIn(null));
     navigate('/login');
   };
 

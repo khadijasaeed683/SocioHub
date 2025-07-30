@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { userLoggedIn } from '../features/authSlice';
 import { useNavigate } from 'react-router-dom'; 
-
+import { login } from '../api/authApi';
 import './LoginPage.css';
 import Navbar from '../components/Navbar';
 
@@ -15,34 +15,22 @@ const LoginPage = () => {
   const [error, setError] = useState('');
 
   const handleLogin = async (e) => {
-    e.preventDefault();
-    setError('');
+  e.preventDefault();
+  setError('');
 
-    try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-        credentials: 'include', // if you later use httpOnly cookies
-      });
+  try {
+    const data = await login(email, password);
+    console.log('Login response:', data);
 
-      const data = await response.json();
-      console.log('Login response:', data);
-
-      if (!response.ok) {
-        setError(data.message || 'Login failed');
-        setEmail('');
-        setPassword('');
-      } else {
-        // Dispatch to Redux
-        dispatch(userLoggedIn({ user: data.user }));
-        navigate('/dashboard');
-      }
-    } catch (err) {
-      console.error(err);
-      setError('Server error. Try again later.');
-    }
-  };
+    dispatch(userLoggedIn(data.user));
+    navigate('/dashboard');
+  } catch (err) {
+    console.error(err);
+    setError(err.message);
+    setEmail('');
+    setPassword('');
+  }
+};
 
   return (
     <>

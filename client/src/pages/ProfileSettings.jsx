@@ -4,7 +4,8 @@ import AuthNavbar from '../components/AuthNavbar';
 import Sidebar from '../components/Sidebar';
 
 const ProfileSettings = ({ user, onSignOut, societies = [] }) => {
-  const [name, setName] = useState(user?.name || '');
+  const [name, setName] = useState(user?.username || '');
+  const [email, setEmail] = useState(user?.email || '');
   const [bio, setBio] = useState(user?.bio || '');
   const [avatar, setAvatar] = useState(user?.avatar || '');
   const [password, setPassword] = useState('');
@@ -66,6 +67,13 @@ const ProfileSettings = ({ user, onSignOut, societies = [] }) => {
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Your full name"
               />
+            <label>Email</label>
+            <input
+              type="text"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Your email"
+            />
 
               <label>Bio</label>
               <textarea

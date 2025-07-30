@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 
-const useRSVP = () => {
+const useRSVP = (onSuccessCallback) => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [formData, setFormData] = useState({ name: '', email: '', phone: '' });
   const [error, setError] = useState('');
@@ -48,6 +48,7 @@ const useRSVP = () => {
       } else {
         toast.success('✅ ' + data.message);
         setSelectedEvent(null);
+        if (onSuccessCallback) onSuccessCallback();
         setFormData({ name: '', email: '', phone: '' });
       }
     } catch (error) {

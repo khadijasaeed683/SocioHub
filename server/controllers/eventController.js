@@ -106,34 +106,65 @@ const createEvent = async (req, res) => {
   }
 };
 
-
-
 const getAllEvents = async (req, res) => {
   try {
     const societyId = req.params.societyId;
-    const { upcoming } = req.query; // get upcoming param from query
-    console.log("societyId", societyId, "upcoming:", upcoming);
+    const { include } = req.query; // 'all', 'upcoming', or 'past'
 
     if (!societyId) {
       return res.status(400).json({ message: 'Society ID is required' });
     }
 
-    const filter = { societyId };
+    const now = new Date();
 
-    if (upcoming === 'true') {
-      const now = new Date();
-      filter.date = { $gte: now }; // only events today or in future
+    let eventsData = {};
+
+    if (include === 'all') {
+      // Fetch both upcoming and past in parallel
+      const [upcomingEvents, pastEvents] = await Promise.all([
+        Event.find({ societyId, date: { $gte: now } })
+          .populate('societyId', 'name logo')
+          .populate('participants', 'name email')
+          .sort({ date: 1, startTime: 1 }),
+
+        Event.find({ societyId, date: { $lt: now } })
+          .populate('societyId', 'name logo')
+          .populate('participants', 'name email')
+          .sort({ date: -1, startTime: -1 }) // most recent first
+      ]);
+
+      eventsData = {
+        upcoming: upcomingEvents,
+        past: pastEvents,
+      };
+
+    } else if (include === 'upcoming') {
+      const upcoming = await Event.find({ societyId, date: { $gte: now } })
+        .populate('societyId', 'name logo')
+        .populate('participants', 'name email')
+        .sort({ date: 1, startTime: 1 });
+
+      eventsData = { upcoming };
+
+    } else if (include === 'past') {
+      const past = await Event.find({ societyId, date: { $lt: now } })
+        .populate('societyId', 'name logo')
+        .populate('participants', 'name email')
+        .sort({ date: -1, startTime: -1 });
+
+      eventsData = { past };
+
+    } else {
+      // Default: return all events (no date filtering)
+      const all = await Event.find({ societyId })
+        .populate('societyId', 'name logo')
+        .populate('participants', 'name email')
+        .sort({ date: 1, startTime: 1 });
+
+      eventsData = { all };
     }
-    const events = await Event.find(filter)
-      .populate('societyId', 'name logo')
-      .populate('participants', 'name email')
-      .sort({ date: 1, startTime: 1 }); // sort upcoming earliest first
 
-    if (!events || events.length === 0) {
-      return res.status(404).json({ message: upcoming === 'true' ? 'No upcoming events found for this society' : 'No events found for this society' });
-    }
-
-    return res.status(200).json(events);
+    return res.status(200).json(eventsData);
 
   } catch (error) {
     console.error(error);
@@ -272,6 +303,9 @@ const registerForEvent = async (req, res) => {
     res.status(500).json({ message: 'Registration failed', error: error.message });
   }
 };
+
+
+
 
 const updateEvent = async (req, res) => {
   try {

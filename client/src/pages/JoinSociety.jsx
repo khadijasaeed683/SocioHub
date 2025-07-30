@@ -16,13 +16,13 @@ const JoinSociety = () => {
   useEffect(() => {
     const fetchSocieties = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/society');
+        const res = await fetch('http://localhost:5000/api/society/?status=active');
         const data = await res.json();
 
         if (!res.ok) {
           setError(data.message || 'Failed to fetch societies');
         } else {
-          setSocieties(data);
+          setSocieties(data.societies);
         }
       } catch (err) {
         setError('Server error. Try again later.');

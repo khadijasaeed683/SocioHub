@@ -2,14 +2,14 @@
 import React, { useContext, useState } from 'react';
 import './AuthNavbar.css';
 import { SidebarContext } from '../context/SidebarContext';
-import { Link, useNavigate } from 'react-router-dom';
-
+import { Link } from 'react-router-dom';
+import useLogout from '../hooks/useLogout';
 
 const AuthNavbar = ({ user, onSignOut }) => {
   const { toggleSidebar } = useContext(SidebarContext);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const navigate = useNavigate();
   const toggleDropdown = () => setDropdownOpen((prev) => !prev);
+  const logout = useLogout();
 
   const getInitials = (name) => {
     if (!name) return '';
@@ -19,10 +19,15 @@ const AuthNavbar = ({ user, onSignOut }) => {
       .slice(0, 2)
       .join('');
   };
-  
+
+
+  if (!user) {
+    return <div className="auth-navbar">Loading user info...</div>;
+  }
 
   return (
     <div className="auth-navbar">
+
       <div className="navbar-left">
         <button className="hamburger" onClick={toggleSidebar}>
           ☰
@@ -48,7 +53,7 @@ const AuthNavbar = ({ user, onSignOut }) => {
               <button>👤 My Profile</button>
             </Link>
             <button>⚙️ Settings</button>
-            <button onClick={onSignOut}>🚪 Sign Out</button>
+            <button onClick={logout}>🚪 Sign Out</button>
           </div>
         )}
       </div>

@@ -7,43 +7,58 @@ import SocietyCard from '../components/SocietyCard';
 import EventCard from '../components/EventCard';
 import RSVPForm from './RSVPForm'; // adjust path if needed
 import useRSVP from '../hooks/useRSVP'; // custom hook for RSVP logic
-import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 
 const UserDashboard = () => {
   const navigate = useNavigate();
   const user = useSelector(state => state.auth.user);
   const [societies, setSocieties] = useState([]);
-  const [UnregisteredSocieties, setUnregisteredSocieties] = useState([]);
   const [events, setEvents] = useState([]);
   const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [pastEvents, setPastEvents] = useState([]);
   const [error, setError] = useState('');
   const [showUnregisterForm, setShowUnregisterForm] = useState(null);
   const [unregisterReason, setUnregisterReason] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(true);
 
+  const handleUnregister = async (eventId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/user/events/${eventId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          // don't send Authorization if you're using cookies only
+        },
+        credentials: 'include'
+      });
+      const data = await response.json();
+      console.log('Login response:', data);
 
-  const handleUnregister = (eventId) => {
-    alert(`Unregistered from event ${eventId}. Reason: ${unregisterReason}`);
-    setShowUnregisterForm(null);
-    setUnregisterReason('');
-    setPassword('');
+      if (!response.ok) {
+        toast.error('Unregistered failes');
+        setShowUnregisterForm(null);
+        setUnregisterReason('');
+        setPassword('');
+      } else {
+        toast.success('Unregistered successfully');
+        setShowUnregisterForm(null);
+        setUnregisterReason('');
+        setPassword('');
+        // Optionally, refresh the events list
+        setEvents(events.filter(event => event._id !== eventId));
+        fetchDashboardData(); // Refresh dashboard data after unregistration
+      }
+
+    } catch (error) {
+      console.error(error);
+      alert(error.response?.data?.message || 'Failed to unregister');
+    }
   };
-  const {
-    selectedEvent,
-    setSelectedEvent,
-    formData,
-    setFormData,
-    handleRSVPClick,
-    handleFormSubmit,
-    handleInputChange,
-  } = useRSVP();
 
-  useEffect(() => {
-    if (!user?._id) return;
 
-    const fetchRegisteredSocitiesData = async () => {
+  const fetchDashboardData = async () => {
       try {
         const res1 = await fetch(`http://localhost:5000/api/user/events`, {
           method: 'GET',
@@ -60,7 +75,7 @@ const UserDashboard = () => {
         }
 
         // 🔸 Societies + upcoming events
-        const res2 = await fetch(`http://localhost:5000/api/user/societies?registered=true`, {
+        const res2 = await fetch(`http://localhost:5000/api/user/societies`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -68,15 +83,15 @@ const UserDashboard = () => {
 
         const data2 = await res2.json();
         if (res2.ok) {
-          const societiesFetched = [...data2.societies];
+          const societiesFetched = [...data2.registeredSocieties, ...data2.joinedSocieties];
           setSocieties(societiesFetched);
 
           const upcomingEventsMap = {};
-
+          const pastEventsMap = {};
           await Promise.all(
             societiesFetched.map(async (society) => {
               try {
-                const eventsRes = await fetch(`http://localhost:5000/api/society/${society._id}/event?upcoming=true`, {
+                const eventsRes = await fetch(`http://localhost:5000/api/society/${society._id}/event?include=all`, {
                   method: 'GET',
                   headers: { 'Content-Type': 'application/json' },
                   credentials: 'include',
@@ -84,55 +99,48 @@ const UserDashboard = () => {
 
                 const eventsData = await eventsRes.json();
                 if (eventsRes.ok) {
-                  upcomingEventsMap[society._id] = eventsData;
+                  upcomingEventsMap[society._id] = eventsData.upcoming;
+                  pastEventsMap[society._id] = eventsData.past;
                 }
               } catch (err) {
 
                 upcomingEventsMap[society._id] = [];
+                pastEventsMap[society._id] = [];
               }
             })
           );
 
           setUpcomingEvents(upcomingEventsMap);
+          setPastEvents(pastEventsMap);
         }
       } catch (err) {
         setError('Something went wrong', err.message);
-      }
-    };
-
-    fetchRegisteredSocitiesData();
-  }, [user._id]);
-
-  useEffect(() => {
-    const fetchSocietyRegistrationRequests = async () => {
-      try {
-        const res = await fetch('http://localhost:5000/api/user/societies/?registered=false', {
-          credentials: 'include',
-        });
-
-        const data = await res.json();
-        // console.log("User Dashboard societies:", data);
-        if (!res.ok) {
-          setError(data.message || 'Failed to fetch societies');
-        } else {
-          setUnregisteredSocieties(data.societies);
-        }
-      } catch (err) {
-        setError('Server error. Try again later.');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchSocietyRegistrationRequests();
-  }, []);
-  console.log("User Dashboard societies:", UnregisteredSocieties);
+  useEffect(() => {
+    if (!user?._id) return;
+    fetchDashboardData();
+  }, [user._id]);
+
+   const {
+    selectedEvent,
+    setSelectedEvent,
+    formData,
+    setFormData,
+    handleRSVPClick,
+    handleFormSubmit,
+    handleInputChange,
+  } = useRSVP(fetchDashboardData);
+
   // console.log("User Dashboard events:", events);
-  // console.log("User Dashboard upcomingEvents:", upcomingEvents);
+  console.log("User Dashboard upcomingEvents:", pastEvents);
   // Use dummySocieties for Sidebar testing instead of fetched societies
   const adminSocieties = societies.filter(s => s.createdBy === user._id);
   const allUpcomingEvents = Object.values(upcomingEvents).flat();
-
+  const allPastEvents = Object.values(pastEvents).flat();
 
   // ✅ Logout function
   const handleSignOut = () => {
@@ -141,7 +149,7 @@ const UserDashboard = () => {
     navigate('/login');
   };
   if (loading) {
-    return <p>Loading societies...</p>;
+    return <p>Loading...</p>;
   }
   if (error) {
     return <p>Error: {error}</p>;
@@ -183,9 +191,11 @@ const UserDashboard = () => {
           <section className="joined-societies">
             <h2>Pending Societies</h2>
             <div className="society-list">
-              {UnregisteredSocieties.map((society) => (
-                <SocietyCard key={society._id} society={society} user={user} />
-              ))}
+              {societies
+                .filter((society) => society.approved === false)
+                .map((society) => (
+                  <SocietyCard key={society._id} society={society} user={user} />
+                ))}
             </div>
           </section>
 
@@ -220,7 +230,7 @@ const UserDashboard = () => {
                   <EventCard
                     key={event._id}
                     event={event}
-                    isRsvped={false}
+                    isRsvped={event.participants.some(rsvp => rsvp.email === user.email)}
                     onRSVPClick={handleRSVPClick}
                   />
                 ))}
@@ -229,7 +239,24 @@ const UserDashboard = () => {
               <p>No upcoming events to show.</p>
             )}
           </section>
+          <section className="past-events">
+            <h2>Past Events in Your Societies</h2>
 
+            {allPastEvents.length > 0 ? (
+              <div className="event-cards-container">
+                {allPastEvents.map((event) => (
+                  <EventCard
+                    key={event._id}
+                    event={event}
+                    isRsvped={event.participants.some(rsvp => rsvp.email === user.email)}
+                    onRSVPClick={handleRSVPClick}
+                  />
+                ))}
+              </div>
+            ) : (
+              <p>No past events to show.</p>
+            )}
+          </section>
 
 
           <div className="explore-button">

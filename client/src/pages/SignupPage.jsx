@@ -4,6 +4,7 @@ import './SignupPage.css';
 import Navbar from '../components/Navbar';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { signup } from '../api/authApi'; 
 
 const SignupPage = ({ onSignup }) => {
   const [username, setUsername] = useState('');
@@ -12,37 +13,22 @@ const SignupPage = ({ onSignup }) => {
   const [error, setError] = useState('');
 
   const handleSignup = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
+    setError('');
 
-  try {
-    const response = await fetch('http://localhost:5000/api/auth/signup', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username, email, password }),
-      credentials: 'include',
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      setError(data.error || data.message || 'Signup failed');
-      toast.error(data.error || data.message || 'Signup failed');
+    try {
+      const data = await signup(username, email, password); 
+      onSignup(data.user);
+      toast.success('Signup successful!');
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+      toast.error(err.message);
       setUsername('');
       setEmail('');
       setPassword('');
-    } else {
-      onSignup(data.user);
-      toast.success('Signup successful!');
     }
-  } catch (err) {
-    console.error(err);
-    setError('Server error. Try again later.');
-    toast.error('Server error. Try again later.');
-  }
-};
-
+  };
 
   return (
     <>

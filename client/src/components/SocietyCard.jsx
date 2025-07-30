@@ -21,9 +21,6 @@ const SocietyCard = ({ society, user }) => {
     <div className="card">
       <div className="top-section">
         <h1 className="society-name">{society.name}</h1>
-
-        
-
       </div>
 
       <div className="bottom-section">

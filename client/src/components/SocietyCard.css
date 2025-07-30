@@ -168,4 +168,18 @@
   background-color: #ff4d4f;
   color: white;
 }
+.image-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100px;           /* adjust as needed */
+  width: 100%;             /* or fixed width like 300px */
+  padding: 10px;
+  border-radius: 10px;
+}
 
+.society-logo {
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: cover;
+}
