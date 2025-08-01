@@ -4,97 +4,114 @@ import Navbar from '../components/Navbar';
 import './LandingPage.css';
 import { toast } from 'react-toastify';
 import Footer from '../components/Footer';
-import EventCard from '../components/EventCard'; // ✅ Add this if not already imported
+import EventCard from '../components/EventCard';
 import { useSelector } from 'react-redux';
-import useRSVP from '../hooks/useRSVP'; 
-import RSVPForm from './RSVPForm'; 
-
-// Carousel scroll function
-const scrollEventCarousel = (scrollOffset) => {
-  const carousel = document.getElementById('event-carousel');
-  if (carousel) {
-    carousel.scrollBy({ left: scrollOffset, behavior: 'smooth' });
-  }
-};
-
-
+import useRSVP from '../hooks/useRSVP';
+import RSVPForm from './RSVPForm';
 
 const LandingPage = () => {
   const [societies, setSocieties] = useState([]);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const currentUser = useSelector(state => state.auth.user);
+  const [canScrollSocietyLeft, setCanScrollSocietyLeft] = useState(false);
+  const [canScrollSocietyRight, setCanScrollSocietyRight] = useState(true);
+  const [canScrollEventLeft, setCanScrollEventLeft] = useState(false);
+  const [canScrollEventRight, setCanScrollEventRight] = useState(true);
 
+  const currentUser = useSelector(state => state.auth.user);
   const navigate = useNavigate();
 
+  // Fetch Events
   useEffect(() => {
     const fetchEvents = async () => {
       try {
         const res = await fetch('http://localhost:5000/api/explore-events');
         const data = await res.json();
-
-        if (!res.ok) {
-          setError(data.message || 'Failed to fetch events');
-        } else {
-          setEvents(data);
-        }
+        if (!res.ok) setError(data.message || 'Failed to fetch events');
+        else setEvents(data);
       } catch (err) {
         setError('Server error. Try again later.');
       } finally {
         setLoading(false);
       }
     };
-
     fetchEvents();
   }, []);
 
+  // Fetch Societies
   useEffect(() => {
     const fetchSocieties = async () => {
       try {
         const res = await fetch('http://localhost:5000/api/society/?status=active');
         const data = await res.json();
-
-        if (!res.ok) {
-          setError(data.message || 'Failed to fetch societies');
-        } else {
-          setSocieties(data.societies);
-        }
+        if (!res.ok) setError(data.message || 'Failed to fetch societies');
+        else setSocieties(data.societies);
       } catch (err) {
         setError('Server error. Try again later.');
       } finally {
         setLoading(false);
       }
     };
-
     fetchSocieties();
   }, []);
 
-  const handleViewDetails = (id) => {
-    navigate(`/society/${id}`);
+  // Scroll state checkers
+  useEffect(() => {
+    const societyCarousel = document.getElementById('societyCarousel');
+    const eventCarousel = document.getElementById('event-carousel');
+
+    const checkSocietyScroll = () => {
+      if (!societyCarousel) return;
+      setCanScrollSocietyLeft(societyCarousel.scrollLeft > 0);
+      setCanScrollSocietyRight(
+        societyCarousel.scrollLeft + societyCarousel.clientWidth < societyCarousel.scrollWidth
+      );
+    };
+
+    const checkEventScroll = () => {
+      if (!eventCarousel) return;
+      setCanScrollEventLeft(eventCarousel.scrollLeft > 0);
+      setCanScrollEventRight(
+        eventCarousel.scrollLeft + eventCarousel.clientWidth < eventCarousel.scrollWidth
+      );
+    };
+
+    societyCarousel?.addEventListener('scroll', checkSocietyScroll);
+    eventCarousel?.addEventListener('scroll', checkEventScroll);
+
+    checkSocietyScroll();
+    checkEventScroll();
+
+    return () => {
+      societyCarousel?.removeEventListener('scroll', checkSocietyScroll);
+      eventCarousel?.removeEventListener('scroll', checkEventScroll);
+    };
+  }, [societies, events]);
+
+  // Scroll functions
+  const scrollSocietyCarousel = (direction) => {
+    const container = document.getElementById('societyCarousel');
+    const scrollAmount = 300;
+    container.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
   };
+
+  const scrollEventCarousel = (direction) => {
+    const container = document.getElementById('event-carousel');
+    const scrollAmount = 300;
+    container.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
+  };
+
+  const handleViewDetails = (id) => navigate(`/society/${id}`);
 
   const handleRegisterClick = (e) => {
     e.preventDefault();
     const isLoggedIn = localStorage.getItem('token');
-
-    if (isLoggedIn) {
-      navigate('/register-society');
-    } else {
+    if (isLoggedIn) navigate('/register-society');
+    else {
       toast.warning('Please login first to register your society.');
       navigate('/login');
     }
-  };
-
-  // ⬅️➡️ Scroll buttons
-  const scrollLeft = () => {
-    const container = document.getElementById('societyCarousel');
-    container.scrollBy({ left: -300, behavior: 'smooth' });
-  };
-
-  const scrollRight = () => {
-    const container = document.getElementById('societyCarousel');
-    container.scrollBy({ left: 300, behavior: 'smooth' });
   };
 
   const {
@@ -106,13 +123,9 @@ const LandingPage = () => {
     handleFormSubmit,
   } = useRSVP();
 
-  if (loading) {
-    return <p>Loading events...</p>;
-  }
+  if (loading) return <p>Loading events...</p>;
+  if (error) return <p>Error: {error}</p>;
 
-  if (error) {
-    return <p>Error: {error}</p>;
-  }
   return (
     <div className="landing-container">
       <Navbar />
@@ -166,14 +179,20 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* 🔄 Society Carousel */}
+      {/* Society Carousel */}
       <section className="feature-section">
         <div className="feature-text">
           <h2>Join a Society</h2>
           <p>Find your favorite university society, send join requests, or join instantly with your edu email.</p>
 
           <div className="society-carousel-container">
-            <button className="carousel-arrow left" onClick={scrollLeft}>&lt;</button>
+            <button
+              className={`carousel-arrow left ${!canScrollSocietyLeft ? 'disabled' : ''}`}
+              onClick={() => scrollSocietyCarousel('left')}
+              disabled={!canScrollSocietyLeft}
+            >
+              &lt;
+            </button>
 
             <div className="society-carousel" id="societyCarousel">
               {societies.map((society, index) => (
@@ -187,14 +206,20 @@ const LandingPage = () => {
               ))}
             </div>
 
-            <button className="carousel-arrow right" onClick={scrollRight}>&gt;</button>
+            <button
+              className={`carousel-arrow right ${!canScrollSocietyRight ? 'disabled' : ''}`}
+              onClick={() => scrollSocietyCarousel('right')}
+              disabled={!canScrollSocietyRight}
+            >
+              &gt;
+            </button>
           </div>
 
           <Link to="/JoinSociety" className="feature-btn center-btn">View More</Link>
         </div>
       </section>
 
-      {/* Browse Public Events */}
+      {/* Event Carousel */}
       <section className="feature-section">
         <div className="feature-text">
           <h2>Browse Public Events</h2>
@@ -202,15 +227,32 @@ const LandingPage = () => {
         </div>
 
         <div className="event-carousel-container">
-          <button className="carousel-arrow left" onClick={() => scrollEventCarousel(-300)}>‹</button>
+          <button
+            className={`carousel-arrow left ${!canScrollEventLeft ? 'disabled' : ''}`}
+            onClick={() => scrollEventCarousel('left')}
+            disabled={!canScrollEventLeft}
+          >
+            ‹
+          </button>
 
           <div className="event-carousel" id="event-carousel">
             {events.map((event) => (
-              <EventCard key={event._id} event={event} isRsvped={event.participants?.some(p => p.email === currentUser?.email)} onRSVPClick={handleRSVPClick} />
+              <EventCard
+                key={event._id}
+                event={event}
+                isRsvped={event.participants?.some(p => p.email === currentUser?.email)}
+                onRSVPClick={handleRSVPClick}
+              />
             ))}
           </div>
 
-          <button className="carousel-arrow right" onClick={() => scrollEventCarousel(300)}>›</button>
+          <button
+            className={`carousel-arrow right ${!canScrollEventRight ? 'disabled' : ''}`}
+            onClick={() => scrollEventCarousel('right')}
+            disabled={!canScrollEventRight}
+          >
+            ›
+          </button>
         </div>
 
         <div className="center-btn">
@@ -218,18 +260,16 @@ const LandingPage = () => {
         </div>
       </section>
 
-
-            {/* RSVP Form Modal */}
-        {selectedEvent && (
-          <RSVPForm
-            event={selectedEvent}
-            formData={formData}
-            setFormData={setFormData}
-            onSubmit={handleFormSubmit}
-            onCancel={() => setSelectedEvent(null)}
-          />
-
-        )}
+      {/* RSVP Form Modal */}
+      {selectedEvent && (
+        <RSVPForm
+          event={selectedEvent}
+          formData={formData}
+          setFormData={setFormData}
+          onSubmit={handleFormSubmit}
+          onCancel={() => setSelectedEvent(null)}
+        />
+      )}
 
       <Footer />
     </div>

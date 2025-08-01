@@ -24,7 +24,6 @@ const ProfileSettings = ({ user, onSignOut, societies = [] }) => {
 
   const handleDelete = () => {
     if (!showPasswordConfirm) {
-      // Step 1: Ask for password first
       setShowPasswordConfirm(true);
       return;
     }
@@ -37,7 +36,7 @@ const ProfileSettings = ({ user, onSignOut, societies = [] }) => {
     const confirmDelete = window.confirm('Are you sure you want to permanently delete your account?');
     if (confirmDelete) {
       alert('Account deleted (mock)');
-      // Here you would call backend API to delete the account with password confirmation
+      // Backend delete logic goes here
     }
   };
 
@@ -67,14 +66,13 @@ const ProfileSettings = ({ user, onSignOut, societies = [] }) => {
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Your full name"
               />
-            <label>Email</label>
-            <input
-              type="text"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Your email"
-            />
-
+              <label>Email</label>
+              <input
+                type="text"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Your email"
+              />
               <label>Bio</label>
               <textarea
                 value={bio}
@@ -85,22 +83,6 @@ const ProfileSettings = ({ user, onSignOut, societies = [] }) => {
               <button className="save-btn" onClick={handleSave}>
                 Save Changes
               </button>
-            </div>
-          </div>
-
-          <div className="certificates-section">
-            <h3>Certificates & Badges</h3>
-            <div className="badges-list">
-              <div className="badge-card">🏅 Hackathon Winner</div>
-              <div className="badge-card">🎓 Workshop Participant</div>
-              <div className="badge-card">👨‍💻 Volunteer Certificate</div>
-            </div>
-
-            <div className="upload-badge">
-              <label htmlFor="badge-upload" className="upload-label">
-                + Upload New Badge
-              </label>
-              <input type="file" id="badge-upload" hidden onChange={() => alert('Badge uploaded!')} />
             </div>
           </div>
 
