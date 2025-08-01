@@ -5,7 +5,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px 32px;
-  background-color: #A67C9D;
+  background-color: #ffffff;
   color: #000000;
   position: sticky;
   top: 0;
@@ -13,6 +13,18 @@
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
 }
+.navbar-left {
+  position: relative;
+}
+
+.navbar-logo {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%) scale(1.6); /* center & enlarge */
+  height: 110px; /* this controls how much space the navbar allocates */
+  width: auto;
+}
+
 
 .navbar-scrolled {
   padding: 10px 32px;

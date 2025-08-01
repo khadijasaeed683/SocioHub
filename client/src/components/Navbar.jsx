@@ -37,8 +37,15 @@ const Navbar = () => {
   return (
     <nav className={`navbar ${scrolled ? 'navbar-scrolled' : ''}`}>
       <div className="navbar-left">
-        <Link to="/" className="logo-link">EventNest</Link>
+        <Link to="/" className="logo-link">
+          <img 
+            src="/assets/Logo.png" 
+            alt="EventNest Logo" 
+            className="navbar-logo" 
+          />
+        </Link>
       </div>
+
 
       <div className="navbar-right">
         <Link className="nav-link" to="/events">Events</Link>
