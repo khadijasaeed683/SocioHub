@@ -6,6 +6,19 @@ body,
   margin: 0;
   padding: 0;
 }
+.hero h1 {
+  font-family: 'Playfair Display', serif; /* Change to chosen fancy font */
+  font-size: 3rem; /* Adjust size */
+  font-weight: 600; /* Boldness */
+  color: #3e1a47	;
+}
+.hero p {
+  font-family: 'Inter', sans-serif;
+  padding-bottom: 1.2%;
+  font-size: 1.2rem;
+  margin: 20px 0;
+  color: #000000;
+}
 
 .landing-container {
   min-height: 100vh;
@@ -23,16 +36,8 @@ body,
   background-color: #ffffff;
 }
 
-.hero h1 {
-  font-size: 2.8rem;
-  color: #000000;
-}
 
-.hero p {
-  font-size: 1.2rem;
-  margin: 20px 0;
-  color: #000000;
-}
+
 
 .cta-btn {
   background-color: #3e1a47;

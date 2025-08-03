@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 import useRSVP from '../hooks/useRSVP';
 import RSVPForm from './RSVPForm';
 
+
 const LandingPage = () => {
   const [societies, setSocieties] = useState([]);
   const [events, setEvents] = useState([]);
@@ -141,7 +142,7 @@ const LandingPage = () => {
       <section className="feature-section">
         <div className="feature-header">
           <div className="feature-heading-text">
-            <h2>Why Register Your Society?</h2>
+            <h2>Want to Register Your Society?</h2>
             <p className="feature-subtitle">
               Manage your community with powerful, easy-to-use tools designed for student societies.
             </p>
