@@ -2,6 +2,8 @@ const User = require('../models/userModel');
 const Society = require('../models/societyModel');
 const Event = require('../models/eventModel');
 const mongoose = require('mongoose');
+const cloudinary = require('../config/cloudinary');
+const extractPublicId =  require('../utils/extractPublicId');
 // get all Users
 const getUsers = async (req, res) => {
   try {
@@ -48,42 +50,104 @@ const createUser = async (req, res) => {
 
 // delete a User
 const deleteUser = async (req, res) => {
-  const { id } = req.params;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ error: 'Invalid User ID' });
-  }
-
   try {
-    const User = await User.findOneAndDelete({ _id: id });
-    if (!User) {
-      return res.status(404).json({ error: 'User not found' });
+    const { id } = req.user;
+    console.log("user id to delete: ", id)
+    // 1. Find user
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: 'Invalid User ID' });
     }
-    res.status(200).json(User);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+    const user = await User.findById(id);
+    if (!user) throw new Error('User not found');
+
+    // 2. Delete user's profile picture from Cloudinary
+    if (user.pfp) {
+      const pfpId = extractPublicId(user.pfp);
+      await cloudinary.uploader.destroy(pfpId);
+    }
+
+    // 3. Remove user from societies' members and pendingRequests
+    await Society.updateMany(
+      { members: id },
+      { $pull: { members: id } }
+    );
+    await Society.updateMany(
+      {},
+      { $pull: { pendingRequests: { userId: id } } }
+    );
+
+    // 4. Delete societies created by the user
+    const societies = await Society.find({ createdBy: id });
+
+    for (const society of societies) {
+      // a. Delete society logo & cover image
+      const logoId = extractPublicId(society.logo);
+      const coverId = extractPublicId(society.coverImage);
+
+      if (logoId) await cloudinary.uploader.destroy(logoId);
+      if (coverId) await cloudinary.uploader.destroy(coverId);
+
+      // b. Delete all events of the society
+      const events = await Event.find({ societyId: society._id });
+      for (const event of events) {
+        const posterId = extractPublicId(event.poster);
+        if (posterId) await cloudinary.uploader.destroy(posterId);
+
+        await Event.findByIdAndDelete(event._id);
+      }
+
+      // c. Delete the society
+      await Society.findByIdAndDelete(society._id);
+    }
+
+    // 5. Finally, delete user
+    await User.findByIdAndDelete(id);
+
+    console.log(`✅ User and related data deleted for id: ${id}`);
+    res.status(200).json({ message: 'Account deleted successfully' });
+  } catch (err) {
+    console.error('❌ Error deleting user and cleanup:', err.message);
+    res.status(200).json( { success: false, error: err.message });
   }
 };
 
 // update a User
 const updateUser = async (req, res) => {
-  const { id } = req.params;
-  const { username, password, role } = req.body;
+  const { id } = req.user;
+  const { username, email, bio } = req.body;
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ error: 'Invalid User ID' });
   }
 
   try {
-    const User = await User.findOneAndUpdate({ _id: id }, { ...req.body }, { new: true });
-    if (!User) {
-      return res.status(404).json({ error: 'User not found' });
+    const avatarFile = req.files?.avatar?.[0];
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    // Update fields if provided
+    if (username) user.username = username;
+    if (email) user.email = email;
+    if (bio) user.bio = bio;
+
+    // Upload avatar to Cloudinary if provided
+    if (avatarFile) {
+      const uploadedAvatar = await cloudinary.uploader.upload(avatarFile.path, {
+        resource_type: 'image',
+        folder: 'avatars'
+      });
+      user.pfp = uploadedAvatar.secure_url;
     }
-    res.status(200).json(User);
+
+    await user.save();
+
+    res.status(200).json({ message: 'User updated successfully', user });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('User update error:', error);
+    res.status(500).json({ error: 'Failed to update user', details: error.message });
   }
 };
+
 const getUserSocieties = async (req, res) => {
   console.log("Fetching user societies...");
   try {
@@ -93,7 +157,7 @@ const getUserSocieties = async (req, res) => {
     const joinedSocieties = [];
 
     const societyPromises = user.societies.map(societyId =>
-      Society.findOne({ _id: societyId})
+      Society.findOne({ _id: societyId })
     );
 
     const societies = (await Promise.all(societyPromises)).filter(Boolean);

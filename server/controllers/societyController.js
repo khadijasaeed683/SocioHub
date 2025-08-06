@@ -54,13 +54,13 @@ async function migratePendingRequests() {
 const registerSociety = async (req, res) => {
   try {
     const user = req.user;
-    console.log(user); // should print your cloud_name etc.
+    console.log(user);
 
     const { name, description, website, contactEmail, phone, type } = req.body;
     console.log("Request body:", req.body);
     const logoFile = req.files.logo ? req.files.logo[0] : null;
     const coverFile = req.files.coverImage ? req.files.coverImage[0] : null;
-    console.log("logoFile", logoFile.path);
+
     let logoUrl = '', coverUrl = '';
     if (logoFile) {
       const logoUpload = await cloudinary.uploader.upload(logoFile.path, { resource_type: 'image' });
@@ -71,23 +71,17 @@ const registerSociety = async (req, res) => {
       coverUrl = coverUpload.secure_url;
     }
 
-    console.log(logoUrl, coverUrl);
-    // Check if user already has a pending request
-    const existingRequest = await Society.findOne({
-      name
-    });
-
+    const existingRequest = await Society.findOne({ name });
     if (existingRequest) {
       return res.status(400).json({ message: 'Society with this name already exists' });
     }
 
     const newRequest = await Society.create({
-
+      name,
       description,
       logo: logoUrl,
       coverImage: coverUrl,
       website,
-      name,
       socialLinks: {
         instagram: req.body['socialLinks.instagram'] || '',
         linkedin: req.body['socialLinks.linkedin'] || ''
@@ -98,16 +92,18 @@ const registerSociety = async (req, res) => {
       createdBy: user._id
     });
 
+    // ✅ Corrected line
     await User.findByIdAndUpdate(user._id, {
-      $addToSet: { societies: societyId }
+      $addToSet: { societies: newRequest._id }
     });
-
-
-    res.status(201).json({ message: 'Society registration requested', request: newRequest });
+    console.log("user ", user.username, " regustered ", newRequest.name);
+    return res.status(201).json({ message: 'Society registration requested', request: newRequest });
   } catch (error) {
+    console.error('❌ Register Society Error:', error);
     res.status(500).json({ message: error.message });
   }
 };
+
 
 const getAllSocieties = async (req, res) => {
   // migratePendingRequests();
@@ -190,35 +186,71 @@ const getUserSocietyRegistrationRequests = async (req, res) => {
   }
 };
 
-const joinSociety = async (req, res) => {
+const toggleJoinSociety = async (req, res) => {
   const user = req.user;
   const societyId = req.params.id;
-  console.log("User trying to join society:", societyId, user._id);
+
+  console.log("User toggling join/leave society:", societyId, user._id);
+
   try {
     const society = await Society.findById(societyId);
     if (!society) {
       return res.status(404).json({ error: 'Society not found' });
     }
-    if (society.pendingRequests.some(req => req.userId.toString() === user._id.toString())) {
-      return res.status(400).json({ message: 'You have already sent a join request' });
+
+    const dbUser = await User.findById(user._id);
+    if (!dbUser) {
+      return res.status(404).json({ error: 'User not found' });
     }
 
-    if (society.members.includes(user._id)) {
-      return res.status(400).json({ message: 'You are already a member of this society' });
-    }
+    // Prevent admin from leaving their own society
     if (society.createdBy.toString() === user._id.toString()) {
-      return res.status(400).json({ message: 'You are already admin of this society' });
+      return res.status(400).json({ message: 'Admin cannot leave their own society' });
     }
+
+    // If already a member, remove from members and user's societies (leave society)
+    if (society.members.includes(user._id)) {
+      society.members = society.members.filter(
+        (memberId) => memberId.toString() !== user._id.toString()
+      );
+      dbUser.societies = dbUser.societies.filter(
+        (sId) => sId.toString() !== societyId
+      );
+
+      await society.save();
+      await dbUser.save();
+
+      return res.status(200).json({ message: 'You have left the society', society });
+    }
+
+    // If a join request was already sent, cancel it
+    const requestIndex = society.pendingRequests.findIndex(
+      (req) => req.userId.toString() === user._id.toString()
+    );
+
+    if (requestIndex !== -1) {
+      society.pendingRequests.splice(requestIndex, 1);
+      await society.save();
+      return res.status(200).json({ message: 'Join request cancelled', society });
+    }
+
+    // Check if inductions are open
     if (!society.inductionsOpen) {
       return res.status(400).json({ message: 'Inductions for this society are currently closed' });
     }
+
+    // Else, send join request
     society.pendingRequests.push({ userId: user._id, reason: req.body.reason });
     await society.save();
-    res.status(200).json({ message: 'Join request sent!', society });
+
+    return res.status(200).json({ message: 'Join request sent!', society });
+
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: error.message });
   }
 };
+
 
 const handleSocietyRegistrationRequest = async (req, res) => {
   try {
@@ -568,7 +600,7 @@ module.exports = {
   registerSociety,
   getUserSocieties,
   getAllSocieties,
-  joinSociety,
+  toggleJoinSociety,
   handleSocietyRegistrationRequest,
   updateSociety,
   getJoinRequests,

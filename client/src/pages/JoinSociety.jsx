@@ -3,6 +3,7 @@ import Navbar from '../components/Navbar';
 import './JoinSociety.css';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 
 const JoinSociety = () => {
@@ -11,7 +12,7 @@ const JoinSociety = () => {
   const [error, setError] = useState('');
   const [selectedSociety, setSelectedSociety] = useState(null);
   const [formData, setFormData] = useState({ name: '', email: '', reason: '' });
-
+  const user = useSelector(state => state.auth.user);
 
   useEffect(() => {
     const fetchSocieties = async () => {
@@ -35,14 +36,12 @@ const JoinSociety = () => {
   }, []);
 
   const handleApplyClick = (society) => {
-    const token = localStorage.getItem('token');
-    if (!token) {
+    if (!user) {
       toast.info('Please login to join this society.');
       navigate('/login');
       return;
     }
 
-    const user = JSON.parse(localStorage.getItem('user'));
     setFormData({
       name: user?.username || '',
       email: user?.email || '',

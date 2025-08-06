@@ -2,27 +2,70 @@ import React, { useState } from 'react';
 import './ProfileSettings.css';
 import AuthNavbar from '../components/AuthNavbar';
 import Sidebar from '../components/Sidebar';
+import { userLoggedIn } from '../features/authSlice';
+import { toast } from 'react-toastify';
+import { useDispatch, useSelector } from 'react-redux';
 
-const ProfileSettings = ({ user, onSignOut, societies = [] }) => {
+const ProfileSettings = ({ onSignOut, societies = [] }) => {
+  const user = useSelector((state) => state.auth.user);
   const [name, setName] = useState(user?.username || '');
   const [email, setEmail] = useState(user?.email || '');
   const [bio, setBio] = useState(user?.bio || '');
-  const [avatar, setAvatar] = useState(user?.avatar || '');
+  const [avatar, setAvatar] = useState(user?.pfp || '');
   const [password, setPassword] = useState('');
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
-
-  const handleSave = () => {
-    alert('Changes saved! (Backend not connected)');
-  };
+  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setAvatar(URL.createObjectURL(file));
+      setAvatar(file);
     }
   };
 
-  const handleDelete = () => {
+  const handleSave = async () => {
+    const formData = new FormData();
+    formData.append('username', name);
+    formData.append('email', email);
+    formData.append('bio', bio);
+    if (avatar instanceof File) {
+      formData.append('avatar', avatar);
+    }
+
+    setLoading(true);
+
+    try {
+      const res = await fetch('/api/user', {
+        method: 'PUT',
+        body: formData,
+        credentials: 'include'
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        toast.success('Profile updated!');        // Update avatar preview with new one if returned
+        if (data.user?.pfp) {
+          setAvatar(data.user.pfp);
+        }
+        if (data.user?.username) setName(data.user.username);
+        if (data.user?.email) setEmail(data.user.email);
+        if (data.user?.bio) setBio(data.user.bio);
+        dispatch(userLoggedIn(data.user));
+
+      } else {
+        toast.error('Failed to update profile: ' + data.error);
+      }
+    } catch (err) {
+      console.error('Update error:', err);
+      alert('Something went wrong while updating profile.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async () =>{
     if (!showPasswordConfirm) {
       setShowPasswordConfirm(true);
       return;
@@ -35,8 +78,28 @@ const ProfileSettings = ({ user, onSignOut, societies = [] }) => {
 
     const confirmDelete = window.confirm('Are you sure you want to permanently delete your account?');
     if (confirmDelete) {
-      alert('Account deleted (mock)');
-      // Backend delete logic goes here
+      try {
+        const res = await fetch('/api/user', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify({ password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          toast.success('Account deleted successfully!');
+          onSignOut(); 
+        } else {
+          toast.error(data?.error || 'Failed to delete account');
+        }
+      } catch (error) {
+        console.error('Error deleting account:', error);
+        toast.error('Something went wrong.');
+      }
     }
   };
 
@@ -51,11 +114,14 @@ const ProfileSettings = ({ user, onSignOut, societies = [] }) => {
           <div className="profile-section">
             <div className="avatar-preview">
               {avatar ? (
-                <img src={avatar} alt="Profile" />
+                <img
+                  src={avatar instanceof File ? URL.createObjectURL(avatar) : avatar}
+                  alt="Profile"
+                />
               ) : (
                 <div className="avatar-placeholder">No Image</div>
               )}
-              <input type="file" onChange={handleAvatarChange} />
+              <input type="file" accept="image/*" onChange={handleAvatarChange} />
             </div>
 
             <div className="info-fields">
@@ -66,6 +132,7 @@ const ProfileSettings = ({ user, onSignOut, societies = [] }) => {
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Your full name"
               />
+
               <label>Email</label>
               <input
                 type="text"
@@ -73,6 +140,7 @@ const ProfileSettings = ({ user, onSignOut, societies = [] }) => {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Your email"
               />
+
               <label>Bio</label>
               <textarea
                 value={bio}
@@ -80,8 +148,8 @@ const ProfileSettings = ({ user, onSignOut, societies = [] }) => {
                 placeholder="Tell something about yourself..."
               ></textarea>
 
-              <button className="save-btn" onClick={handleSave}>
-                Save Changes
+              <button className="save-btn" onClick={handleSave} disabled={loading}>
+                {loading ? 'Saving...' : 'Save Changes'}
               </button>
             </div>
           </div>

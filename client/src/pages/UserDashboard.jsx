@@ -123,7 +123,7 @@ const UserDashboard = () => {
   useEffect(() => {
     if (!user?._id) return;
     fetchDashboardData();
-  }, [user._id]);
+  }, [user?._id]);
 
    const {
     selectedEvent,
@@ -136,7 +136,7 @@ const UserDashboard = () => {
   } = useRSVP(fetchDashboardData);
 
   // console.log("User Dashboard events:", events);
-  console.log("User Dashboard upcomingEvents:", pastEvents);
+  // console.log("User Dashboard upcomingEvents:", pastEvents);
   // Use dummySocieties for Sidebar testing instead of fetched societies
   const adminSocieties = societies.filter(s => s.createdBy === user._id);
   const allUpcomingEvents = Object.values(upcomingEvents).flat();

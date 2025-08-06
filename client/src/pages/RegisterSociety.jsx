@@ -3,6 +3,7 @@ import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import './RegisterSociety.css';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const RegisterSociety = ({ user, societies }) => {
   const [name, setName] = useState('');
@@ -16,6 +17,7 @@ const RegisterSociety = ({ user, societies }) => {
   const [linkedin, setLinkedin] = useState('');
   const [type, setType] = useState('');
 
+  const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -42,6 +44,7 @@ const RegisterSociety = ({ user, societies }) => {
 
       if (res.ok) {
         toast.success('Society registration submitted successfully!');
+        navigate('/dashboard')
         setName('');
         setDescription('');
         setLogo(null);

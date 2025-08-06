@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const { registerSociety,
   getUserSocieties,
-  joinSociety,
+  toggleJoinSociety,
   getAllSocieties,
   getJoinRequests,
   handleJoinRequest,
@@ -50,8 +50,14 @@ router.put(
 router.post(
   '/:id/join',
   protect,
-  joinSociety
+  toggleJoinSociety
 );
+router.post(
+  '/:id/leave',
+  protect,
+  toggleJoinSociety
+);
+
 
 router.get(
   '/:id/requests',

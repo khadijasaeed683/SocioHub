@@ -5,12 +5,13 @@ import './SocietyDetails.css';
 import { FaInstagram, FaLinkedin, FaEnvelope, FaPhone } from 'react-icons/fa';
 import Navbar from '../components/Navbar';
 import { toast } from 'react-toastify';
+import { useSelector } from 'react-redux';
 
 const SocietyDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [society, setSociety] = useState(null);
-
+  const user = useSelector(state => state.auth.user);
   const [showApplyForm, setShowApplyForm] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '', reason: '' });
 
@@ -29,67 +30,71 @@ const SocietyDetails = () => {
   const handleFormChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
+  const hasJoined = society?.members?.some((member) => member._id === user._id);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const response = await fetch(`http://localhost:5000/api/society/${id}/join`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          reason: formData.reason,
-        }),
-      });
+      const response = await fetch(
+        `http://localhost:5000/api/society/${id}/${hasJoined ? 'leave' : 'join'}`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: user.username,
+            email: user.email,
+            reason: formData.reason, // optional on leave
+          }),
+        }
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
-        console.error('Join society failed:', data);
-
-        if (response.status === 401) {
-          toast.error('Please login to join this society.');
-          navigate('/login');
-          return;
-        }
-
-        toast.error(data.message || data.error || 'Failed to join society');
+        toast.error(data.message || 'Action failed');
       } else {
-        toast.success('Join request sent successfully!');
+        toast.success(hasJoined ? 'Left the society.' : 'Join request sent!');
+        // Optional: refresh society data to reflect changes
+        setSociety((prev) => ({
+          ...prev,
+          members: hasJoined
+            ? prev.members.filter((m) => m._id !== user._id)
+            : [...prev.members, { _id: user._id }],
+        }));
       }
     } catch (err) {
-      console.error('Error joining society:', err);
+      console.error('Error:', err);
       toast.error('Server error. Please try again later.');
     }
+
     setShowApplyForm(false);
     setFormData({ name: '', email: '', reason: '' });
   };
 
-    const handleJoinClick = () => {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    toast.info('Please login to join this society.');
-    navigate('/login');
-    return;
-  }
+  const handleJoinClick = () => {
+    if (!user) {
+      toast.info('Please login to join this society.');
+      navigate('/login');
+      return;
+    }
 
-  const user = JSON.parse(localStorage.getItem('user'));
-  setFormData({
-    name: user?.username || '',
-    email: user?.email || '',
-    reason: '',
-  });
+    setFormData({
+      name: user?.username || '',
+      email: user?.email || '',
+      reason: '',
+    });
 
-  setShowApplyForm(true);
-};
+    setShowApplyForm(true);
+  };
 
   if (!society) {
     return <div>Loading...</div>;
   }
+  console.log("FETCHED SOCIETY: ", society)
 
   return (
     <>
@@ -108,9 +113,19 @@ const SocietyDetails = () => {
             <img src={society.logo} alt={society.name} className="logo-img" />
             <h1>{society.name}</h1>
             <p className="type">{society.type}</p>
-            <button className="join-society-btn" onClick={handleJoinClick}>
-              Join {society.name}
+            <button
+              className="join-society-btn"
+              onClick={handleJoinClick}
+              disabled={society.pendingRequests?.some((req) => req.userId === user?._id)}
+            >
+              {society.pendingRequests?.some((req) => req.userId === user?._id)
+                ? 'Join request pending'
+                : society.members?.some((m) => m._id === user?._id)
+                  ? `Leave ${society.name}`
+                  : `Join ${society.name}`}
             </button>
+
+
           </div>
         </div>
 
@@ -167,8 +182,9 @@ const SocietyDetails = () => {
                 name="reason"
                 value={formData.reason}
                 onChange={handleFormChange}
-                placeholder="Why do you want to join?"
-              ></textarea>
+                placeholder={`Why do you want to ${hasJoined ? 'leave' : 'join'}?`}
+                required={!hasJoined}
+              />
               <div className="form-actions">
                 <button type="submit">Submit</button>
                 <button type="button" className="cancel-btn" onClick={() => setShowApplyForm(false)}>

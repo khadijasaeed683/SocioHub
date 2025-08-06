@@ -1,6 +1,5 @@
 // utils/jwtUtils.js
 const jwt = require('jsonwebtoken');
-const userModel = require('../models/userModel');
 
 const generateToken = (user) => {
   const token = jwt.sign(

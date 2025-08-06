@@ -21,6 +21,7 @@ const LandingPage = () => {
   const [canScrollEventRight, setCanScrollEventRight] = useState(true);
 
   const currentUser = useSelector(state => state.auth.user);
+  const isLoggedIn = useSelector((state) => state.auth.isAuthenticated)
   const navigate = useNavigate();
 
   // Fetch Events
@@ -107,7 +108,6 @@ const LandingPage = () => {
 
   const handleRegisterClick = (e) => {
     e.preventDefault();
-    const isLoggedIn = localStorage.getItem('token');
     if (isLoggedIn) navigate('/register-society');
     else {
       toast.warning('Please login first to register your society.');
