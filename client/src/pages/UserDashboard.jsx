@@ -5,8 +5,8 @@ import Sidebar from '../components/Sidebar';
 import './UserDashboard.css';
 import SocietyCard from '../components/SocietyCard';
 import EventCard from '../components/EventCard';
-import RSVPForm from './RSVPForm'; // adjust path if needed
-import useRSVP from '../hooks/useRSVP'; // custom hook for RSVP logic
+import RSVPForm from './RSVPForm';
+import useRSVP from '../hooks/useRSVP';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 
@@ -29,103 +29,86 @@ const UserDashboard = () => {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          // don't send Authorization if you're using cookies only
         },
         credentials: 'include'
       });
       const data = await response.json();
-      console.log('Login response:', data);
-
       if (!response.ok) {
-        toast.error('Unregistered failes');
-        setShowUnregisterForm(null);
-        setUnregisterReason('');
-        setPassword('');
+        toast.error('Unregistration failed');
       } else {
         toast.success('Unregistered successfully');
-        setShowUnregisterForm(null);
-        setUnregisterReason('');
-        setPassword('');
-        // Optionally, refresh the events list
         setEvents(events.filter(event => event._id !== eventId));
-        fetchDashboardData(); // Refresh dashboard data after unregistration
+        fetchDashboardData();
       }
-
     } catch (error) {
       console.error(error);
       alert(error.response?.data?.message || 'Failed to unregister');
+    } finally {
+      setShowUnregisterForm(null);
+      setUnregisterReason('');
+      setPassword('');
     }
   };
 
-
   const fetchDashboardData = async () => {
-      try {
-        const res1 = await fetch(`http://localhost:5000/api/user/events`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            // don't send Authorization if you're using cookies only
-          },
-          credentials: 'include'
-        });
+    try {
+      const res1 = await fetch(`http://localhost:5000/api/user/events`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include'
+      });
+      const data1 = await res1.json();
+      if (res1.ok) setEvents(data1);
 
-        const data1 = await res1.json();
-        if (res1.ok) {
-          setEvents(data1);
-        }
+      const res2 = await fetch(`http://localhost:5000/api/user/societies`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+      });
+      const data2 = await res2.json();
+      if (res2.ok) {
+        const societiesFetched = [...data2.registeredSocieties, ...data2.joinedSocieties];
+        setSocieties(societiesFetched);
 
-        // 🔸 Societies + upcoming events
-        const res2 = await fetch(`http://localhost:5000/api/user/societies`, {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-        });
+        const upcomingEventsMap = {};
+        const pastEventsMap = {};
 
-        const data2 = await res2.json();
-        if (res2.ok) {
-          const societiesFetched = [...data2.registeredSocieties, ...data2.joinedSocieties];
-          setSocieties(societiesFetched);
-
-          const upcomingEventsMap = {};
-          const pastEventsMap = {};
-          await Promise.all(
-            societiesFetched.map(async (society) => {
-              try {
-                const eventsRes = await fetch(`http://localhost:5000/api/society/${society._id}/event?include=all`, {
-                  method: 'GET',
-                  headers: { 'Content-Type': 'application/json' },
-                  credentials: 'include',
-                });
-
-                const eventsData = await eventsRes.json();
-                if (eventsRes.ok) {
-                  upcomingEventsMap[society._id] = eventsData.upcoming;
-                  pastEventsMap[society._id] = eventsData.past;
-                }
-              } catch (err) {
-
-                upcomingEventsMap[society._id] = [];
-                pastEventsMap[society._id] = [];
+        await Promise.all(
+          societiesFetched.map(async (society) => {
+            try {
+              const eventsRes = await fetch(`http://localhost:5000/api/society/${society._id}/event?include=all`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+              });
+              const eventsData = await eventsRes.json();
+              if (eventsRes.ok) {
+                upcomingEventsMap[society._id] = eventsData.upcoming;
+                pastEventsMap[society._id] = eventsData.past;
               }
-            })
-          );
+            } catch {
+              upcomingEventsMap[society._id] = [];
+              pastEventsMap[society._id] = [];
+            }
+          })
+        );
 
-          setUpcomingEvents(upcomingEventsMap);
-          setPastEvents(pastEventsMap);
-        }
-      } catch (err) {
-        setError('Something went wrong', err.message);
-      } finally {
-        setLoading(false);
+        setUpcomingEvents(upcomingEventsMap);
+        setPastEvents(pastEventsMap);
       }
-    };
+    } catch (err) {
+      setError('Something went wrong');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!user?._id) return;
     fetchDashboardData();
   }, [user?._id]);
 
-   const {
+  const {
     selectedEvent,
     setSelectedEvent,
     formData,
@@ -135,129 +118,117 @@ const UserDashboard = () => {
     handleInputChange,
   } = useRSVP(fetchDashboardData);
 
-  // console.log("User Dashboard events:", events);
-  // console.log("User Dashboard upcomingEvents:", pastEvents);
-  // Use dummySocieties for Sidebar testing instead of fetched societies
   const adminSocieties = societies.filter(s => s.createdBy === user._id);
   const allUpcomingEvents = Object.values(upcomingEvents).flat();
   const allPastEvents = Object.values(pastEvents).flat();
 
-  // ✅ Logout function
   const handleSignOut = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     navigate('/login');
   };
-  if (loading) {
-    return <p>Loading...</p>;
-  }
-  if (error) {
-    return <p>Error: {error}</p>;
-  }
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
+
   return (
     <>
       <AuthNavbar user={user} onSignOut={handleSignOut} />
       <div className="dashboard-layout">
-        <Sidebar
-          user={user}
-          societies={adminSocieties}
-        />
+        <Sidebar user={user} societies={adminSocieties} />
 
         <div className="dashboard-page">
           <h1>Welcome, {user.username}</h1>
 
-          <section className="joined-societies">
-            <h2>Active Societies</h2>
-            <div className="society-list">
-              {societies
-                .filter((society) => society.deactivated === false)
-                .map((society) => (
-                  <SocietyCard key={society._id} society={society} user={user} />
-                ))}
-            </div>
-          </section>
+          {societies.some(s => s.deactivated === false && s.approved === true) && (
+            <section className="joined-societies">
+              <h2>Active Societies</h2>
+              <div className="society-list">
+                {societies
+                  .filter(s => s.deactivated === false && s.approved === true)
+                  .map(s => (
+                    <SocietyCard key={s._id} society={s} user={user} />
+                  ))}
+              </div>
+            </section>
+          )}
 
-          <section className="joined-societies">
-            <h2>Deactivated Societies</h2>
-            <div className="society-list">
-              {societies
-                .filter((society) => society.deactivated === true)
-                .map((society) => (
-                  <SocietyCard key={society._id} society={society} user={user} />
-                ))}
-            </div>
-          </section>
+          {societies.some(s => s.deactivated === true) && (
+            <section className="joined-societies">
+              <h2>Deactivated Societies</h2>
+              <div className="society-list">
+                {societies
+                  .filter(s => s.deactivated === true)
+                  .map(s => (
+                    <SocietyCard key={s._id} society={s} user={user} />
+                  ))}
+              </div>
+            </section>
+          )}
 
-          <section className="joined-societies">
-            <h2>Pending Societies</h2>
-            <div className="society-list">
-              {societies
-                .filter((society) => society.approved === false)
-                .map((society) => (
-                  <SocietyCard key={society._id} society={society} user={user} />
-                ))}
-            </div>
-          </section>
+          {societies.some(s => s.approved === false) && (
+            <section className="joined-societies">
+              <h2>Pending Societies</h2>
+              <div className="society-list">
+                {societies
+                  .filter(s => s.approved === false)
+                  .map(s => (
+                    <SocietyCard key={s._id} society={s} user={user} />
+                  ))}
+              </div>
+            </section>
+          )}
 
-
-          <section className="user-events">
-            <h2>Registered Events</h2>
-            {events && events.length > 0 ? (
+          {events.length > 0 && (
+            <section className="user-events">
+              <h2>Registered Events</h2>
               <ul>
-                {events.map((event) => (
+                {events.map(event => (
                   <li key={event._id}>
                     {event.title} - {event.societyId.name}
                     <button
                       className="unregister-btn"
-                      onClick={() => setShowUnregisterForm(event._id)}>
+                      onClick={() => setShowUnregisterForm(event._id)}
+                    >
                       Unregister
                     </button>
                   </li>
                 ))}
               </ul>
-            ) : (
-              <p>No registered events to show.</p>
-            )}
-          </section>
+            </section>
+          )}
 
-
-          <section className="upcoming-events">
-            <h2>Upcoming Events in Your Societies</h2>
-
-            {allUpcomingEvents.length > 0 ? (
+          {allUpcomingEvents.length > 0 && (
+            <section className="upcoming-events">
+              <h2>Upcoming Events in Your Societies</h2>
               <div className="event-cards-container">
-                {allUpcomingEvents.map((event) => (
+                {allUpcomingEvents.map(event => (
                   <EventCard
                     key={event._id}
                     event={event}
-                    isRsvped={event.participants.some(rsvp => rsvp.email === user.email)}
+                    isRsvped={event.participants.some(r => r.email === user.email)}
                     onRSVPClick={handleRSVPClick}
                   />
                 ))}
               </div>
-            ) : (
-              <p>No upcoming events to show.</p>
-            )}
-          </section>
-          <section className="past-events">
-            <h2>Past Events in Your Societies</h2>
+            </section>
+          )}
 
-            {allPastEvents.length > 0 ? (
+          {allPastEvents.length > 0 && (
+            <section className="past-events">
+              <h2>Past Events in Your Societies</h2>
               <div className="event-cards-container">
-                {allPastEvents.map((event) => (
+                {allPastEvents.map(event => (
                   <EventCard
                     key={event._id}
                     event={event}
-                    isRsvped={event.participants.some(rsvp => rsvp.email === user.email)}
+                    isRsvped={event.participants.some(r => r.email === user.email)}
                     onRSVPClick={handleRSVPClick}
                   />
                 ))}
               </div>
-            ) : (
-              <p>No past events to show.</p>
-            )}
-          </section>
-
+            </section>
+          )}
 
           <div className="explore-button">
             <button onClick={() => navigate('/JoinSociety')}>
@@ -305,6 +276,7 @@ const UserDashboard = () => {
           </div>
         </div>
       )}
+
       {selectedEvent && (
         <RSVPForm
           event={selectedEvent}

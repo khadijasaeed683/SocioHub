@@ -158,7 +158,7 @@ const LandingPage = () => {
 
         <div className="card-grid">
           <div className="feature-card">
-            <img src="assets/events.png" alt="Manage Events" />
+            <img src="assets/events-.png" alt="Manage Events" />
             <p>Manage Events</p>
           </div>
           <div className="feature-card">
@@ -166,11 +166,11 @@ const LandingPage = () => {
             <p>Approve Members</p>
           </div>
           <div className="feature-card">
-            <img src="assets/profile.png" alt="Custom Profile" />
+            <img src="assets/profile-.png" alt="Custom Profile" />
             <p>Custom Profile</p>
           </div>
           <div className="feature-card">
-            <img src="assets/role.png" alt="Assign Roles" />
+            <img src="assets/role-.png" alt="Assign Roles" />
             <p>Assign Roles</p>
           </div>
           <div className="feature-card">

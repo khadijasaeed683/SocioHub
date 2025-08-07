@@ -191,7 +191,7 @@ body,
 }
 
 .feature-card {
-  background-color: #d4a8ca;
+  background-color: #e8b9dd;
   padding: 1rem;
   border-radius: 0.75rem;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
@@ -211,12 +211,12 @@ body,
 }
 
 .feature-card img {
-  height: 58px;
-  margin-bottom: 0.5rem;
+  height: 80px;
+  margin-bottom: 0.3rem;
 }
 
 .feature-card p {
-  font-size: 0.875rem;
+  font-size: 0.975rem;
   font-weight: 500;
   color: #4a4a4a;
 }
