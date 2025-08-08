@@ -11,7 +11,8 @@ const { registerSociety,
   getSocietyById,
   updateSociety,
   removeMember,
-  getSocietiesByApprovalStatus
+  getSocietiesByApprovalStatus,
+  deleteSociety
 } = require('../controllers/societyController');
 const { protect, authAdmin } = require('../middleware/authMiddleware');
 const upload = require('../middleware/multer');
@@ -26,7 +27,10 @@ router.get(
   '/:id',
   getSocietyById
 );
-
+// router.delete(
+//   '/:id',
+//   deleteSociety
+// );
 router.post(
   '/',
   protect,

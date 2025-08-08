@@ -116,26 +116,21 @@ const getAllEvents = async (req, res) => {
     }
 
     const now = new Date();
-
     let eventsData = {};
 
-    if (include === 'all') {
-      // Fetch both upcoming and past in parallel
-      const [upcomingEvents, pastEvents] = await Promise.all([
-        Event.find({ societyId, date: { $gte: now } })
-          .populate('societyId', 'name logo')
-          .populate('participants', 'name email')
-          .sort({ date: 1, startTime: 1 }),
+    if (include === 'all' || !include) {
+      // Fetch all and split into upcoming and past
+      const allEvents = await Event.find({ societyId })
+        .populate('societyId', 'name logo')
+        .populate('participants', 'name email')
+        .sort({ date: 1, startTime: 1 });
 
-        Event.find({ societyId, date: { $lt: now } })
-          .populate('societyId', 'name logo')
-          .populate('participants', 'name email')
-          .sort({ date: -1, startTime: -1 }) // most recent first
-      ]);
+      const upcomingEvents = allEvents.filter(event => event.date >= now);
+      const pastEvents = allEvents.filter(event => event.date < now);
 
       eventsData = {
         upcoming: upcomingEvents,
-        past: pastEvents,
+        past: pastEvents
       };
 
     } else if (include === 'upcoming') {
@@ -153,15 +148,6 @@ const getAllEvents = async (req, res) => {
         .sort({ date: -1, startTime: -1 });
 
       eventsData = { past };
-
-    } else {
-      // Default: return all events (no date filtering)
-      const all = await Event.find({ societyId })
-        .populate('societyId', 'name logo')
-        .populate('participants', 'name email')
-        .sort({ date: 1, startTime: 1 });
-
-      eventsData = { all };
     }
 
     return res.status(200).json(eventsData);
@@ -174,17 +160,26 @@ const getAllEvents = async (req, res) => {
 
 
 
+
 const getPublicEvents = async (req, res) => {
   try {
 
-    const events = await Event.find({})
-      .populate('societyId', 'name logo')
-      .populate('participants', 'name email')
+    const events = await Event.find({ isPublic: true })
+      .populate({
+        path: 'societyId',
+        match: { approved: true } // only populate approved societies
+      })
+      .populate('participants')
       .sort({ createdAt: -1 });
-    if (!events || events.length === 0) {
-      return res.status(404).json({ message: 'No events found for this society' });
+
+    const filteredEvents = events.filter(e => e.societyId); // remove those with no matching society
+
+    if (filteredEvents.length === 0) {
+      return res.status(404).json({ message: 'No approved public events found' });
     }
-    return res.status(200).json(events);
+
+    return res.status(200).json(filteredEvents);
+
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

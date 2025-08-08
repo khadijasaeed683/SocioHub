@@ -282,10 +282,11 @@ const handleSocietyRegistrationRequest = async (req, res) => {
         pendingSociety.createdBy,
         {
           role: 'society-head',
-          $push: { societies: pendingSociety._id },
+          $addToSet: { societies: pendingSociety._id }, // adds only if not exists
         },
         { new: true }
       );
+
       console.log("[DEBUG] User promoted to society-head:", updatedUser);
 
       return res.status(200).json({
@@ -581,13 +582,27 @@ const toggleSocietyActivation = async (req, res) => {
 };
 const deleteSociety = async (req, res) => {
   try {
-    const societyId = req.params.id;
+    const societyId = req.params.societyId;
+      console.log("deleting society: ", req.params)
 
     const society = await Society.findById(societyId);
     if (!society) {
       return res.status(404).json({ message: 'Society not found' });
     }
 
+    // Remove this society from all members' societies array
+    await User.updateMany(
+      { _id: { $in: society.members } },
+      { $pull: { societies: societyId } }
+    );
+
+    // Remove this society from creator's societies array
+    await User.updateOne(
+      { _id: society.createdBy },
+      { $pull: { societies: societyId } }
+    );
+
+    // Delete the society itself
     await Society.findByIdAndDelete(societyId);
 
     res.status(200).json({ message: 'Society deleted successfully.' });
@@ -596,6 +611,7 @@ const deleteSociety = async (req, res) => {
     res.status(500).json({ message: 'Server error while deleting society.' });
   }
 };
+
 module.exports = {
   registerSociety,
   getUserSocieties,
