@@ -1,10 +1,16 @@
+.navbar-logo {
+  height: 32px; /* adjust to match your navbar height */
+  width: auto;  /* keeps aspect ratio */
+  display: block;
+}
+
 .auth-navbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #1e1e2f; /* dark background */
+  background-color: #ffffff; /* dark background */
   padding: 10px 20px;
-  color: #f1f1f1;
+  color: #2e0032;
   position: fixed; /* stays at top */
   top: 0;
   left: 0;
@@ -14,10 +20,7 @@
   box-shadow: 0 2px 5px rgba(0,0,0,0.3);
   font-family: 'Segoe UI', sans-serif;
 }
-.logo-link{
-  font-size: 24px;
-  color: #f1f1f1;
-}
+
 .navbar-left {
   display: flex;
   align-items: center;
@@ -29,7 +32,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: #f1f1f1;
+  color: #2e0032;
   margin-bottom: 10px;
 }
 
@@ -53,7 +56,7 @@
   width: 35px;
   height: 35px;
   background-color: #4a90e2;
-  color: white;
+  color: 2e0032;
   font-weight: bold;
   font-size: 1rem;
   border-radius: 50%;
@@ -72,7 +75,7 @@
 
 .username {
   font-size: 1rem;
-  color: #f1f1f1;
+  color: #2e0032;
 }
 
 .dropdown-menu {
@@ -96,7 +99,7 @@
   padding: 8px 10px;
   text-align: left;
   font-size: 0.95rem;
-  color: #f1f1f1;
+  color: #ffffff;
   cursor: pointer;
   border-radius: 4px;
 }

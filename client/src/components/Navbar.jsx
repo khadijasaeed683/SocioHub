@@ -39,7 +39,7 @@ const Navbar = () => {
       <div className="navbar-left">
         <Link to="/" className="logo-link">
           <img 
-            src="/assets/Logo.png" 
+            src="/assets/Logo3.png" 
             alt="EventNest Logo" 
             className="navbar-logo" 
           />
