@@ -9,6 +9,7 @@
   align-items: center;
   justify-content: space-between;
   background-color: #ffffff; /* dark background */
+  
   padding: 10px 20px;
   color: #2e0032;
   position: fixed; /* stays at top */

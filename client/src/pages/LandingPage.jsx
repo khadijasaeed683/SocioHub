@@ -5,10 +5,10 @@ import './LandingPage.css';
 import { toast } from 'react-toastify';
 import Footer from '../components/Footer';
 import EventCard from '../components/EventCard';
+import SocietyCard from '../components/SocietyCard'; // <-- new import
 import { useSelector } from 'react-redux';
 import useRSVP from '../hooks/useRSVP';
 import RSVPForm from './RSVPForm';
-
 
 const LandingPage = () => {
   const [societies, setSocieties] = useState([]);
@@ -21,7 +21,7 @@ const LandingPage = () => {
   const [canScrollEventRight, setCanScrollEventRight] = useState(true);
 
   const currentUser = useSelector(state => state.auth.user);
-  const isLoggedIn = useSelector((state) => state.auth.isAuthenticated)
+  const isLoggedIn = useSelector(state => state.auth.isAuthenticated);
   const navigate = useNavigate();
 
   // Fetch Events
@@ -195,15 +195,16 @@ const LandingPage = () => {
               &lt;
             </button>
 
-            <div className="society-carousel" id="societyCarousel">
+            <div className="society-carousel no-scrollbar" id="societyCarousel">
               {societies.map((society, index) => (
-                <div key={society._id || index} className="society-card">
-                  <img src={society.logo || '/assets/default-logo.png'} alt={society.name} />
-                  <h3>{society.name}</h3>
-                  <button className="details-btn" onClick={() => handleViewDetails(society._id)}>
-                    View Details
-                  </button>
-                </div>
+                <SocietyCard
+                  key={society._id || index}
+                  logo={society.logo || '/assets/default-logo.png'}
+                  name={society.name}
+                  membersCount={society.membersCount || 0} // ✅ added
+                  onClick={() => handleViewDetails(society._id)}
+                />
+
               ))}
             </div>
 
@@ -236,7 +237,7 @@ const LandingPage = () => {
             ‹
           </button>
 
-          <div className="event-carousel" id="event-carousel">
+          <div className="event-carousel no-scrollbar" id="event-carousel">
             {events.map((event) => (
               <EventCard
                 key={event._id}
