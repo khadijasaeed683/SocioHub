@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Navbar from '../components/Navbar';
+import Navbar from '../components/AuthNavbar';
 import Sidebar from '../components/Sidebar';
 import './RegisterSociety.css';
 import { toast } from 'react-toastify';

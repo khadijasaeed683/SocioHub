@@ -31,7 +31,10 @@ const AuthNavbar = () => {
         <button className="hamburger" onClick={toggleSidebar}>
           ☰
         </button>
-        <Link to="/" className="logo-link">EventNest</Link>
+        <Link to="/" >
+          <img src="/assets/Logo3.png" alt="EventNest Logo" className="navbar-logo" />
+        </Link>
+
       </div>
 
       <div className="navbar-right">

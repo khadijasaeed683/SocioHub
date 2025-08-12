@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AuthNavbar from '../components/AuthNavbar';
 import Sidebar from '../components/Sidebar';
 import './UserDashboard.css';
-import SocietyCard from '../components/SocietyCard';
+import SocietyCard from '../components/UserSocietyCard';
 import EventCard from '../components/EventCard';
 import RSVPForm from './RSVPForm';
 import useRSVP from '../hooks/useRSVP';

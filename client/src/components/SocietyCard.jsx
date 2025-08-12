@@ -1,54 +1,26 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import './SocietyCard.css';
+import "./SocietyCard.css";
+import { FaUsers } from "react-icons/fa"; // ✅ members icon
 
-const SocietyCard = ({ society, user }) => {
-  const navigate = useNavigate();
-
-  const handleViewDetails = (id) => {
-    navigate(`/society/${id}`);
-  };
-
-  const handleRequestActivation = (societyId) => {
-    // Example: Send activation request to backend
-    console.log(`Requesting activation for society: ${societyId}`);
-    // You can implement the actual API call here if needed
-    alert('Activation request sent!');
-  };
-
-
+const SocietyCard = ({ logo, name, membersCount, category = "Music", onClick }) => {
   return (
-    <div className="card">
-      <div className="top-section">
-        <h1 className="society-name">{society.name}</h1>
+    <div className="Gsociety-card" onClick={onClick}>
+      <img
+        src={logo || "/assets/default-logo.png"}
+        alt={name}
+        className="Gsociety-logo"
+      />
+
+      {/* Name & Members Row */}
+      <div className="Gsociety-header">
+        <h3 className="Gsociety-name">{name}</h3>
+        <div className="Gsociety-members-count">
+          <FaUsers className="members-icon" />
+          <span>{membersCount}</span>
+        </div>
       </div>
 
-      <div className="bottom-section">
-        <div className="row row1">
-          <div className="item">
-            <span className="big-text">{society.members.length}</span>
-            <span className="regular-text">Members</span>
-          </div>
-          <div className="item">
-            <span className="big-text">{society.events.length}</span>
-            <span className="regular-text">Events</span>
-          </div>
-          <div className="item">
-            <span className="big-text">Role</span>
-            <span className="regular-text">
-              {society.createdBy === user._id ? 'Admin' : 'Member'}
-            </span>
-          </div>
-        </div>
-        {society.deactivated && (
-          <button className="details-btn" onClick={() => handleRequestActivation(society._id)}>
-            Request Activation
-          </button>
-        )}
-        <button className="details-btn" onClick={() => handleViewDetails(society._id)}>
-          View Details
-        </button>
-      </div>
+      {/* Category instead of "members" */}
+      <p className="Gsociety-category">{category}</p>
     </div>
   );
 };
