@@ -64,8 +64,8 @@ const Members = () => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
+          credentials: 'include'
         }
       );
       const data = await res.json();

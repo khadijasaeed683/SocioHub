@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import './Events.css';
 import { useSociety } from '../../context/SocietyContext';
-import {toast} from 'react-toastify'
+import { toast } from 'react-toastify'
+
 const Events = () => {
   const { society } = useSociety();
-  const [events, setEvents] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editEventId, setEditEventId] = useState(null);
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [pastEvents, setPastEvents] = useState([]);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -61,32 +63,33 @@ const Events = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (e, customData = null, customId = null) => {
+    if (e) e.preventDefault();
+
     const eventFormData = new FormData();
-    for (const key in formData) {
-      if (formData[key]) {
-        eventFormData.append(key, formData[key]);
+    const dataToSend = customData || formData;
+    const idToEdit = customId || editEventId;
+    for (const key in dataToSend) {
+      if (dataToSend[key] !== undefined && dataToSend[key] !== null && dataToSend[key] !== '') {
+        eventFormData.append(key, dataToSend[key]);
       }
     }
-
     try {
       const res = await fetch(
-        editEventId
-          ? `http://localhost:5000/api/event/${editEventId}`
+        idToEdit
+          ? `http://localhost:5000/api/event/${idToEdit}`
           : `http://localhost:5000/api/society/${society._id}/event`,
         {
-          method: editEventId ? 'PUT' : 'POST',
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
+          method: idToEdit ? 'PATCH' : 'POST',
           body: eventFormData,
+          credentials: 'include'
         }
       );
 
       const data = await res.json();
-
+      console.log(data);
       if (res.ok) {
+        toast.success(data.message);
         setShowForm(false);
         setEditEventId(null);
         setFormData({
@@ -99,17 +102,34 @@ const Events = () => {
           poster: null,
         });
 
-        setEvents((prev) =>
-          editEventId ? prev.map((ev) => (ev._id === editEventId ? data : ev)) : [data.event, ...prev]
-        );
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+
+        const eventDate = new Date(data.event.date);
+        eventDate.setHours(0, 0, 0, 0);
+
+        if (eventDate >= now) {
+  setUpcomingEvents((prev) => {
+    const exists = prev.some(ev => ev._id === data.event._id);
+    return exists ? prev.map(ev => ev._id === data.event._id ? data.event : ev)
+                  : [data.event, ...prev];
+  });
+} else {
+  setPastEvents((prev) => {
+    const exists = prev.some(ev => ev._id === data.event._id);
+    return exists ? prev.map(ev => ev._id === data.event._id ? data.event : ev)
+                  : [data.event, ...prev];
+  });
+}
+
       } else {
-        console.error('Error:', data.message);
+        toast.error(data.message);
       }
-      toast.success(data.message);
     } catch (error) {
       console.error('Submission error:', error);
     }
   };
+
 
   const handleConfirmation = (eventId, action) => {
     setConfirmTargetId(eventId);
@@ -118,67 +138,48 @@ const Events = () => {
   };
 
   const confirmActionHandler = async () => {
-  if (confirmAction === 'toggle') {
-    try {
-      const eventToToggle = events.find(ev => ev._id === confirmTargetId);
-      const res = await fetch(`http://localhost:5000/api/society/${society._id}/event/${confirmTargetId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({ rsvpOpen: !eventToToggle.rsvpOpen })
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        // Update local state to reflect backend change
-        setEvents((prev) =>
-          prev.map((ev) =>
-            ev._id === confirmTargetId ? { ...ev, rsvpOpen: data.event.rsvpOpen } : ev
-          )
-        );
-        toast.success(data.message);
-      } else {
-        console.error('Error toggling RSVP:', data.message);
-        toast.error(data.message);
-      }
-    } catch (error) {
-      console.error('Server error toggling RSVP:', error);
-      toast.error(error);
+    let targetEvent = upcomingEvents.find(ev => ev._id === confirmTargetId) ||
+      pastEvents.find(ev => ev._id === confirmTargetId);
+    if (confirmAction === 'toggle') {
+      setEditEventId(confirmTargetId);
+      // console.log("confirmTargetId: ", confirmTargetId);
+      // console.log("editEventId: ", editEventId);
+      // console.log("selected event to update: ", targetEvent)
+      setTimeout(() => {
+        handleSubmit(null, { rsvpOpen: !targetEvent.rsvpOpen }, confirmTargetId);
+      }, 0);
     }
-  } else if (confirmAction === 'delete') {
-  try {
-    const res = await fetch(`http://localhost:5000/api/event/${confirmTargetId}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+    else if (confirmAction === 'delete') {
+      try {
+        const res = await fetch(`http://localhost:5000/api/event/${confirmTargetId}`, {
+          method: 'DELETE',
+          credentials: 'include'
+        });
+        const data = await res.json();
+        if (res.ok) {
+          const now = new Date();
+          now.setHours(0, 0, 0, 0);
+
+          const eventDate = new Date(targetEvent.date);
+          eventDate.setHours(0, 0, 0, 0);
+
+          if (eventDate >= now) {
+            setUpcomingEvents((prev) => prev.filter(ev => ev._id !== confirmTargetId));
+          } else {
+            setPastEvents((prev) => prev.filter(ev => ev._id !== confirmTargetId));
+          }
+          toast.success(data.message);
+        } else {
+          toast.error(data.message);
+        }
+      } catch (error) {
+        console.error(error);
       }
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
-      // Update local state to remove the deleted event
-      setEvents((prev) => prev.filter((ev) => ev._id !== confirmTargetId));
-      toast.success(data.message);
-    } else {
-      console.error('Error deleting event:', data.message);
-      toast.error(data.message);
     }
-  } catch (error) {
-    console.error('Server error deleting event:', error);
-    toast.error(error);
-  }
-}
-
-
-  setShowConfirm(false);
-  setConfirmTargetId(null);
-  setConfirmAction('');
-};
-
+    setShowConfirm(false);
+    setConfirmTargetId(null);
+    setConfirmAction('');
+  };
 
   const cancelActionHandler = () => {
     setShowConfirm(false);
@@ -186,23 +187,25 @@ const Events = () => {
     setConfirmAction('');
   };
 
-  const today = new Date();
-  const upcomingEvents = events.filter((e) => new Date(e.date) >= today);
-  const pastEvents = events.filter((e) => new Date(e.date) < today);
+  // const today = new Date();
+  // const upcomingEvents = events?.filter((e) => new Date(e.date) >= today);
+  // const pastEvents = events?.filter((e) => new Date(e.date) < today);
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/society/${society._id}/event?upcoming=true`, {
+        const res = await fetch(`http://localhost:5000/api/society/${society._id}/event?include=all`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
           },
+          credentials: 'include'
         });
         const data = await res.json();
+        console.log(data)
         if (res.ok) {
-          setEvents(data);
+          setUpcomingEvents(data.upcoming);
+          setPastEvents(data.past);
         } else {
           console.error('Error fetching events:', data.message);
         }
@@ -310,31 +313,32 @@ const Events = () => {
       )}
 
       {showRSVPList && (
-  <div className="modal-overlay">
-    <div className="modal-form">
-      <h4>RSVP List</h4>
-      <ul>
-        {showRSVPList.participants.length > 0 ? (
-          showRSVPList.participants.map((participant, idx) => (
-            <li key={idx}>
-        {participant.name} ({participant.email}) {/* adjust fields as needed */}
-      </li>
-          ))
-        ) : (
-          <li>No RSVPs yet.</li>
-        )}
-      </ul>
-      <div className="form-actions">
-        <button className="cancel-btn" onClick={() => setShowRSVPList(null)}>Close</button>
-      </div>
-    </div>
-  </div>
-)}
+        <div className="modal-overlay">
+          <div className="modal-form">
+            <h4>RSVP List</h4>
+            <ul>
+              {showRSVPList.participants.length > 0 ? (
+                showRSVPList.participants.map((participant, idx) => (
+                  <li key={idx}>
+                    {participant.name} ({participant.email}) {/* adjust fields as needed */}
+                  </li>
+                ))
+              ) : (
+                <li>No RSVPs yet.</li>
+              )}
+            </ul>
+            <div className="form-actions">
+              <button className="cancel-btn" onClick={() => setShowRSVPList(null)}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
 
 
       <div className="events-section">
+        {/* Upcoming Events */}
         <h3>Upcoming Events</h3>
-        {upcomingEvents.length === 0 ? <p>No upcoming events.</p> : (
+        {Array.isArray(upcomingEvents) && upcomingEvents.length > 0 ? (
           upcomingEvents.map((event) => (
             <div key={event._id} className="event-card">
               <img src={event.poster} alt={event.title} className="event-banner" />
@@ -351,12 +355,52 @@ const Events = () => {
                   <button onClick={() => handleConfirmation(event._id, 'toggle')}>
                     {event.rsvpOpen ? '🔒 Close RSVP' : '🔓 Open RSVP'}
                   </button>
-                  <button onClick={() => setShowRSVPList(event)}>📋 View RSVPs</button>
+                  {event.participants && event.participants.length > 0 && (
+                    <button onClick={() => setShowRSVPList(event)}>
+                      📋 View RSVPs
+                    </button>
+                  )}
+
                   <button onClick={() => handleConfirmation(event._id, 'delete')}>🗑️ Delete</button>
                 </div>
               </div>
             </div>
           ))
+        ) : (
+          <p>No upcoming events.</p>
+        )}
+
+        {/* Past Events */}
+        <h3>Past Events</h3>
+        {Array.isArray(pastEvents) && pastEvents.length > 0 ? (
+          pastEvents.map((event) => (
+            <div key={event._id} className="event-card">
+              <img src={event.poster} alt={event.title} className="event-banner" />
+              <div className="event-details">
+                <h4>{event.title}</h4>
+                <p>📅 {new Date(event.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                <p>{event.description}</p>
+                <p>📍 Location: {event.location}</p>
+                <p>🕒 {formatTime(event.startTime)} – {formatTime(event.endTime)}</p>
+                <p>👥 Registrations: {event.participants?.length || 0}</p>
+                <p>🔓 RSVP: {event.rsvpOpen ? 'Open' : 'Closed'}</p>
+                <div className="event-actions">
+                  <button onClick={() => openEditForm(event)}>✏️ Edit</button>
+                  <button onClick={() => handleConfirmation(event._id, 'toggle')}>
+                    {event.rsvpOpen ? '🔒 Close RSVP' : '🔓 Open RSVP'}
+                  </button>
+                  {event.participants && event.participants.length > 0 && (
+                    <button onClick={() => setShowRSVPList(event)}>
+                      📋 View RSVPs
+                    </button>
+                  )}
+                  <button onClick={() => handleConfirmation(event._id, 'delete')}>🗑️ Delete</button>
+                </div>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p>No past events.</p>
         )}
       </div>
     </div>

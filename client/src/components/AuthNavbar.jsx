@@ -11,7 +11,6 @@ const AuthNavbar = () => {
   const toggleDropdown = () => setDropdownOpen(prev => !prev);
   const { handleLogout, loading } = useLogout();
   const user = useSelector(state => state.auth.user);
-
   const getInitials = (name) => {
     if (!name) return '';
     return name

@@ -38,7 +38,7 @@ const Overview = () => {
 
       const res = await fetch(`http://localhost:5000/api/society/${society._id}`, {
         method: 'PUT',
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+        credentials: 'include',
         body: formData,
       });
 
@@ -50,7 +50,7 @@ const Overview = () => {
         setSociety(data.society);
 
         if (field === 'description') setAbout(data.society.description);
-        else if (field === 'logo' || field === 'coverImage') ; // auto re-render
+        else if (field === 'logo' || field === 'coverImage'); // auto re-render
         else setSocials(prev => ({ ...prev, [field]: value }));
 
         setEditField('');

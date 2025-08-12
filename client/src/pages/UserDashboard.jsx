@@ -32,7 +32,7 @@ const UserDashboard = () => {
         },
         credentials: 'include'
       });
-      const data = await response.json();
+      // const data = await response.json();
       if (!response.ok) {
         toast.error('Unregistration failed');
       } else {
@@ -66,6 +66,7 @@ const UserDashboard = () => {
         credentials: 'include',
       });
       const data2 = await res2.json();
+      console.log(data2)
       if (res2.ok) {
         const societiesFetched = [...data2.registeredSocieties, ...data2.joinedSocieties];
         setSocieties(societiesFetched);

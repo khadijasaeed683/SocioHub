@@ -15,8 +15,8 @@ const ManageSocietyContent = () => {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
           },
+          credentials: 'include'
         });
         const data = await res.json();
 
