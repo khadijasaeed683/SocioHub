@@ -411,13 +411,17 @@ export default Events;
 
 
 const formatTime = (timeString) => {
+  if (!timeString || typeof timeString !== 'string') return ''; // or return 'Invalid time'
+
   const [hour, minute] = timeString.split(':');
   const date = new Date();
   date.setHours(parseInt(hour));
   date.setMinutes(parseInt(minute));
+  
   return date.toLocaleTimeString('en-US', {
     hour: 'numeric',
     minute: '2-digit',
     hour12: true
   });
 };
+

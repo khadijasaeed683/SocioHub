@@ -192,7 +192,7 @@ const LandingPage = () => {
               onClick={() => scrollSocietyCarousel('left')}
               disabled={!canScrollSocietyLeft}
             >
-              &lt;
+              ‹
             </button>
 
             <div className="society-carousel no-scrollbar" id="societyCarousel">
@@ -201,10 +201,9 @@ const LandingPage = () => {
                   key={society._id || index}
                   logo={society.logo || '/assets/default-logo.png'}
                   name={society.name}
-                  membersCount={society.membersCount || 0} // ✅ added
+                  membersCount={society.membersCount || 0}
                   onClick={() => handleViewDetails(society._id)}
                 />
-
               ))}
             </div>
 
@@ -213,7 +212,7 @@ const LandingPage = () => {
               onClick={() => scrollSocietyCarousel('right')}
               disabled={!canScrollSocietyRight}
             >
-              &gt;
+              ›
             </button>
           </div>
 
@@ -221,8 +220,9 @@ const LandingPage = () => {
         </div>
       </section>
 
+
       {/* Event Carousel */}
-      <section className="feature-section">
+      <section className="feature-section events">
         <div className="feature-text">
           <h2>Browse Public Events</h2>
           <p>Explore campus-wide public events and RSVP without logging in. Stay involved, effortlessly.</p>

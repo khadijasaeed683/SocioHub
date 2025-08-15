@@ -18,11 +18,15 @@ const EventCard = ({ event, isRsvped, onRSVPClick }) => {
               year: 'numeric', 
               month: 'long', 
               day: 'numeric' 
-          })} {event.time ? `at ${event.time}` : ''} 📍 {event.location}
+          })} 
+          {event.time && ` at ${event.time}`}
+          <br />
+          📍         {event.location}
         </p>
 
-        <p className="event-desc">📜 {event.description}</p>
-        <p className="event-society">🎓 Hosted by: {event.societyId.name}</p>
+
+        <p className="event-desc"> {event.description}</p>
+        <p className="event-society"> Hosted by: {event.societyId.name}</p>
 
         {event.isPublic && <span className="open-tag">Open to All</span>}
 

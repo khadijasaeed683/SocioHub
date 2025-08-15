@@ -1,5 +1,5 @@
 .event-card {
-  background-color:#fefefe;
+  background-color:#e8b9dd !important;
   padding: 24px;
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.1);
@@ -40,8 +40,9 @@
 }
 
 .event-society {
-  font-style: italic;
-  margin-bottom: 10px;
+  /* font-style: italic; */
+  font-weight: 500;
+  margin-bottom: 20px;
 }
 
 .open-tag {

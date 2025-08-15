@@ -69,7 +69,9 @@ body,
   font-size: 1rem;
   color: #000000;
   margin-bottom: 20px;
+  
 }
+
 
 .feature-img {
   flex: 1;
@@ -93,7 +95,6 @@ body,
 }
 
 .society-gallery::-webkit-scrollbar-thumb {
-  background: #a67c9d;
   border-radius: 4px;
 }
 
@@ -113,12 +114,13 @@ body,
 
 .feature-section {
   background-color: #ffffff;
-  padding: 2.5rem 1rem;
+  padding: 2.5rem 5rem;
   border-radius: 0.75rem;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch; /* makes .feature-text span full width */
 }
+
 
 .feature-header {
   width: 100%;
@@ -212,7 +214,6 @@ body,
   width: 100%;
   max-width: 1210px; /* Reduced for responsiveness */
   margin: 0 auto;
-  overflow: hidden;
 }
 
 .society-carousel {
@@ -234,9 +235,9 @@ body,
   position: relative;
   padding: 1rem 0;
   width: 100%;
-  max-width: 1300px;
+  max-width: 1210px;
   margin: auto;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .event-carousel {
@@ -252,7 +253,7 @@ body,
   height: 8px;
 }
 .event-carousel::-webkit-scrollbar-thumb {
-  background: #a67c9d;
+  background: #e8b9dd;
   border-radius: 4px;
 }
 
@@ -260,27 +261,32 @@ body,
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background-color: rgba(13, 6, 15, 0.4);
-  border: none;
-  color: white;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  font-size: 1.4rem;
-  cursor: pointer;
-  z-index: 10;
+  z-index: 2;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%; /* perfect circle */
+  background-color: white; /* default when NOT scrollable */
+  color: black;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.3s;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+
+
+
+/* Left arrow */
 .carousel-arrow.left {
-  left: 0;
+  left: -20px; /* half outside the carousel */
 }
+
+/* Right arrow */
 .carousel-arrow.right {
-  right: 0;
+  right: -20px; /* half outside the carousel */
 }
+
 
 .carousel-arrow:hover {
   background-color: rgba(13, 6, 15, 0.6);
@@ -301,3 +307,15 @@ body,
 .no-scrollbar::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
 }
+
+
+.feature-text {
+  text-align: left; /* force left alignment */
+  align-items: flex-start; /* if flexbox is used */
+}
+
+.feature-text h2,
+.feature-text p {
+  text-align: left; /* ensure headings & paragraphs follow */
+}
+
