@@ -119,7 +119,7 @@ const Overview = () => {
 
       {/* ✅ Logo Section */}
       <div className="logo-section">
-        <img src={society.logo} alt="Society Logo" className="society-logo" />
+        <img src={society.logo} alt="Society Logo" className="Osociety-logo" />
         <p className='society-name'>{society.name}</p>
         {editField === 'logo' ? (
           <>

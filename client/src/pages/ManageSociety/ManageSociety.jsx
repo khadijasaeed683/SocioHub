@@ -2,6 +2,7 @@ import { React, useEffect } from 'react';
 import { NavLink, Outlet, useParams, useNavigate } from 'react-router-dom';
 import './ManageSociety.css';
 import { SocietyProvider, useSociety } from '../../context/SocietyContext';
+import { FaHome } from 'react-icons/fa'; // ✅ Home icon
 
 const ManageSocietyContent = () => {
   const navigate = useNavigate();
@@ -37,43 +38,44 @@ const ManageSocietyContent = () => {
 
   return (
     <>
-      <div className="admin-navbar">
+      {/* ✅ Top Navbar Only */}
+      <div className="sadmin-navbar">
         <div className="admin-navbar-left">
-          <button className="back-btn" onClick={() => navigate('/dashboard')}>
-            ← Back
+          {/* ✅ Home button instead of back */}
+          <button className="home-btn" onClick={() => navigate('/dashboard')}>
+            <FaHome size={20} />
           </button>
         </div>
+
         <div className="admin-navbar-center">
           <h2>{society?.name} Management Portal</h2>
         </div>
-        <div className="admin-navbar-right" />
+
+        {/* ✅ Links moved to top navbar */}
+        <div className="admin-navbar-right">
+          <NavLink
+            to={`/manage-society/${id}/overview`}
+            className={({ isActive }) => (isActive ? 'active-link' : '')}
+          >
+            Overview
+          </NavLink>
+          <NavLink
+            to={`/manage-society/${id}/members`}
+            className={({ isActive }) => (isActive ? 'active-link' : '')}
+          >
+            Members
+          </NavLink>
+          <NavLink
+            to={`/manage-society/${id}/events`}
+            className={({ isActive }) => (isActive ? 'active-link' : '')}
+          >
+            Events
+          </NavLink>
+        </div>
       </div>
 
+      {/* ✅ No sidebar anymore */}
       <div className="manage-society-layout">
-        <aside className="manage-society-sidebar">
-          <h3 className="sidebar-heading">Admin Panel</h3>
-          <nav className="sidebar-links">
-            <NavLink
-              to={`/manage-society/${id}/overview`}
-              className={({ isActive }) => (isActive ? 'active-link' : '')}
-            >
-              Overview
-            </NavLink>
-            <NavLink
-              to={`/manage-society/${id}/members`}
-              className={({ isActive }) => (isActive ? 'active-link' : '')}
-            >
-              Members
-            </NavLink>
-            <NavLink
-              to={`/manage-society/${id}/events`}
-              className={({ isActive }) => (isActive ? 'active-link' : '')}
-            >
-              Events
-            </NavLink>
-          </nav>
-        </aside>
-
         <main className="manage-society-main">
           <Outlet />
         </main>

@@ -1,11 +1,10 @@
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { userLoggedOut } from '../features/authSlice'; // adjust path if needed
-import { useNavigate } from 'react-router-dom';
-import {useState} from 'react';
+import { useState } from 'react';
+
 const useLogout = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
   const handleLogout = async () => {
@@ -15,16 +14,17 @@ const useLogout = () => {
         withCredentials: true
       });
 
+      // Just update Redux state
       dispatch(userLoggedOut());
-      navigate('/login');
+
     } catch (error) {
       console.error('Logout failed:', error);
-    }finally{
+    } finally {
       setLoading(false);
     }
   };
 
-  return {handleLogout, loading};
+  return { handleLogout, loading };
 };
 
 export default useLogout;

@@ -45,15 +45,7 @@
   padding: 40px;
   overflow-y: auto;
 }
-.admin-navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: black;
-  color: white;
-  
-  padding: 15px 30px;
-}
+
 
 .admin-navbar h2 {
   font-size: 1.4rem;
@@ -71,4 +63,36 @@
 
 .back-btn:hover {
   text-decoration: underline;
+}
+.sadmin-navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8f8f8;
+  padding: 10px 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+.admin-navbar-left .home-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: #000;
+}
+
+.admin-navbar-right {
+  display: flex;
+  gap: 15px;
+}
+
+.admin-navbar-right a {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+}
+
+.admin-navbar-right .active-link {
+  color: #3e1a47;
+  border-bottom: 2px solid #b46490;
 }

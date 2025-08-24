@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
-import EventCard from '../components/EventCard'; // Assuming EventCard is a separate component
-import RSVPForm from './RSVPForm'; // Assuming RSVPForm is a separate component
+import EventCard from '../components/EventCard';
+import RSVPForm from './RSVPForm';
 import './ExploreEvents.css';
-import useRSVP from '../hooks/useRSVP'; // custom hook for RSVP logic
+import useRSVP from '../hooks/useRSVP';
 import { useSelector } from 'react-redux';
+import Footer from '../components/Footer'; // ✅ Import Footer
 
 const ExploreEvents = () => {
-  // const [rsvpedEvents, setRsvpedEvents] = useState([]);
   const currentUser = useSelector(state => state.auth.user);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState(""); // ✅ state for search
 
   const {
     selectedEvent,
@@ -51,23 +52,39 @@ const ExploreEvents = () => {
     return <p>Error: {error}</p>;
   }
 
+  // ✅ Filter events by search query
+  const filteredEvents = events.filter(event =>
+    event.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <>
       <Navbar />
       <div className="explore-events-page">
         <h2>Upcoming Events</h2>
+
+        {/* ✅ Search Bar */}
+        <input
+          type="text"
+          placeholder="Search events by name..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="eventsearch-bar"
+        />
+
         <div className="events-list">
-          {
-            console.log(events)}{
-            events.map((event) => (
+          {filteredEvents.length > 0 ? (
+            filteredEvents.map((event) => (
               <EventCard
                 key={event._id}
                 event={event}
                 isRsvped={event.participants?.some(p => p.email === currentUser?.email)}
                 onRSVPClick={handleRSVPClick}
               />
-
-            ))}
+            ))
+          ) : (
+            <p>No events found.</p>
+          )}
         </div>
 
         {/* RSVP Form Modal */}
@@ -79,9 +96,11 @@ const ExploreEvents = () => {
             onSubmit={handleFormSubmit}
             onCancel={() => setSelectedEvent(null)}
           />
-
         )}
       </div>
+
+      {/* ✅ Footer */}
+      <Footer />
     </>
   );
 };

@@ -18,7 +18,7 @@
   right: 0;
   height: 60px;
   z-index: 1000;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  box-shadow: 0 1px 5px rgba(0,0,0,0.3);
   font-family: 'Segoe UI', sans-serif;
 }
 
@@ -35,6 +35,11 @@
   cursor: pointer;
   color: #2e0032;
   margin-bottom: 10px;
+  padding-right: 20px;
+}
+.hamburger:hover {
+  background: none;
+  color: #2e0032; /* keep text color same */
 }
 
 .app-name {

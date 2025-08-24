@@ -32,7 +32,7 @@ const UserDashboard = () => {
         },
         credentials: 'include'
       });
-      // const data = await response.json();
+
       if (!response.ok) {
         toast.error('Unregistration failed');
       } else {
@@ -66,7 +66,7 @@ const UserDashboard = () => {
         credentials: 'include',
       });
       const data2 = await res2.json();
-      console.log(data2)
+
       if (res2.ok) {
         const societiesFetched = [...data2.registeredSocieties, ...data2.joinedSocieties];
         setSocieties(societiesFetched);
@@ -119,7 +119,8 @@ const UserDashboard = () => {
     handleInputChange,
   } = useRSVP(fetchDashboardData);
 
-  const adminSocieties = societies.filter(s => s.createdBy === user._id);
+  // ✅ safeguard against null
+  const adminSocieties = user ? societies.filter(s => s.createdBy === user._id) : [];
   const allUpcomingEvents = Object.values(upcomingEvents).flat();
   const allPastEvents = Object.values(pastEvents).flat();
 
@@ -128,6 +129,17 @@ const UserDashboard = () => {
     localStorage.removeItem('user');
     navigate('/login');
   };
+
+  if (!user) {
+    return (
+      <>
+        <AuthNavbar user={null} onSignOut={handleSignOut} />
+        <div className="dashboard-page">
+          <p>Please log in to view your dashboard.</p>
+        </div>
+      </>
+    );
+  }
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
@@ -186,7 +198,7 @@ const UserDashboard = () => {
               <ul>
                 {events.map(event => (
                   <li key={event._id}>
-                    {event.title} - {event.societyId.name}
+                    {event.title} - {event.societyId?.name}
                     <button
                       className="unregister-btn"
                       onClick={() => setShowUnregisterForm(event._id)}

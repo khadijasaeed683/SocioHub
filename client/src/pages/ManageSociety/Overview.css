@@ -23,15 +23,15 @@
 .logo-section {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
+  gap: 2rem;
   position: relative;
+  padding-top: 20px;
 }
 
-.society-logo {
-  width: 110px;
-  height: 110px;
-  object-fit: contain;
+.Osociety-logo {
+  width: 200px;
+  height: 200px;
+  object-fit:fill;
   border-radius: 10px;
   border: 2px solid #ccc;
 }

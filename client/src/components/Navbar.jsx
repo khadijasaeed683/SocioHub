@@ -46,9 +46,9 @@ const Navbar = () => {
         </Link>
       </div>
 
-
       <div className="navbar-right">
         <Link className="nav-link" to="/events">Events</Link>
+        <Link className="nav-link" to="/JoinSociety">Societies</Link> {/* ✅ New link */}
 
         {user ? (
           <div className="user-info" onClick={toggleDropdown}>
@@ -59,7 +59,7 @@ const Navbar = () => {
                 <span>{getInitials(user.username)}</span>
               )}
             </div>
-            <span >{user.username}</span>
+            <span>{user.username}</span>
 
             {dropdownOpen && (
               <div className="dropdown-menu">

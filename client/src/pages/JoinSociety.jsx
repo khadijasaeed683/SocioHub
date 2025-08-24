@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer'; // ✅ Import Footer
 import './JoinSociety.css';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-
 
 const JoinSociety = () => {
   const [societies, setSocieties] = useState([]);
@@ -12,7 +12,9 @@ const JoinSociety = () => {
   const [error, setError] = useState('');
   const [selectedSociety, setSelectedSociety] = useState(null);
   const [formData, setFormData] = useState({ name: '', email: '', reason: '' });
+  const [searchQuery, setSearchQuery] = useState(""); // ✅ Search state
   const user = useSelector(state => state.auth.user);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchSocieties = async () => {
@@ -52,7 +54,6 @@ const JoinSociety = () => {
     console.log('Selected society:', society);
   };
 
-
   const handleFormChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -62,16 +63,11 @@ const JoinSociety = () => {
     try {
       const response = await fetch(`http://localhost:5000/api/society/${selectedSociety._id}/join`, {
         method: 'POST',
-        credentials: 'include', // ✅ include cookies if using JWT httpOnly
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          // Authorization: `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          reason: formData.reason,
-        }),
+        body: JSON.stringify(formData),
       });
 
       const data = await response.json();
@@ -88,7 +84,6 @@ const JoinSociety = () => {
         toast.error(data.message || data.error || 'Failed to join society');
       } else {
         toast.success('Join request sent successfully!');
-
       }
     } catch (err) {
       console.error('Error joining society:', err);
@@ -97,43 +92,60 @@ const JoinSociety = () => {
     setSelectedSociety(null);
     setFormData({ name: '', email: '', reason: '' });
   };
-  const navigate = useNavigate();
 
   const handleViewDetails = (id) => {
     navigate(`/society/${id}`);
   };
+
+  // ✅ Filter societies by search query (safe handling)
+  const filteredSocieties = societies.filter(society =>
+    (society.name || "").toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <>
       <Navbar />
       <div className="join-society-page">
         <h2>Join a Society</h2>
+
+        {/* ✅ Search Bar */}
+        <input
+          type="text"
+          placeholder="Search societies by name..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="eventsearch-bar"
+        />
+
         <div className="society-list">
-          {societies.map((society) => (
-            <div key={society._id} className="society-card">
-              <img
-                src={society.logo || 'https://via.placeholder.com/80x80?text=No+Logo'}
-                alt={`${society.name} logo`}
-                className="society-logo"
-              />
-              <h3>{society.name}</h3>
-              <p>{society.description}</p>
-              {society.inductionsOpen && <span className="open-tag">Inductions Open</span>}
-              <div className="card-buttons">
-                <button
-                  disabled={!society.inductionsOpen}
-                  onClick={() => handleApplyClick(society)}
-                >
-                  {society.inductionsOpen ? 'Join' : 'Inductions Closed'}
-                </button>
+          {filteredSocieties.length > 0 ? (
+            filteredSocieties.map((society) => (
+              <div key={society._id} className="society-card">
+                <img
+                  src={society.logo || 'https://via.placeholder.com/80x80?text=No+Logo'}
+                  alt={`${society.name} logo`}
+                  className="society-logo"
+                />
+                <h3>{society.name}</h3>
+                <p>{society.description}</p>
+                {society.inductionsOpen && <span className="open-tag">Inductions Open</span>}
+                <div className="card-buttons">
+                  <button
+                    disabled={!society.inductionsOpen}
+                    onClick={() => handleApplyClick(society)}
+                  >
+                    {society.inductionsOpen ? 'Join' : 'Inductions Closed'}
+                  </button>
 
-                <button onClick={() => handleViewDetails(society._id)}>
-                  View Details
-                </button>
+                  <button onClick={() => handleViewDetails(society._id)}>
+                    Details
+                  </button>
+                </div>
               </div>
-
-            </div>
-          ))}
+            ))
+          ) : (
+            <p>No societies found.</p>
+          )}
         </div>
 
         {selectedSociety && (
@@ -162,7 +174,7 @@ const JoinSociety = () => {
                   value={formData.reason}
                   onChange={handleFormChange}
                   placeholder="Why do you want to join?"
-                  required="true"
+                  required
                 ></textarea>
                 <div className="form-actions">
                   <button type="submit">Submit</button>
@@ -175,6 +187,9 @@ const JoinSociety = () => {
           </div>
         )}
       </div>
+
+      {/* ✅ Footer */}
+      <Footer />
     </>
   );
 };
