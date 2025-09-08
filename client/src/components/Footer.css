@@ -1,7 +1,7 @@
 /* components/Footer.css */
 .eventnest-footer {
   background-color: #2C2A29;
-  color: #f1f1f1;
+  color: #f1f1f1 !important;
   padding: 30px 20px;
   font-size: 0.95rem;
   margin-top: auto;
@@ -23,7 +23,7 @@
 
 .footer-link,
 .footer-socials a {
-  color: #f1f1f1;
+  color: #f1f1f1 !important;
   text-decoration: none;
   transition: color 0.2s ease;
 }

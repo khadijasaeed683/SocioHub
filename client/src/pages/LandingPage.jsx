@@ -162,7 +162,7 @@ const LandingPage = () => {
             <p>Manage Events</p>
           </div>
           <div className="feature-card">
-            <img src="assets/members.avif" alt="Approve Members" />
+            <img src="assets/user.png" alt="Approve Members" />
             <p>Approve Members</p>
           </div>
           <div className="feature-card">
@@ -201,7 +201,8 @@ const LandingPage = () => {
                   key={society._id || index}
                   logo={society.logo || '/assets/default-logo.png'}
                   name={society.name}
-                  membersCount={society.membersCount || 0}
+                  membersCount={society.members ? society.members.length : 0}
+                  category={society.type}
                   onClick={() => handleViewDetails(society._id)}
                 />
               ))}

@@ -61,7 +61,7 @@ const ExploreEvents = () => {
     <>
       <Navbar />
       <div className="explore-events-page">
-        <h2>Upcoming Events</h2>
+        <h2>Sponsored Events</h2>
 
         {/* ✅ Search Bar */}
         <input
