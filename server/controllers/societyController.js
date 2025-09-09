@@ -417,15 +417,23 @@ const getSocietyMembers = async (req, res) => {
 const getSocietyById = async (req, res) => {
   const societyId = req.params.id;
   try {
-    const society = await Society.findById(societyId).populate('members', 'username email');
+    const society = await Society.findById(societyId)
+      .populate("members", "username email profilePic") // members
+      .populate({
+        path: "events",
+        populate: { path: "societyId", select: "name logo" }, // also populate society info inside event
+      });
+
     if (!society) {
-      return res.status(404).json({ error: 'Society not found' });
+      return res.status(404).json({ error: "Society not found" });
     }
+
     res.status(200).json(society);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
 const removeMember = async (req, res) => {
   const user = req.user; // Society head
   const { societyId, memberId } = req.params;

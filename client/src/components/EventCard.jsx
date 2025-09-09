@@ -2,6 +2,7 @@ import React from 'react';
 import './EventCard.css';
 
 const EventCard = ({ event, isRsvped, onRSVPClick }) => {
+  console.log("EventCard props:", { event, isRsvped });
   return (
     <div className="event-card">
       {event.poster && (

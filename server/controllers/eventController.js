@@ -5,7 +5,6 @@ const cloudinary = require('../config/cloudinary');
 const nodemailer = require('nodemailer');
 const generateQRCode = require('../utils/generateQRCode');
 const parseTimeToDate = require('../utils/parseTime');
-const generateEventPoster = require('../utils/generateEventPoster'); // Assuming you have a utility to generate posters
 
 const createEvent = async (req, res) => {
   try {
@@ -306,70 +305,87 @@ const updateEvent = async (req, res) => {
   try {
     const { title, description, startTime, endTime, location, date, isPublic, rsvpOpen } = req.body;
     const eventId = req.params.id;
-    console.log(req.files);
+
     const posterFile = (req.files && req.files.poster) ? req.files.poster[0] : null;
-    //  Find existing event
+
+    // Find existing event
     const event = await Event.findById(eventId);
     if (!event) {
       return res.status(404).json({ message: 'Event not found' });
     }
 
-    //  Update fields if provided
+    // Update basic fields
     if (title) event.title = title;
     if (description) event.description = description;
     if (location) event.location = location;
     if (isPublic !== undefined) event.isPublic = isPublic;
     if (rsvpOpen !== undefined) event.rsvpOpen = rsvpOpen;
-
-    //  Validate and update date if provided
+    console.log("2date: ", date);
+    // Update date only if user provides a new one
     if (date) {
-      const eventDate = new Date(date);
-      const today = new Date();
-      const todayDateOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-      if (eventDate < todayDateOnly) {
-        return res.status(400).json({ message: 'Event date must be in the future' });
-      }
-      event.date = eventDate;
-    }
-    console.log("st: ", startTime, "st: ", endTime)
-    //  Validate and update times if provided
-    let startTimeDate, endTimeDate;
-    // if (startTime) startTimeDate = parseTimeToDate(startTime);
-    // if (endTime) endTimeDate = parseTimeToDate(endTime);
+      const newDate = new Date(date);
+      const oldDate = new Date(event.date);
 
-    if (startTime && endTime && endTimeDate <= startTimeDate) {
-      return res.status(400).json({ message: 'End time must be after start time' });
+      // Normalize both dates to YYYY-MM-DD (ignore time)
+      const normalize = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      const normalizedNew = normalize(newDate);
+      const normalizedOld = normalize(oldDate);
+
+      // If user actually changed the date, then validate
+      if (normalizedNew.getTime() !== normalizedOld.getTime()) {
+        const today = normalize(new Date());
+        if (normalizedNew < today) {
+          return res.status(400).json({ message: 'Event date must be in the future' });
+        }
+      }
+
+      event.date = newDate; // always update, since frontend passes it
+    }
+
+
+    // Validate times
+    if (startTime && endTime) {
+      const [sh, sm] = startTime.split(':').map(Number);
+      const [eh, em] = endTime.split(':').map(Number);
+
+      const startTimeDate = new Date();
+      startTimeDate.setHours(sh, sm, 0, 0);
+
+      const endTimeDate = new Date();
+      endTimeDate.setHours(eh, em, 0, 0);
+
+      if (endTimeDate <= startTimeDate) {
+        return res.status(400).json({ message: 'End time must be after start time' });
+      }
     }
 
     if (startTime) event.startTime = startTime;
     if (endTime) event.endTime = endTime;
 
-    //  Upload new poster if provided
+    // Upload new poster if provided
     if (posterFile) {
       const posterUpload = await cloudinary.uploader.upload(posterFile.path, { resource_type: 'image' });
       event.poster = posterUpload.secure_url;
     }
-    // event.poster = await generateEventPoster(event); // Generate poster using OpenAI
-    //  Check for conflicting events at same location, date, and overlapping time
-    const conflictingEvent = await Event.findOne({
-      _id: { $ne: eventId }, // Exclude this event
-      location: event.location,
-      date: event.date,
-      $or: [
-        {
-          startTime: { $lt: event.endTime },
-          endTime: { $gt: event.startTime }
-        }
-      ]
-    });
 
-    if (conflictingEvent) {
-      return res.status(400).json({
-        message: `Location is already booked for another event (${conflictingEvent.title}) at this date and time.`
+    // Check for conflicting events (same date + location + overlapping times)
+    if (event.startTime && event.endTime) {
+      const conflictingEvent = await Event.findOne({
+        _id: { $ne: eventId }, // exclude current event
+        location: event.location,
+        date: event.date,
+        startTime: { $lt: event.endTime },
+        endTime: { $gt: event.startTime }
       });
+
+      if (conflictingEvent) {
+        return res.status(400).json({
+          message: `Location is already booked for another event (${conflictingEvent.title}) at this date and time.`
+        });
+      }
     }
 
-    //  Save updated event
+    // Save changes
     await event.save();
 
     res.status(200).json({ message: 'Event updated successfully', event });
@@ -379,6 +395,7 @@ const updateEvent = async (req, res) => {
     res.status(500).json({ message: 'Event update failed', error: error.message });
   }
 };
+
 
 const deleteEvent = async (req, res) => {
   const { id } = req.params;

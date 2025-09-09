@@ -41,18 +41,44 @@ const Events = () => {
   };
 
   const openEditForm = (event) => {
-    setFormData({
-      title: event.title,
-      date: event.date?.slice(0, 10),
-      description: event.description,
-      startTime: event.startTime,
-      endTime: event.endTime,
-      location: event.location,
-      poster: null,
-    });
-    setEditEventId(event._id);
-    setShowForm(true);
+  const formatForTimeInput = (timeString) => {
+    if (!timeString) return "";
+
+    // Try parsing time like "2:30 PM" or "14:30"
+    const date = new Date(`1970-01-01T${timeString}`);
+    if (!isNaN(date)) {
+      return date.toISOString().substr(11, 5); // HH:mm
+    }
+
+    // If stored as "HH:mm AM/PM"
+    const match = timeString.match(/(\d+):(\d+)\s*(AM|PM)?/i);
+    if (match) {
+      let [ , h, m, ampm ] = match;
+      h = parseInt(h, 10);
+      m = parseInt(m, 10);
+      if (ampm) {
+        if (ampm.toUpperCase() === "PM" && h < 12) h += 12;
+        if (ampm.toUpperCase() === "AM" && h === 12) h = 0;
+      }
+      return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
+    }
+
+    return timeString; // fallback
   };
+
+  setFormData({
+    title: event.title,
+    date: event.date?.slice(0, 10),
+    description: event.description,
+    startTime: formatForTimeInput(event.startTime),
+    endTime: formatForTimeInput(event.endTime),
+    location: event.location,
+    poster: null,
+  });
+  setEditEventId(event._id);
+  setShowForm(true);
+};
+
 
   const handleInputChange = (e) => {
     const { name, value, files } = e.target;
@@ -64,71 +90,100 @@ const Events = () => {
   };
 
   const handleSubmit = async (e, customData = null, customId = null) => {
-    if (e) e.preventDefault();
+  if (e) e.preventDefault();
 
-    const eventFormData = new FormData();
-    const dataToSend = customData || formData;
-    const idToEdit = customId || editEventId;
-    for (const key in dataToSend) {
-      if (dataToSend[key] !== undefined && dataToSend[key] !== null && dataToSend[key] !== '') {
-        eventFormData.append(key, dataToSend[key]);
-      }
+  const dataToSend = customData || formData;
+  const idToEdit = customId || editEventId;
+
+  // Validation for event date
+  if (dataToSend.date) {
+    const eventDate = new Date(dataToSend.date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (!idToEdit && eventDate < today) {
+      // Creating new event in the past → block
+      toast.error("Event date must be in the future.");
+      return;
     }
-    try {
-      const res = await fetch(
-        idToEdit
-          ? `http://localhost:5000/api/event/${idToEdit}`
-          : `http://localhost:5000/api/society/${society._id}/event`,
-        {
-          method: idToEdit ? 'PATCH' : 'POST',
-          body: eventFormData,
-          credentials: 'include'
-        }
-      );
 
-      const data = await res.json();
-      console.log(data);
-      if (res.ok) {
-        toast.success(data.message);
-        setShowForm(false);
-        setEditEventId(null);
-        setFormData({
-          title: '',
-          date: '',
-          description: '',
-          startTime: '',
-          endTime: '',
-          location: '',
-          poster: null,
+    // if (idToEdit && eventDate < today) {
+    //   // Editing → allow, but warn gently
+    //   toast.warn("You are updating a past event. It will remain in the past unless you reschedule it.");
+    // }
+  }
+
+  const eventFormData = new FormData();
+  for (const key in dataToSend) {
+    if (
+      dataToSend[key] !== undefined &&
+      dataToSend[key] !== null &&
+      dataToSend[key] !== ""
+    ) {
+      eventFormData.append(key, dataToSend[key]);
+    }
+  }
+
+  try {
+    const res = await fetch(
+      idToEdit
+        ? `http://localhost:5000/api/event/${idToEdit}`
+        : `http://localhost:5000/api/society/${society._id}/event`,
+      {
+        method: idToEdit ? "PATCH" : "POST",
+        body: eventFormData,
+        credentials: "include",
+      }
+    );
+
+    const data = await res.json();
+    if (res.ok) {
+      toast.success(data.message);
+      setShowForm(false);
+      setEditEventId(null);
+      setFormData({
+        title: "",
+        date: "",
+        description: "",
+        startTime: "",
+        endTime: "",
+        location: "",
+        poster: null,
+      });
+
+      // Update state lists (upcoming / past)
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      const eventDate = new Date(data.event.date);
+      eventDate.setHours(0, 0, 0, 0);
+
+      if (eventDate >= now) {
+        setUpcomingEvents((prev) => {
+          const exists = prev.some((ev) => ev._id === data.event._id);
+          return exists
+            ? prev.map((ev) =>
+                ev._id === data.event._id ? data.event : ev
+              )
+            : [data.event, ...prev];
         });
-
-        const now = new Date();
-        now.setHours(0, 0, 0, 0);
-
-        const eventDate = new Date(data.event.date);
-        eventDate.setHours(0, 0, 0, 0);
-
-        if (eventDate >= now) {
-  setUpcomingEvents((prev) => {
-    const exists = prev.some(ev => ev._id === data.event._id);
-    return exists ? prev.map(ev => ev._id === data.event._id ? data.event : ev)
-                  : [data.event, ...prev];
-  });
-} else {
-  setPastEvents((prev) => {
-    const exists = prev.some(ev => ev._id === data.event._id);
-    return exists ? prev.map(ev => ev._id === data.event._id ? data.event : ev)
-                  : [data.event, ...prev];
-  });
-}
-
       } else {
-        toast.error(data.message);
+        setPastEvents((prev) => {
+          const exists = prev.some((ev) => ev._id === data.event._id);
+          return exists
+            ? prev.map((ev) =>
+                ev._id === data.event._id ? data.event : ev
+              )
+            : [data.event, ...prev];
+        });
       }
-    } catch (error) {
-      console.error('Submission error:', error);
+    } else {
+      toast.error(data.message);
     }
-  };
+  } catch (error) {
+    console.error("Submission error:", error);
+  }
+};
+
 
 
   const handleConfirmation = (eventId, action) => {
@@ -336,73 +391,103 @@ const Events = () => {
 
 
       <div className="events-section">
-        {/* Upcoming Events */}
-        <h3>Upcoming Events</h3>
-        {Array.isArray(upcomingEvents) && upcomingEvents.length > 0 ? (
-          upcomingEvents.map((event) => (
-            <div key={event._id} className="event-card">
-              <img src={event.poster} alt={event.title} className="event-banner" />
-              <div className="event-details">
-                <h4>{event.title}</h4>
-                <p>📅 {new Date(event.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                <p>{event.description}</p>
-                <p>📍 Location: {event.location}</p>
-                <p>🕒 {formatTime(event.startTime)} – {formatTime(event.endTime)}</p>
-                <p>👥 Registrations: {event.participants?.length || 0}</p>
-                <p>🔓 RSVP: {event.rsvpOpen ? 'Open' : 'Closed'}</p>
-                <div className="event-actions">
-                  <button onClick={() => openEditForm(event)}>✏️ Edit</button>
-                  <button onClick={() => handleConfirmation(event._id, 'toggle')}>
-                    {event.rsvpOpen ? '🔒 Close RSVP' : '🔓 Open RSVP'}
-                  </button>
-                  {event.participants && event.participants.length > 0 && (
-                    <button onClick={() => setShowRSVPList(event)}>
-                      📋 View RSVPs
-                    </button>
-                  )}
-
-                  <button onClick={() => handleConfirmation(event._id, 'delete')}>🗑️ Delete</button>
-                </div>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p>No upcoming events.</p>
+  {/* Upcoming Events */}
+  <h3>Upcoming Events</h3>
+  {Array.isArray(upcomingEvents) && upcomingEvents.length > 0 ? (
+    upcomingEvents.map((event) => (
+      <div key={event._id} className="event-card">
+        {event.poster && (
+          <img
+            src={event.poster}
+            alt={event.title}
+            className="event-banner"
+          />
         )}
-
-        {/* Past Events */}
-        <h3>Past Events</h3>
-        {Array.isArray(pastEvents) && pastEvents.length > 0 ? (
-          pastEvents.map((event) => (
-            <div key={event._id} className="event-card">
-              <img src={event.poster} alt={event.title} className="event-banner" />
-              <div className="event-details">
-                <h4>{event.title}</h4>
-                <p>📅 {new Date(event.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                <p>{event.description}</p>
-                <p>📍 Location: {event.location}</p>
-                <p>🕒 {formatTime(event.startTime)} – {formatTime(event.endTime)}</p>
-                <p>👥 Registrations: {event.participants?.length || 0}</p>
-                <p>🔓 RSVP: {event.rsvpOpen ? 'Open' : 'Closed'}</p>
-                <div className="event-actions">
-                  <button onClick={() => openEditForm(event)}>✏️ Edit</button>
-                  <button onClick={() => handleConfirmation(event._id, 'toggle')}>
-                    {event.rsvpOpen ? '🔒 Close RSVP' : '🔓 Open RSVP'}
-                  </button>
-                  {event.participants && event.participants.length > 0 && (
-                    <button onClick={() => setShowRSVPList(event)}>
-                      📋 View RSVPs
-                    </button>
-                  )}
-                  <button onClick={() => handleConfirmation(event._id, 'delete')}>🗑️ Delete</button>
-                </div>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p>No past events.</p>
-        )}
+        <div className="event-details">
+          <h4>{event.title}</h4>
+          <p>
+            📅{" "}
+            {new Date(event.date).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </p>
+          <p>{event.description}</p>
+          <p>📍 Location: {event.location}</p>
+          <p>
+            🕒 {formatTime(event.startTime)} – {formatTime(event.endTime)}
+          </p>
+          <p>👥 Registrations: {event.participants?.length || 0}</p>
+          <p>🔓 RSVP: {event.rsvpOpen ? "Open" : "Closed"}</p>
+          <div className="event-actions">
+            <button onClick={() => openEditForm(event)}>✏️ Edit</button>
+            <button onClick={() => handleConfirmation(event._id, "toggle")}>
+              {event.rsvpOpen ? "🔒 Close RSVP" : "🔓 Open RSVP"}
+            </button>
+            {event.participants && event.participants.length > 0 && (
+              <button onClick={() => setShowRSVPList(event)}>📋 View RSVPs</button>
+            )}
+            <button onClick={() => handleConfirmation(event._id, "delete")}>
+              🗑️ Delete
+            </button>
+          </div>
+        </div>
       </div>
+    ))
+  ) : (
+    <p>No upcoming events.</p>
+  )}
+
+  {/* Past Events */}
+  <h3>Past Events</h3>
+  {Array.isArray(pastEvents) && pastEvents.length > 0 ? (
+    pastEvents.map((event) => (
+      <div key={event._id} className="event-card">
+        {event.poster && (
+          <img
+            src={event.poster}
+            alt={event.title}
+            className="event-banner"
+          />
+        )}
+        <div className="event-details">
+          <h4>{event.title}</h4>
+          <p>
+            📅{" "}
+            {new Date(event.date).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </p>
+          <p>{event.description}</p>
+          <p>📍 Location: {event.location}</p>
+          <p>
+            🕒 {formatTime(event.startTime)} – {formatTime(event.endTime)}
+          </p>
+          <p>👥 Registrations: {event.participants?.length || 0}</p>
+          <p>🔓 RSVP: {event.rsvpOpen ? "Open" : "Closed"}</p>
+          <div className="event-actions">
+            <button onClick={() => openEditForm(event)}>✏️ Edit</button>
+            <button onClick={() => handleConfirmation(event._id, "toggle")}>
+              {event.rsvpOpen ? "🔒 Close RSVP" : "🔓 Open RSVP"}
+            </button>
+            {event.participants && event.participants.length > 0 && (
+              <button onClick={() => setShowRSVPList(event)}>📋 View RSVPs</button>
+            )}
+            <button onClick={() => handleConfirmation(event._id, "delete")}>
+              🗑️ Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    ))
+  ) : (
+    <p>No past events.</p>
+  )}
+</div>
+
     </div>
   );
 };
