@@ -159,7 +159,7 @@ const Members = () => {
               style={{ cursor: isDeactivated ? 'not-allowed' : 'pointer', opacity: isDeactivated ? 0.5 : 1 }}
             >
               <div className="avatar">
-                {app.userId.pfp ? <img src={app.userId.pfp} alt="" /> : app.userId.username[0]}
+                {app.userId.profilePicture ? <img src={app.userId.pfp} alt="" /> : app.userId.username[0]}
               </div>
               <span>{app.userId.username}</span>
             </div>
