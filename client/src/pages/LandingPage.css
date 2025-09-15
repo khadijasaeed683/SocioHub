@@ -1,4 +1,4 @@
-/* Colour Code: 3e1a47, dark puple */
+/* Colour Code: 3e1a47, dark purple */
 /* Ensure full-height layout */
 html,
 body,
@@ -7,12 +7,14 @@ body,
   margin: 0;
   padding: 0;
 }
+
 .hero h1 {
   font-family: 'Playfair Display', serif;
   font-size: 3rem;
   font-weight: 600;
   color: #3e1a47;
 }
+
 .hero p {
   font-family: 'Inter', sans-serif;
   padding-bottom: 1.2%;
@@ -55,24 +57,33 @@ body,
   flex-direction: row-reverse;
 }
 
+.feature-section {
+  background-color: #ffffff;
+  padding: 2.5rem 5%;
+  border-radius: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* centers the whole section */
+}
+
+/* Force only text parts to stay left-aligned */
 .feature-text {
-  flex: 1;
-  min-width: 280px;
+  width: 100%;
+  max-width: 1200px;
+  text-align: left;
 }
- /* for join a socity heading */
-.feature-text h2 {
-  font-size: 1.8rem;
-  color: #2d2d2d;
-  margin-bottom: 10px;
+
+.feature-text h2,
+.feature-text p {
+  text-align: left; /* ensure headings & paragraphs stay left */
 }
+
 
 .feature-text p {
   font-size: 1rem;
   color: #000000;
   margin-bottom: 20px;
-  
 }
-
 
 .feature-img {
   flex: 1;
@@ -113,14 +124,6 @@ body,
   background-color: rgb(90, 100, 114);
 }
 
-.feature-section {
-  background-color: #ffffff;
-  padding: 2.5rem 5rem;
-  border-radius: 0.75rem;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch; /* makes .feature-text span full width */
-}
 
 
 .feature-header {
@@ -130,6 +133,8 @@ body,
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+  flex-wrap: wrap; /* allows wrapping for small screens */
+  gap: 1rem;
 }
 
 .feature-header h2 {
@@ -170,7 +175,7 @@ body,
 
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 1.5rem;
   width: 100%;
   max-width: 1200px;
@@ -183,12 +188,11 @@ body,
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
   text-align: center;
   transition: box-shadow 0.3s ease;
-  width: 200px;
-  height: 160px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  min-height: 160px;
 }
 
 .feature-card:hover {
@@ -196,14 +200,32 @@ body,
 }
 
 .feature-card img {
-  height: 80px;
-  margin-bottom: 0.3rem;
+  height: 70px;
+  margin-bottom: 0.5rem;
+  max-width: 100%;
 }
 
 .feature-card p {
   font-size: 0.975rem;
   font-weight: 500;
   color: #4a4a4a;
+}
+
+/* ✅ Responsive tweak for mobile */
+@media (max-width: 768px) {
+  .feature-header {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .feature-btn {
+    align-self: flex-start;
+  }
+
+  .feature-card {
+    min-height: 140px;
+  }
 }
 
 .society-carousel-container {
@@ -213,7 +235,7 @@ body,
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 1210px; /* Reduced for responsiveness */
+  max-width: 1210px;
   margin: 0 auto;
 }
 
@@ -253,6 +275,7 @@ body,
 .event-carousel::-webkit-scrollbar {
   height: 8px;
 }
+
 .event-carousel::-webkit-scrollbar-thumb {
   background: #e8b9dd;
   border-radius: 4px;
@@ -265,8 +288,8 @@ body,
   z-index: 2;
   width: 40px;
   height: 40px;
-  border-radius: 50%; /* perfect circle */
-  background-color: white; /* default when NOT scrollable */
+  border-radius: 50%;
+  background-color: white;
   color: black;
   display: flex;
   align-items: center;
@@ -275,19 +298,15 @@ body,
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-
-
-
 /* Left arrow */
 .carousel-arrow.left {
-  left: -20px; /* half outside the carousel */
+  left: -20px;
 }
 
 /* Right arrow */
 .carousel-arrow.right {
-  right: -20px; /* half outside the carousel */
+  right: -20px;
 }
-
 
 .carousel-arrow:hover {
   background-color: rgba(13, 6, 15, 0.6);
@@ -308,15 +327,3 @@ body,
 .no-scrollbar::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
 }
-
-
-.feature-text {
-  text-align: left; /* force left alignment */
-  align-items: flex-start; /* if flexbox is used */
-}
-
-.feature-text h2,
-.feature-text p {
-  text-align: left; /* ensure headings & paragraphs follow */
-}
-
