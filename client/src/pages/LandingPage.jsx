@@ -226,8 +226,14 @@ const LandingPage = () => {
       <section className="feature-section events">
         <div className="feature-text">
           <h2>Browse Public Events</h2>
-          <p>Explore campus-wide public events and RSVP without logging in. Stay involved, effortlessly.</p>
+          <p>
+            Explore campus-wide public events and RSVP without logging in. Stay involved, effortlessly.{" "}
+            <Link to="/events" className="inline-link">
+              Explore Events →
+            </Link>
+          </p>
         </div>
+
 
         <div className="event-carousel-container">
           <button
@@ -256,10 +262,6 @@ const LandingPage = () => {
           >
             ›
           </button>
-        </div>
-
-        <div className="center-btn">
-          <Link to="/events" className="feature-btn">Explore More Events</Link>
         </div>
       </section>
 

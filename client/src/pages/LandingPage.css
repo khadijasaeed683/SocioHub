@@ -327,3 +327,14 @@ body,
 .no-scrollbar::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
 }
+.inline-link {
+  color: #3e1a47;
+  font-weight: 600;
+  margin-left: 12px;  /* increased gap */
+  text-decoration: underline; /* always underlined */
+  transition: color 0.3s ease;
+}
+
+.inline-link:hover {
+  color: #cba2c1;
+}
